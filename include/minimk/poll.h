@@ -9,7 +9,6 @@
 #include <minimk/socket.h> // for minimk_socket_t
 
 #include <stddef.h> // for size_t
-#include <stdint.h> // for uintptr_t
 
 /// Type representing a pollable descriptor.
 struct minimk_pollfd {

@@ -8,7 +8,10 @@
 #include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
+
+#ifdef _WIN32
 #include <stdint.h> // for uintptr_t
+#endif
 
 /// Type representing a socket descriptor.
 ///

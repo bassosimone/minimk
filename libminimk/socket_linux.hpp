@@ -6,10 +6,12 @@
 #include <minimk/socket.h> // for minimk_socket_t
 
 #include <sys/socket.h> // for recv
+#include <sys/types.h>  // for ssize_t
 
 #include <fcntl.h>  // for fcntl
 #include <limits.h> // for SSIZE_MAX
 #include <netdb.h>  // for getaddrinfo
+#include <stddef.h> // for size_t
 #include <unistd.h> // for close
 
 // Testable minimk_socket_create implementation.

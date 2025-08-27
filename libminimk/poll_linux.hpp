@@ -2,15 +2,12 @@
 // Purpose: poll library for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <minimk/core.h>   // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/poll.h>   // for minimk_poll
-#include <minimk/socket.h> // for minimk_socket_t
+#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/poll.h>  // for minimk_poll
 
-#include <limits.h> // for UINT16_MAX
+#include <poll.h>   // for poll
 #include <stddef.h> // for offsetof
-
-#include <sys/poll.h> // for poll
+#include <stdint.h> // for UINT16_MAX
 
 // Ensure the structure definition is binary compatible
 static_assert(sizeof(struct minimk_pollfd) == sizeof(struct pollfd), "minimk_pollfd must have same size as pollfd");
