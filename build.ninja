@@ -14,4 +14,4 @@ build libminimk/errno_linux.o: cxx libminimk/errno_linux.cpp
 build libminimk/poll_linux.o: cxx libminimk/poll_linux.cpp
 build libminimk/socket_linux.o: cxx libminimk/socket_linux.cpp
 
-build libminimk/libminimk.a: ar libminimk/errno_linux.o libminimk/poll_linux.o libminimk/socket_linux.o
+build libminimk.a: ar libminimk/errno_linux.o libminimk/poll_linux.o libminimk/socket_linux.o
