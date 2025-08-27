@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 rule cxx
-  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -Wall -Wextra -c $in -o $out
+  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -c $in -o $out
   description = CXX $out
 
 rule asm
