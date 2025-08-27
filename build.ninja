@@ -1,0 +1,16 @@
+# File: build.ninja
+# Purpose: Build the project
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+rule cxx
+  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -Wall -Wextra -c $in -o $out
+  description = CXX KERNEL $out
+
+rule ar
+  command = ar rv $out $in
+  description = AR $out
+
+build libminimk/errno_linux.o: cxx libminimk/errno_linux.cpp
+build libminimk/socket_linux.o: cxx libminimk/socket_linux.cpp
+
+build libminimk/libminimk.a: ar libminimk/errno_linux.o libminimk/socket_linux.o
