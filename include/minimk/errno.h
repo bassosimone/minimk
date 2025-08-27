@@ -65,6 +65,9 @@ typedef uint32_t minimk_error_t;
 /// Connection timed out.
 #define MINIMK_ETIMEDOUT 16
 
+/// Out of memory.
+#define MINIMK_ENOMEM 17
+
 MINIMK_BEGIN_DECLS
 
 /// Clears the current errno value before invoking a system call.

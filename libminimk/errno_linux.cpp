@@ -60,6 +60,9 @@ minimk_error_t minimk_errno_get(void) noexcept {
     case ETIMEDOUT:
         return MINIMK_ETIMEDOUT;
 
+    case ENOMEM:
+        return MINIMK_ENOMEM;
+
     default:
         return MINIMK_EUNKNOWN;
     }

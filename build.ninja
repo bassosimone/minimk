@@ -4,7 +4,11 @@
 
 rule cxx
   command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -Wall -Wextra -c $in -o $out
-  description = CXX KERNEL $out
+  description = CXX $out
+
+rule asm
+  command = clang -O2 -c $in -o $out
+  description = ASM $out
 
 rule ar
   command = ar rv $out $in
@@ -12,6 +16,15 @@ rule ar
 
 build libminimk/errno_linux.o: cxx libminimk/errno_linux.cpp
 build libminimk/poll_linux.o: cxx libminimk/poll_linux.cpp
+build libminimk/runtime.o: cxx libminimk/runtime.cpp
 build libminimk/socket_linux.o: cxx libminimk/socket_linux.cpp
+build libminimk/stack_linux.o: cxx libminimk/stack_linux.cpp
+build libminimk/switch_linux_amd64.o: asm libminimk/switch_linux_amd64.S
 
-build libminimk.a: ar libminimk/errno_linux.o libminimk/poll_linux.o libminimk/socket_linux.o
+build libminimk.a: ar $
+  libminimk/errno_linux.o $
+  libminimk/poll_linux.o $
+  libminimk/runtime.o $
+  libminimk/socket_linux.o $
+  libminimk/stack_linux.o $
+  libminimk/switch_linux_amd64.o
