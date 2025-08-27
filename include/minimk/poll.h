@@ -20,16 +20,24 @@ struct minimk_pollfd {
 MINIMK_BEGIN_DECLS
 
 /// Function returning the POLLIN value used by the platform.
+///
+/// This function is thread-safe.
 short minimk_poll_pollin(void) MINIMK_NOEXCEPT;
 
 /// Function returning the POLLOUT value used by the platform.
+///
+/// This function is thread-safe.
 short minimk_poll_pollout(void) MINIMK_NOEXCEPT;
 
 /// Function returning the POLLERR value used by the platform.
+///
+/// This function is thread-safe.
 short minimk_poll_pollerr(void) MINIMK_NOEXCEPT;
 
 /// Function that blocks until sockets become readable/writable, a timeout expires
 /// or we are interrupted by a signal (thus returning MINIMK_EINTR).
+///
+/// This function is thread-safe.
 ///
 /// The fds argument points to an array of fds.
 ///
@@ -38,7 +46,8 @@ short minimk_poll_pollerr(void) MINIMK_NOEXCEPT;
 /// The timeout is the number of milliseconds to wait, if positive, zero to
 /// avoid blocking, and negative to block until I/O or signal.
 ///
-/// The nready return argument contains the number of ready descriptors.
+/// The nready return argument is set to zero when the function is called and
+/// contains the number of ready descriptors on success.
 ///
 /// The return value is zero on success or a nonzero error code on failure. Note
 /// that success includes the case where no descriptors are ready.
