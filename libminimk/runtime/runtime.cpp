@@ -147,8 +147,9 @@ static void sched_clean_exited(void) {
 /// Select the first runnable coroutine using a fair algorithm.
 static coroutine *sched_pick_runnable(size_t *fair) {
     // note that wrap is not UB for size_t
-    for (size_t idx = 0; idx < MAX_COROS; idx++, (*fair)++) {
+    for (size_t idx = 0; idx < MAX_COROS; idx++) {
         auto coro = &coroutines[(*fair) % MAX_COROS];
+        (*fair)++;
         if (coro->state == CORO_RUNNABLE) {
             return coro;
         }
