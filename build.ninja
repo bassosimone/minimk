@@ -6,6 +6,10 @@ rule cxx
   command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -c $in -o $out
   description = CXX $out
 
+rule cc
+  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra $in -o $out
+  description = CC $out
+
 rule asm
   command = clang -O2 -c $in -o $out
   description = ASM $out
@@ -30,3 +34,7 @@ build libminimk.a: ar $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
   libminimk/socket/socket_linux.o
+
+build examples/runtime/00_coroutine_hello.exe: cc examples/runtime/00_coroutine_hello.c libminimk.a
+
+build examples/runtime/01_coroutine_pingpong.exe: cc examples/runtime/01_coroutine_pingpong.c libminimk.a
