@@ -5,11 +5,11 @@
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_run
 
-#include <assert.h> // for assert
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uintptr_t
 #include <string.h> // for memset
 
+#include "assert.h" // for MINIMK_ASSERT
 #include "stack.h"  // for struct stack
 #include "switch.h" // for minimk_switch
 
@@ -66,9 +66,9 @@ static minimk_error_t find_free_coroutine_slot(coroutine **found) noexcept {
 }
 
 /// Trampoline for starting to execute a coroutine.
-static void coro_trampoline(void) {
+static void coro_trampoline(void) noexcept {
     // Ensure that we're in the coroutine world.
-    assert(current != nullptr);
+    MINIMK_ASSERT(current != nullptr);
 
     // Transfer control to the coroutine entry, which in turn may
     // voluntarily yield the control to other coroutines.
@@ -82,7 +82,7 @@ static void coro_trampoline(void) {
     minimk_runtime_yield();
 
     // We should never reach this line.
-    assert(false);
+    MINIMK_ASSERT(false);
 }
 
 /// Initialize the given coroutine or return a nonzero error.
@@ -111,7 +111,7 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
 }
 
 /// Free all resources and mark the coroutine slot as empty.
-static void destroy_coroutine(coroutine *coro) {
+static void destroy_coroutine(coroutine *coro) noexcept {
     (void)minimk_runtime_stack_free(&coro->stack);
     memset(coro, 0, sizeof(*coro)); // The zero state implies empty slot
 }
@@ -134,7 +134,7 @@ minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) noex
 }
 
 /// Frees resources used by all the exited coroutines.
-static void sched_clean_exited(void) {
+static void sched_clean_exited(void) noexcept {
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
         auto coro = &coroutines[idx];
         if (coro->state == CORO_EXITED) {
@@ -145,7 +145,7 @@ static void sched_clean_exited(void) {
 }
 
 /// Select the first runnable coroutine using a fair algorithm.
-static coroutine *sched_pick_runnable(size_t *fair) {
+static coroutine *sched_pick_runnable(size_t *fair) noexcept {
     // note that wrap is not UB for size_t
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
         auto coro = &coroutines[(*fair) % MAX_COROS];
@@ -159,7 +159,7 @@ static coroutine *sched_pick_runnable(size_t *fair) {
 
 void minimk_runtime_run(void) noexcept {
     // Ensure we are not yet inside the coroutine world.
-    assert(current == nullptr);
+    MINIMK_ASSERT(current == nullptr);
 
     // Continue until we're out of coroutines.
     for (size_t fair = 0;;) {
@@ -184,7 +184,7 @@ void minimk_runtime_run(void) noexcept {
 
 void minimk_runtime_yield(void) noexcept {
     // Ensure we're inside the coroutine world.
-    assert(current != nullptr);
+    MINIMK_ASSERT(current != nullptr);
 
     // Manually switch back to the scheduler stack.
     minimk_runtime_switch(&current->sp, scheduler_sp);
