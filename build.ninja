@@ -28,6 +28,8 @@ build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux
 
 build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
+build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
+
 build libminimk.a: ar $
   libminimk/errno/errno_linux.o $
   libminimk/poll/poll_linux.o $
@@ -35,8 +37,11 @@ build libminimk.a: ar $
   libminimk/runtime/runtime.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
-  libminimk/socket/socket_linux.o
+  libminimk/socket/socket_linux.o $
+  libminimk/time/monotonic_linux.o
 
 build examples/runtime/00_coroutine_hello.exe: cc examples/runtime/00_coroutine_hello.c libminimk.a
 
 build examples/runtime/01_coroutine_pingpong.exe: cc examples/runtime/01_coroutine_pingpong.c libminimk.a
+
+build examples/time/00_monotonic.exe: cc examples/time/00_monotonic.c libminimk.a
