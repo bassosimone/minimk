@@ -300,6 +300,30 @@ static void block_on_poll(void) noexcept {
     }
 }
 
+/// Utility function to factor code for switching coroutine.
+static inline void __sched_switch(void) noexcept {
+    // Log the state before switching
+    MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
+                 (unsigned long long)current,
+                 (unsigned long long)current->sp);
+
+    validate_coro_stack_pointer("before_switch", current);
+
+    MINIMK_TRACE("trace: scheduler_sp before switch: 0x%llx\n", (unsigned long long)scheduler_sp);
+
+    // Perform the actual switching
+    minimk_runtime_switch(&scheduler_sp, current->sp);
+
+    // Log the state after switching
+    MINIMK_TRACE("trace: scheduler: returned from coroutine<0x%llx> sp=%llx\n",
+                 (unsigned long long)current,
+                 (unsigned long long)scheduler_sp);
+
+    MINIMK_TRACE("trace: scheduler_sp after switch: 0x%llx\n", (unsigned long long)scheduler_sp);
+
+    validate_coro_stack_pointer("after_switch", current);
+}
+
 void minimk_runtime_run(void) noexcept {
     // Ensure we are not yet inside the coroutine world.
     MINIMK_ASSERT(current == nullptr);
@@ -321,26 +345,8 @@ void minimk_runtime_run(void) noexcept {
             continue;
         }
 
-        // Log the state before switching
-        MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
-                     (unsigned long long)current,
-                     (unsigned long long)current->sp);
-
-        validate_coro_stack_pointer("before_switch", current);
-
-        MINIMK_TRACE("trace: scheduler_sp before switch: 0x%llx\n", (unsigned long long)scheduler_sp);
-
-        // Perform the actual switching
-        minimk_runtime_switch(&scheduler_sp, current->sp);
-
-        // Log the state after switching
-        MINIMK_TRACE("trace: scheduler: returned from coroutine<0x%llx> sp=%llx\n",
-                     (unsigned long long)current,
-                     (unsigned long long)scheduler_sp);
-
-        MINIMK_TRACE("trace: scheduler_sp after switch: 0x%llx\n", (unsigned long long)scheduler_sp);
-
-        validate_coro_stack_pointer("after_switch", current);
+        // Transfer the control to the current coroutine
+        __sched_switch();
 
         // We're now inside the scheduler again.
         current = nullptr;
