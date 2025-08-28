@@ -1,4 +1,4 @@
-// File: src/libminimk/socket_linux.cpp
+// File: libminimk/socket/socket_linux.cpp
 // Purpose: socket library implemented for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 

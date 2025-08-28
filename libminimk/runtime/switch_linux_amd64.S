@@ -1,15 +1,15 @@
-    // File: libminimk/switch_linux_amd64.S
-    // Purpose: coroutine context-switching for linux amd64
+    // File: libminimk/runtime/switch_linux_amd64.S
+    // Purpose: coroutine context-switching for runtime on linux amd64
     // SPDX-License-Identifier: GPL-3.0-or-later
 
-    // void minimk_switch(
+    // void minimk_runtime_switch(
     //  uintptr_t *old_stack_ptr /* = rdi */,
     //  uintptr_t  new_stack_ptr /* = rsi */
     // );
     .text
-    .globl minimk_switch
-    .type minimk_switch, @function
-minimk_switch:
+    .globl minimk_runtime_switch
+    .type minimk_runtime_switch, @function
+minimk_runtime_switch:
     // Save callee-saved registers on current stack
     pushq %rbx
     pushq %rbp
@@ -35,16 +35,16 @@ minimk_switch:
     // Return (the return address is already on the stack on amd64)
     ret
 
-    .size minimk_switch, .-minimk_switch
+    .size minimk_runtime_switch, .-minimk_runtime_switch
 
-    // void minimk_init_coro_stack(
+    // void minimk_runtime_init_coro_stack(
     //  uintptr_t *stack_ptr  /* = rdi */,
     //  uintptr_t  stack_top  /* = rsi */,
     //  uintptr_t  trampoline /* = rdx */
     // );
-    .globl minimk_init_coro_stack
-    .type minimk_init_coro_stack, @function
-minimk_init_coro_stack:
+    .globl minimk_runtime_init_coro_stack
+    .type minimk_runtime_init_coro_stack, @function
+minimk_runtime_init_coro_stack:
     // Save the current stack pointer while we mess with the new stack
     movq %rsp, %rax
     
@@ -69,4 +69,4 @@ minimk_init_coro_stack:
     movq %rax, %rsp
     ret
 
-    .size minimk_init_coro_stack, .-minimk_init_coro_stack
+    .size minimk_runtime_init_coro_stack, .-minimk_runtime_init_coro_stack

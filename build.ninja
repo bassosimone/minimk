@@ -14,17 +14,19 @@ rule ar
   command = ar rv $out $in
   description = AR $out
 
-build libminimk/errno_linux.o: cxx libminimk/errno_linux.cpp
-build libminimk/poll_linux.o: cxx libminimk/poll_linux.cpp
-build libminimk/runtime.o: cxx libminimk/runtime.cpp
-build libminimk/socket_linux.o: cxx libminimk/socket_linux.cpp
-build libminimk/stack_linux.o: cxx libminimk/stack_linux.cpp
-build libminimk/switch_linux_amd64.o: asm libminimk/switch_linux_amd64.S
+build libminimk/errno/errno_linux.o: cxx libminimk/errno/errno_linux.cpp
+build libminimk/poll/poll_linux.o: cxx libminimk/poll/poll_linux.cpp
+
+build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
+build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
+build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
+
+build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
 build libminimk.a: ar $
-  libminimk/errno_linux.o $
-  libminimk/poll_linux.o $
-  libminimk/runtime.o $
-  libminimk/socket_linux.o $
-  libminimk/stack_linux.o $
-  libminimk/switch_linux_amd64.o
+  libminimk/errno/errno_linux.o $
+  libminimk/poll/poll_linux.o $
+  libminimk/runtime/runtime.o $
+  libminimk/runtime/stack_linux.o $
+  libminimk/runtime/switch_linux_amd64.o $
+  libminimk/socket/socket_linux.o

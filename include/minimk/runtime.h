@@ -1,8 +1,8 @@
 // File: include/minimk/runtime.h
 // Purpose: coroutine runtime.
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef LIBMINIMK_RUNTIME_H
-#define LIBMINIMK_RUNTIME_H
+#ifndef MINIMK_RUNTIME_H
+#define MINIMK_RUNTIME_H
 
 #include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
@@ -31,4 +31,4 @@ void minimk_runtime_yield(void) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 
-#endif // LIBMINIMK_RUNTIME_H
+#endif // MINIMK_RUNTIME_H

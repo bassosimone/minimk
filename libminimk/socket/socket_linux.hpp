@@ -1,6 +1,8 @@
-// File: libminimk/socket_linux.hpp
+// File: libminimk/socket/socket_linux.hpp
 // Purpose: socket library implemented for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
+#define LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 
 #include <minimk/errno.h>  // for minimk_errno_clear
 #include <minimk/socket.h> // for minimk_socket_t
@@ -116,3 +118,5 @@ minimk_error_t __minimk_socket_destroy(minimk_socket_t *sock) noexcept {
     *sock = -1;
     return (rc == 0) ? 0 : __minimk_errno_get();
 }
+
+#endif // LIBMINIMK_SOCKET_SOCKET_LINUX_HPP

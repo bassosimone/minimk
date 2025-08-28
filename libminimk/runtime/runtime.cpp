@@ -1,5 +1,5 @@
-// File: libminimk/runtime.cpp
-// Purpose: portable coroutine runtime.
+// File: libminimk/runtime/runtime.cpp
+// Purpose: cooperative coroutine runtime implementation
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <minimk/errno.h>   // for minimk_error_t
@@ -97,13 +97,13 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
     coro->opaque = opaque;
 
     // Allocate a stack for the coroutine
-    minimk_error_t rv = minimk_stack_alloc(&coro->stack);
+    minimk_error_t rv = minimk_runtime_stack_alloc(&coro->stack);
     if (rv != 0) {
         return rv;
     }
 
     // Use assembly to synthesize the stack frame
-    minimk_init_coro_stack(&coro->sp, minimk_stack_top(&coro->stack), (uintptr_t)coro_trampoline);
+    minimk_runtime_init_coro_stack(&coro->sp, minimk_runtime_stack_top(&coro->stack), (uintptr_t)coro_trampoline);
 
     // Mark as ready to run
     coro->state = CORO_RUNNABLE;
@@ -112,7 +112,7 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
 
 /// Free all resources and mark the coroutine slot as empty.
 static void destroy_coroutine(coroutine *coro) {
-    (void)minimk_stack_free(&coro->stack);
+    (void)minimk_runtime_stack_free(&coro->stack);
     memset(coro, 0, sizeof(*coro)); // The zero state implies empty slot
 }
 
@@ -174,7 +174,7 @@ void minimk_runtime_run(void) noexcept {
         }
 
         // Switch to current for a while.
-        minimk_switch(&scheduler_sp, current->sp);
+        minimk_runtime_switch(&scheduler_sp, current->sp);
 
         // We're now inside the scheduler again.
         current = nullptr;
@@ -186,5 +186,5 @@ void minimk_runtime_yield(void) noexcept {
     assert(current != nullptr);
 
     // Manually switch back to the scheduler stack.
-    minimk_switch(&current->sp, scheduler_sp);
+    minimk_runtime_switch(&current->sp, scheduler_sp);
 }

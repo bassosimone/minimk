@@ -1,6 +1,8 @@
-// File: libminimk/poll_linux.hpp
-// Purpose: poll library for linux
+// File: libminimk/poll/poll_linux.hpp
+// Purpose: poll library implemented for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
+#ifndef LIBMINIMK_POLL_POLL_LINUX_HPP
+#define LIBMINIMK_POLL_POLL_LINUX_HPP
 
 #include <minimk/errno.h> // for minimk_error_t
 #include <minimk/poll.h>  // for minimk_poll
@@ -33,3 +35,5 @@ minimk_error_t __minimk_poll(struct minimk_pollfd *fds, size_t size, int timeout
     *nready = (success) ? (size_t)rv : 0;
     return (success) ? 0 : __minimk_errno_get();
 }
+
+#endif // LIBMINIMK_POLL_POLL_LINUX_HPP
