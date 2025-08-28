@@ -50,6 +50,14 @@ minimk_runtime_init_coro_stack:
     
     // Temporarily switch to new coroutine stack
     movq %rsi, %rsp
+
+    // Add padding so that before calling any C function the stack
+    // ends up being aligned on a 16 bytes boundary, which is the
+    // requirement from the ABI we're using.
+    //
+    // The switching code will never pick up on this padding but this
+    // will ensure we have a properly aligned stack for SIMD code.
+    pushq $0    // padding
     
     // Push trampoline address as the address to return to
     pushq %rdx
