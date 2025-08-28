@@ -11,8 +11,17 @@
 
 /// Stack allocated by a coroutine.
 struct stack {
+    /// The point in memory where the guard page starts.
     uintptr_t base;
+
+    /// The totally allocated stack size.
     size_t size;
+
+    /// The top of the stack where we should point the stack pointer.
+    uintptr_t top;
+
+    /// The bottom of the stack, where the stack ends.
+    uintptr_t bottom;
 };
 
 MINIMK_BEGIN_DECLS
@@ -26,14 +35,6 @@ minimk_error_t minimk_runtime_stack_alloc(struct stack *sp) MINIMK_NOEXCEPT;
 ///
 /// Additionally, zeroes the stack structure.
 minimk_error_t minimk_runtime_stack_free(struct stack *sp) MINIMK_NOEXCEPT;
-
-/// Returns the pointer to the stack top.
-///
-/// This function assumes the stack grows downwards, which should
-/// be the case on arm64 and amd64 and possibly other platforms.
-static inline uintptr_t minimk_runtime_stack_top(struct stack *sp) MINIMK_NOEXCEPT {
-    return sp->base + sp->size;
-}
 
 MINIMK_END_DECLS
 

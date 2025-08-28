@@ -12,6 +12,7 @@
 #include "assert.h" // for MINIMK_ASSERT
 #include "stack.h"  // for struct stack
 #include "switch.h" // for minimk_switch
+#include "trace.h"  // for MINIMK_TRACE
 
 /// The coroutine slot is unused.
 #define CORO_NULL 0
@@ -59,6 +60,7 @@ static minimk_error_t find_free_coroutine_slot(coroutine **found) noexcept {
         if (coro->state != CORO_NULL) {
             continue;
         }
+        MINIMK_TRACE("trace: found free coroutine<0x%llx>\n", (unsigned long long)coro);
         *found = coro;
         return 0;
     }
@@ -77,6 +79,7 @@ static void coro_trampoline(void) noexcept {
     // Mark the coroutine as exited and the scheduler will
     // take care of freeing the allocated resources.
     current->state = CORO_EXITED;
+    MINIMK_TRACE("trace: coroutine<0x%llx> EXITED\n", (unsigned long long)current);
 
     // Transfer the control back to the scheduler.
     minimk_runtime_yield();
@@ -103,16 +106,22 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
     }
 
     // Use assembly to synthesize the stack frame
-    minimk_runtime_init_coro_stack(&coro->sp, minimk_runtime_stack_top(&coro->stack), (uintptr_t)coro_trampoline);
+    minimk_runtime_init_coro_stack(&coro->sp, coro->stack.top, (uintptr_t)coro_trampoline);
+
+    MINIMK_TRACE("trace: coroutine<0x%llx> stack layout:\n", (unsigned long long)coro);
+    MINIMK_TRACE("    stack_top: 0x%llx\n", (unsigned long long)coro->stack.top);
+    MINIMK_TRACE("    sp: 0x%llx\n", (unsigned long long)coro->sp);
 
     // Mark as ready to run
     coro->state = CORO_RUNNABLE;
+    MINIMK_TRACE("trace: coroutine<0x%llx> RUNNABLE\n", (unsigned long long)coro);
     return 0;
 }
 
 /// Free all resources and mark the coroutine slot as empty.
 static void destroy_coroutine(coroutine *coro) noexcept {
     (void)minimk_runtime_stack_free(&coro->stack);
+    MINIMK_TRACE("trace: coroutine<0x%llx> NULL\n", (unsigned long long)coro);
     memset(coro, 0, sizeof(*coro)); // The zero state implies empty slot
 }
 
@@ -157,6 +166,20 @@ static coroutine *sched_pick_runnable(size_t *fair) noexcept {
     return nullptr;
 }
 
+/// Ensures that the coroutine stack pointer is within the allocated region
+static inline void validate_coro_stack_pointer(const char *context, coroutine *coro) noexcept {
+    struct stack *stack = &coro->stack;
+    uintptr_t sp = coro->sp;
+
+    MINIMK_TRACE("trace: %s: validating sp=0x%llx in stack[0x%llx, 0x%llx)\n",
+                 context,
+                 (unsigned long long)sp,
+                 (unsigned long long)stack->bottom,
+                 (unsigned long long)stack->top);
+
+    MINIMK_ASSERT(sp >= stack->bottom && sp < stack->top);
+}
+
 void minimk_runtime_run(void) noexcept {
     // Ensure we are not yet inside the coroutine world.
     MINIMK_ASSERT(current == nullptr);
@@ -174,8 +197,26 @@ void minimk_runtime_run(void) noexcept {
             break;
         }
 
-        // Switch to current for a while.
+        // Log the state before switching
+        MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
+                     (unsigned long long)current,
+                     (unsigned long long)current->sp);
+
+        validate_coro_stack_pointer("before_switch", current);
+
+        MINIMK_TRACE("trace: scheduler_sp before switch: 0x%llx\n", (unsigned long long)scheduler_sp);
+
+        // Perform the actual switching
         minimk_runtime_switch(&scheduler_sp, current->sp);
+
+        // Log the state after switching
+        MINIMK_TRACE("trace: scheduler: returned from coroutine<0x%llx> sp=%llx\n",
+                     (unsigned long long)current,
+                     (unsigned long long)scheduler_sp);
+
+        MINIMK_TRACE("trace: scheduler_sp after switch: 0x%llx\n", (unsigned long long)scheduler_sp);
+
+        validate_coro_stack_pointer("after_switch", current);
 
         // We're now inside the scheduler again.
         current = nullptr;

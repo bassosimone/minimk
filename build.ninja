@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 rule cxx
-  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -c $in -o $out
+  command = clang++ -Iinclude -O2 -DMINIMK_ENABLE_TRACE -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -c $in -o $out
   description = CXX $out
 
 rule cc
-  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra $in -o $out
+  command = clang -Iinclude -O2 -DMINIMK_ENABLE_TRACE -std=c11 -Wall -Wextra $in -o $out
   description = CC $out
 
 rule asm
@@ -25,6 +25,7 @@ build libminimk/runtime/assert.o: cxx libminimk/runtime/assert.cpp
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
+build libminimk/runtime/trace.o: cxx libminimk/runtime/trace.cpp
 
 build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
@@ -37,6 +38,7 @@ build libminimk.a: ar $
   libminimk/runtime/runtime.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
+  libminimk/runtime/trace.o $
   libminimk/socket/socket_linux.o $
   libminimk/time/monotonic_linux.o
 
