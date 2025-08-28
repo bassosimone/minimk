@@ -8,6 +8,7 @@
 #include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
+#include <stdint.h> // for uintptr_t
 
 /// Stack allocated by a coroutine.
 struct stack {

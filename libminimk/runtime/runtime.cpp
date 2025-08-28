@@ -3,8 +3,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/poll.h>    // for minimk_poll
 #include <minimk/runtime.h> // for minimk_runtime_run
+#include <minimk/time.h>    // for minimk_time_monotonic_now
 
+#include <limits.h> // for INT_MAX
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uintptr_t
 #include <string.h> // for memset
@@ -14,14 +17,19 @@
 #include "switch.h" // for minimk_switch
 #include "trace.h"  // for MINIMK_TRACE
 
-/// The coroutine slot is unused.
+#include "../integer/u64.h" // for minimk_integer_u64_satadd
+
+/// Unused coroutine slot.
 #define CORO_NULL 0
 
-/// The coroutine can run immediately.
+/// Coroutine can run immediately.
 #define CORO_RUNNABLE 1
 
-/// The coroutine has finished.
+/// Coroutine has terminated.
 #define CORO_EXITED 2
+
+/// Coroutine is blocked awaiting for a deadline.
+#define CORO_BLOCKED_ON_TIMER 3
 
 /// Portable coroutine state.
 ///
@@ -39,6 +47,10 @@ struct coroutine {
 
     /// State.
     unsigned long state;
+
+    /// Management of the blocked state.
+    uint64_t deadline;
+
 } __attribute__((aligned(16)));
 
 /// Maximum number of coroutines we can create.
@@ -91,8 +103,6 @@ static void coro_trampoline(void) noexcept {
 /// Initialize the given coroutine or return a nonzero error.
 static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque), void *opaque) noexcept {
     // Zero initialize the whole coroutine
-    //
-    // If we're not aligned, this may backfire on arm64
     memset(coro, 0, sizeof(*coro));
 
     // Initialize the entry
@@ -153,6 +163,30 @@ static void sched_clean_exited(void) noexcept {
     }
 }
 
+/// Possibly resume the coroutine given the current time and the revents.
+static void sched_maybe_resume(coroutine *coro, uint64_t now, short revents) noexcept {
+    // Compute whether the coroutine was blocked on a timer and needs to be resumed
+    bool resume_timer = (coro->state == CORO_BLOCKED_ON_TIMER && now >= coro->deadline);
+
+    // Compute whether the coroutine was blocked on I/O and needs to be resumed
+    (void)revents; // TODO(bassosimone): implement
+    bool resume_io = false;
+
+    // Resume the coroutine when needed
+    if (resume_timer || resume_io) {
+        coro->deadline = 0;
+        coro->state = CORO_RUNNABLE;
+    }
+}
+
+/// Wakeup coroutines whose deadline has expired.
+static void sched_expire_deadlines(void) noexcept {
+    uint64_t now = minimk_time_monotonic_now();
+    for (size_t idx = 0; idx < MAX_COROS; idx++) {
+        sched_maybe_resume(&coroutines[idx], now, 0);
+    }
+}
+
 /// Select the first runnable coroutine using a fair algorithm.
 static coroutine *sched_pick_runnable(size_t *fair) noexcept {
     // note that wrap is not UB for size_t
@@ -180,21 +214,111 @@ static inline void validate_coro_stack_pointer(const char *context, coroutine *c
     MINIMK_ASSERT(sp >= stack->bottom && sp < stack->top);
 }
 
+/// Returns the number of coroutines that are not in a null state.
+static size_t count_nonnull_coroutines(void) noexcept {
+    size_t res = 0;
+    for (size_t idx = 0; idx < MAX_COROS; idx++) {
+        auto coro = &coroutines[idx];
+        if (coro->state != CORO_NULL) {
+            res++;
+            continue;
+        }
+    }
+    return res;
+}
+
+/// Attempts to block on the poll system call until a timeout expires or I/O occurs.
+///
+/// We allow signals to make us return early and recheck the situation. Generally, this
+/// library is cooperative and tries to avoid owning the signals.
+static void block_on_poll(void) noexcept {
+    // 1. pick a reasonable default deadline to avoid blocking for too much time.
+    uint64_t now = minimk_time_monotonic_now();
+    uint64_t default_timeout = 100000000;
+    uint64_t deadline = minimk_integer_u64_satadd(now, default_timeout);
+
+    MINIMK_TRACE("trace: poll initial deadline=%llu [us]\n", (unsigned long long)deadline);
+
+    // 2. we need to poll at most a socket per coroutine.
+    //
+    // On linux/amd64 each structure is 8 byte and we have 16 coroutines
+    // which causes the stack to grow by 128 bytes.
+    minimk_pollfd fds[MAX_COROS] = {};
+    size_t numfds = 0;
+
+    // 3. scan the coroutines list and init deadline and fds.
+    for (size_t idx = 0; idx < MAX_COROS; idx++) {
+        auto coro = &coroutines[idx];
+
+        if (coro->state == CORO_BLOCKED_ON_TIMER) {
+            deadline = (coro->deadline < deadline) ? coro->deadline : deadline;
+            continue;
+        }
+
+        // TODO(bassosimone): operate on sockets when we
+        // implement this functionality
+    }
+
+    MINIMK_TRACE("trace: poll adjusted deadline=%llu [us]\n", (unsigned long long)deadline);
+
+    // 4. compute the poll timeout.
+    uint64_t poll_timeout64 = (((deadline > now) ? (deadline - now) : 0) / 1000000) + 1;
+    int poll_timeout = (int)((poll_timeout64) < INT_MAX ? poll_timeout64 : INT_MAX);
+
+    MINIMK_TRACE("trace: poll_timeout64=%llu [ms]\n", (unsigned long long)poll_timeout64);
+    MINIMK_TRACE("trace: poll_timeout=%lld [ms]\n", (long long)poll_timeout);
+
+    // 5. invoke the poll system call and handle is result.
+    //
+    // Note that under Linux poll fails in these cases:
+    //
+    // - EFAULT fds points outside the process's accessible address space.
+    //
+    // - EINTR  A signal occurred before any requested event.
+    //
+    // - EINVAL The nfds value exceeds the RLIMIT_NOFILE value.
+    //
+    // - ENOMEM Unable to allocate memory for kernel data structures.
+    MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n",
+                 (unsigned long long)fds,
+                 (unsigned long long)numfds,
+                 (unsigned long)poll_timeout);
+
+    size_t active = 0;
+    auto rc = minimk_poll(fds, numfds, poll_timeout, &active);
+
+    MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", (unsigned long long)rc, (unsigned long long)active);
+
+    if (rc != 0) {
+        return;
+    }
+
+    // 6. check what we need to resume now
+    now = minimk_time_monotonic_now();
+    for (size_t idx = 0; idx < MAX_COROS; idx++) {
+        sched_maybe_resume(&coroutines[idx], now, fds[idx].revents);
+    }
+}
+
 void minimk_runtime_run(void) noexcept {
     // Ensure we are not yet inside the coroutine world.
     MINIMK_ASSERT(current == nullptr);
 
     // Continue until we're out of coroutines.
-    for (size_t fair = 0;;) {
+    for (size_t fair = 0; count_nonnull_coroutines() > 0;) {
         // Check whether there are coroutines that need cleanup.
         sched_clean_exited();
+
+        // Wakeup coroutines whose deadline has expired.
+        sched_expire_deadlines();
 
         // Fairly select the first runnable coroutine.
         current = sched_pick_runnable(&fair);
 
-        // If there are no runnable coroutines, we're outta here.
+        // If there are no runnable coroutines, wait for something to happen.
         if (current == nullptr) {
-            break;
+            block_on_poll();
+            continue;
         }
 
         // Log the state before switching
@@ -229,4 +353,18 @@ void minimk_runtime_yield(void) noexcept {
 
     // Manually switch back to the scheduler stack.
     minimk_runtime_switch(&current->sp, scheduler_sp);
+}
+
+void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
+    // Ensure we're inside the coroutine world.
+    MINIMK_ASSERT(current != nullptr);
+
+    // Get the current monotonic clock reading
+    uint64_t deadline = minimk_time_monotonic_now();
+    deadline = minimk_integer_u64_satadd(deadline, nanosec);
+
+    // Suspend the coroutine
+    current->state = CORO_BLOCKED_ON_TIMER;
+    current->deadline = deadline;
+    minimk_runtime_yield();
 }

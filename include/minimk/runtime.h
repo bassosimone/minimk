@@ -7,6 +7,8 @@
 #include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
 
+#include <stdint.h> // for uint64_t
+
 MINIMK_BEGIN_DECLS
 
 /// Creates a coroutine that the runtime will execute.
@@ -28,6 +30,15 @@ void minimk_runtime_run(void) MINIMK_NOEXCEPT;
 ///
 /// This function must be called by a running goroutine.
 void minimk_runtime_yield(void) MINIMK_NOEXCEPT;
+
+/// Put the coroutine to sleep for the given amount of nanoseconds.
+///
+/// A too large number of nanoseconds would be reasonably truncated by the
+/// runtime to avoid overflows. You do not actually need to sleep for so much
+/// time anyway. We will surely extinguish ourselves before that.
+///
+/// This function must be called by a running goroutine.
+void minimk_runtime_nanosleep(uint64_t nanosec) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

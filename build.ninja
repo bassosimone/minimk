@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 rule cxx
-  command = clang++ -Iinclude -O2 -DMINIMK_ENABLE_TRACE -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -c $in -o $out
+  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -c $in -o $out
   description = CXX $out
 
 rule cc
-  command = clang -Iinclude -O2 -DMINIMK_ENABLE_TRACE -std=c11 -Wall -Wextra $in -o $out
+  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra $in -o $out
   description = CC $out
 
 rule asm
@@ -45,5 +45,7 @@ build libminimk.a: ar $
 build examples/runtime/00_coroutine_hello.exe: cc examples/runtime/00_coroutine_hello.c libminimk.a
 
 build examples/runtime/01_coroutine_pingpong.exe: cc examples/runtime/01_coroutine_pingpong.c libminimk.a
+
+build examples/runtime/02_coroutine_sleep.exe: cc examples/runtime/02_coroutine_sleep.c libminimk.a
 
 build examples/time/00_monotonic.exe: cc examples/time/00_monotonic.c libminimk.a

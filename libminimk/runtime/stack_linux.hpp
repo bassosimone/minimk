@@ -11,6 +11,7 @@
 #include <sys/mman.h> // for mmap
 
 #include <stddef.h> // for size_t
+#include <stdint.h> // for uintptr_t
 #include <unistd.h> // for getpagesize
 
 #include "trace.h" // for MINIMK_TRACE
