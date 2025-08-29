@@ -6,6 +6,7 @@
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/poll.h>    // for minimk_poll
 #include <minimk/runtime.h> // for minimk_runtime_run
+#include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/time.h>    // for minimk_time_monotonic_now
 
 #include <limits.h> // for INT_MAX
@@ -31,6 +32,9 @@
 /// Coroutine is blocked awaiting for a deadline.
 #define CORO_BLOCKED_ON_TIMER 3
 
+/// Coroutine is blocked awaiting for a socket.
+#define CORO_BLOCKED_ON_IO 4
+
 /// Portable coroutine state.
 ///
 /// We align this structure to safely memset it to zero on arm64.
@@ -50,6 +54,9 @@ struct coroutine {
 
     /// Management of the blocked state.
     uint64_t deadline;
+    minimk_socket_t sock;
+    short events;
+    short revents;
 
 } __attribute__((aligned(16)));
 
@@ -106,6 +113,7 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
     memset(coro, 0, sizeof(*coro));
 
     // Initialize the entry
+    coro->sock = minimk_socket_invalid();
     coro->entry = entry;
     coro->opaque = opaque;
 
@@ -166,16 +174,19 @@ static void sched_clean_exited(void) noexcept {
 /// Possibly resume the coroutine given the current time and the revents.
 static void sched_maybe_resume(coroutine *coro, uint64_t now, short revents) noexcept {
     // Compute whether the coroutine was blocked on a timer and needs to be resumed
-    bool resume_timer = (coro->state == CORO_BLOCKED_ON_TIMER && now >= coro->deadline);
-
-    // Compute whether the coroutine was blocked on I/O and needs to be resumed
-    (void)revents; // TODO(bassosimone): implement
-    bool resume_io = false;
-
-    // Resume the coroutine when needed
-    if (resume_timer || resume_io) {
+    if (coro->state == CORO_BLOCKED_ON_TIMER && now >= coro->deadline) {
         coro->deadline = 0;
         coro->state = CORO_RUNNABLE;
+        return;
+    }
+
+    // Compute whether the coroutine was blocked on I/O and needs to be resumed
+    if (coro->state == CORO_BLOCKED_ON_IO && ((coro->events & revents) != 0 || now >= coro->deadline)) {
+        coro->deadline = 0;
+        coro->state = CORO_RUNNABLE;
+        coro->sock = minimk_socket_invalid();
+        coro->revents = revents;
+        return;
     }
 }
 
@@ -250,13 +261,24 @@ static void block_on_poll(void) noexcept {
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
         auto coro = &coroutines[idx];
 
+        // 3.1. arm timers
         if (coro->state == CORO_BLOCKED_ON_TIMER) {
             deadline = (coro->deadline < deadline) ? coro->deadline : deadline;
             continue;
         }
 
-        // TODO(bassosimone): operate on sockets when we
-        // implement this functionality
+        // 3.2. deal with I/O
+        if (coro->state == CORO_BLOCKED_ON_IO) {
+            deadline = (coro->deadline < deadline) ? coro->deadline : deadline;
+            MINIMK_ASSERT(coro->sock != minimk_socket_invalid());
+            MINIMK_ASSERT(coro->events != 0);
+            MINIMK_ASSERT(coro->revents == 0);
+            fds[idx].events = coro->events;
+            fds[idx].fd = coro->sock;
+            MINIMK_TRACE(
+                "trace: poll fd=%llu events=%llu\n", (unsigned long long)coro->sock, (unsigned long long)coro->events);
+            continue;
+        }
     }
 
     MINIMK_TRACE("trace: poll adjusted deadline=%llu [us]\n", (unsigned long long)deadline);
@@ -285,13 +307,14 @@ static void block_on_poll(void) noexcept {
                  (unsigned long)poll_timeout);
 
     size_t active = 0;
-    auto rc = minimk_poll(fds, numfds, poll_timeout, &active);
+    auto poll_rc = minimk_poll(fds, numfds, poll_timeout, &active);
 
-    MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", (unsigned long long)rc, (unsigned long long)active);
+    MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", (unsigned long long)poll_rc, (unsigned long long)active);
 
-    if (rc != 0) {
+    if (poll_rc == MINIMK_EINTR) {
         return;
     }
+    MINIMK_ASSERT(poll_rc == 0);
 
     // 6. check what we need to resume now
     now = minimk_time_monotonic_now();
@@ -373,4 +396,54 @@ void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
     current->state = CORO_BLOCKED_ON_TIMER;
     current->deadline = deadline;
     minimk_runtime_yield();
+}
+
+/// Internal function to uniformly handle suspending for I/O.
+static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short events, uint64_t nanosec) noexcept {
+    // Ensure we're inside the coroutine world.
+    MINIMK_ASSERT(current != nullptr);
+
+    // Get the current monotonic clock reading
+    uint64_t deadline = minimk_time_monotonic_now();
+    deadline = minimk_integer_u64_satadd(deadline, nanosec);
+
+    // Prepare for suspending
+    current->state = CORO_BLOCKED_ON_IO;
+    current->deadline = deadline;
+    MINIMK_ASSERT(sock != minimk_socket_invalid());
+    current->sock = sock;
+    current->events = events;
+    current->revents = 0;
+
+    // Suspend and wait for resume
+    minimk_runtime_yield();
+
+    // Finish cleaning up the coroutine state
+    short revents = current->revents;
+    current->revents = 0;
+    MINIMK_ASSERT(current->deadline == 0);
+    MINIMK_ASSERT(current->sock == minimk_socket_invalid());
+    MINIMK_ASSERT(current->events == 0);
+
+    // We have a successful I/O suspend if the event we expected occurred.
+    if ((revents & events) != 0) {
+        return 0;
+    }
+
+    // We also have some kind of success if there is an error in the sense that
+    // the caller should retry the I/O operation to get the error.
+    if ((revents & minimk_poll_pollerr()) != 0) {
+        return 0;
+    }
+
+    // Otherwise, it must have been an I/O timeout.
+    return MINIMK_ETIMEDOUT;
+}
+
+minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) noexcept {
+    return __minimk_suspend_io(sock, minimk_poll_pollin(), nanosec);
+}
+
+minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock, uint64_t nanosec) noexcept {
+    return __minimk_suspend_io(sock, minimk_poll_pollout(), nanosec);
 }
