@@ -100,6 +100,16 @@ minimk_error_t __minimk_socket_bind(minimk_socket_t sock, const char *address, c
     return (rv == 0) ? 0 : __minimk_errno_get();
 }
 
+// Testable minimk_socket_listen implementation.
+template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
+          decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
+          decltype(listen) __sys_listen = listen>
+minimk_error_t __minimk_socket_listen(minimk_socket_t sock, int backlog) noexcept {
+    __minimk_errno_clear();
+    int rv = __sys_listen((int)sock, backlog);
+    return (rv == 0) ? 0 : __minimk_errno_get();
+}
+
 // Testable minimk_socket_recv implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,

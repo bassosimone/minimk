@@ -121,6 +121,19 @@ minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address, 
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address, const char *port) MINIMK_NOEXCEPT;
 
+/// Function to mark a socket as listening for incoming connections.
+///
+/// This function is thread-safe.
+///
+/// The sock argument must be a valid socket created using minimk_socket_create
+/// and bound using minimk_socket_bind.
+///
+/// The backlog argument specifies the maximum length of the queue of pending
+/// connections. A value of 128 is typically reasonable for most applications.
+///
+/// The return value is zero on success or a nonzero error code on failure.
+minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NOEXCEPT;
+
 /// Function to read bytes from a given socket.
 ///
 /// This function is thread-safe.

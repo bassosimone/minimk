@@ -47,6 +47,10 @@ minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address, con
     return __minimk_socket_bind(sock, address, port);
 }
 
+minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) noexcept {
+    return __minimk_socket_listen(sock, backlog);
+}
+
 minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) noexcept {
     return __minimk_socket_recv(sock, data, count, nread);
 }
