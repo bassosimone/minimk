@@ -43,6 +43,10 @@ minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address, 
     return __minimk_socket_connect(sock, address, port);
 }
 
+minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address, const char *port) noexcept {
+    return __minimk_socket_bind(sock, address, port);
+}
+
 minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) noexcept {
     return __minimk_socket_recv(sock, data, count, nread);
 }

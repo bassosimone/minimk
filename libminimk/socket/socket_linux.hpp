@@ -76,6 +76,30 @@ minimk_error_t __minimk_socket_connect(minimk_socket_t sock, const char *address
     return (rv == 0) ? 0 : __minimk_errno_get();
 }
 
+// Testable minimk_socket_bind implementation.
+template <decltype(getaddrinfo) __libc_getaddrinfo = getaddrinfo,
+          decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
+          decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
+          decltype(bind) __sys_bind = bind>
+minimk_error_t __minimk_socket_bind(minimk_socket_t sock, const char *address, const char *port) noexcept {
+    // Use getaddrinfo to obtain a sockaddr_storage
+    addrinfo hints{};
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags |= AI_NUMERICHOST | AI_NUMERICSERV;
+    addrinfo *rp = nullptr;
+    if (__libc_getaddrinfo(address, port, &hints, &rp) != 0) {
+        return MINIMK_EINVAL;
+    }
+
+    // Issue the bind system call
+    __minimk_errno_clear();
+    int rv = __sys_bind(sock, rp->ai_addr, rp->ai_addrlen);
+    freeaddrinfo(rp);
+
+    // Handle the return value
+    return (rv == 0) ? 0 : __minimk_errno_get();
+}
+
 // Testable minimk_socket_recv implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
