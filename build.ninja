@@ -29,6 +29,7 @@ build libminimk/errno/errno_linux.o: cxx libminimk/errno/errno_linux.cpp
 build libminimk/poll/poll_linux.o: cxx libminimk/poll/poll_linux.cpp
 
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
+build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
 build libminimk/runtime/trace.o: cxx libminimk/runtime/trace.cpp
@@ -42,6 +43,7 @@ build libminimk.a: ar $
   libminimk/errno/errno_linux.o $
   libminimk/poll/poll_linux.o $
   libminimk/runtime/runtime.o $
+  libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
   libminimk/runtime/trace.o $
@@ -56,6 +58,9 @@ build examples/runtime/01_coroutine_pingpong.exe: link examples/runtime/01_corou
 
 build examples/runtime/02_coroutine_sleep.o: cc examples/runtime/02_coroutine_sleep.c
 build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutine_sleep.o libminimk.a
+
+build examples/runtime/03_echo_server.o: cc examples/runtime/03_echo_server.c
+build examples/runtime/03_echo_server.exe: link examples/runtime/03_echo_server.o libminimk.a
 
 build examples/socket/00_echo_server_blocking.o: cc examples/socket/00_echo_server_blocking.c
 build examples/socket/00_echo_server_blocking.exe: link examples/socket/00_echo_server_blocking.o libminimk.a
