@@ -16,6 +16,8 @@
 #include <stddef.h> // for size_t
 #include <unistd.h> // for close
 
+#include "../runtime/trace.h" // for MINIMK_TRACE
+
 // Testable minimk_socket_create implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
@@ -130,13 +132,29 @@ template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(recv) __sys_recv = recv>
 minimk_error_t __minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) noexcept {
+    // As documented, reject zero-byte reads
+    if (count <= 0) {
+        MINIMK_TRACE("trace: suspicious recv 0x%llx with zero bytes size\n", (unsigned long long)sock);
+        return MINIMK_EINVAL;
+    }
+
+    // Issue the recv system call proper
     __minimk_errno_clear();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
     ssize_t rv = __sys_recv((int)sock, data, count, MSG_NOSIGNAL);
+
+    // Handle the case of error
     if (rv == -1) {
         *nread = 0;
         return __minimk_errno_get();
     }
+
+    // Handle the case of EOF
+    if (rv == 0) {
+        return MINIMK_EOF;
+    }
+
+    // Handle the case of success
     *nread = (size_t)rv;
     return 0;
 }
@@ -146,13 +164,24 @@ template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(send) __sys_send = send>
 minimk_error_t __minimk_socket_send(minimk_socket_t sock, const void *data, size_t count, size_t *nwritten) noexcept {
+    // As documented, reject zero-byte reads
+    if (count <= 0) {
+        MINIMK_TRACE("trace: suspicious send 0x%llx with zero bytes size\n", (unsigned long long)sock);
+        return MINIMK_EINVAL;
+    }
+
+    // Issue the send system call proper
     __minimk_errno_clear();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
     ssize_t rv = __sys_send((int)sock, data, count, MSG_NOSIGNAL);
+
+    // Handle the case of error
     if (rv == -1) {
         *nwritten = 0;
         return __minimk_errno_get();
     }
+
+    // Handle the case of success
     *nwritten = (size_t)rv;
     return 0;
 }

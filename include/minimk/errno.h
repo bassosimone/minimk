@@ -68,6 +68,9 @@ typedef uint32_t minimk_error_t;
 /// Out of memory.
 #define MINIMK_ENOMEM 17
 
+/// We reached the end of the stream.
+#define MINIMK_EOF 18
+
 MINIMK_BEGIN_DECLS
 
 /// Clears the current errno value before invoking a system call.

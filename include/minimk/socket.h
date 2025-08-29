@@ -161,6 +161,13 @@ minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_
 /// The nread argument is set to zero when the function is called and updated
 /// to be the number of bytes read on success.
 ///
+/// This function increases robustness as follows:
+///
+/// 1. if count is zero, it returns MINIMK_EINVAL since reading zero bytes is most
+/// likely a bug in the code and should not actually happen.
+///
+/// 2. otherwise, if recv returns zero, it returns MINIMK_EOF.
+///
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) MINIMK_NOEXCEPT;
 
@@ -176,6 +183,11 @@ minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count
 ///
 /// The nwritten argument is set to zero when the function is called and updated
 /// to be the number of bytes written on success.
+///
+/// This function increases robustness as follows:
+///
+/// 1. if count is zero, it returns MINIMK_EINVAL since writing zero bytes is most
+/// likely a bug in the code and should not actually happen.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t

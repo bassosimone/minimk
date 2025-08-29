@@ -1,8 +1,8 @@
-// File: libminimk/runtime/assert.cpp
+// File: libminimk/assert/assert.cpp
 // Purpose: like assert but not influenced by NDEBUG
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "assert.h"
+#include <minimk/assert.h> // for __minimk_assert
 
 #include <stdarg.h> // for va_list
 #include <stdio.h>  // for vfprintf

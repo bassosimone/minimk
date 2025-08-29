@@ -2,6 +2,7 @@
 // Purpose: cooperative coroutine runtime implementation
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/poll.h>    // for minimk_poll
 #include <minimk/runtime.h> // for minimk_runtime_run
@@ -12,7 +13,6 @@
 #include <stdint.h> // for uintptr_t
 #include <string.h> // for memset
 
-#include "assert.h" // for MINIMK_ASSERT
 #include "stack.h"  // for struct stack
 #include "switch.h" // for minimk_switch
 #include "trace.h"  // for MINIMK_TRACE
