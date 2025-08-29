@@ -203,6 +203,16 @@ minimk_socket_send(minimk_socket_t sock, const void *data, size_t count, size_t 
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_socket_destroy(minimk_socket_t *sock) MINIMK_NOEXCEPT;
 
+/// Like minimk_socket_send but sends all the content of the buffer unless an error occurs.
+///
+/// In case of short write, returns the error that occurred. This is an all-or-nothing operation.
+///
+/// When interruped by a signal, this function continues to write relentlessly.
+minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) MINIMK_NOEXCEPT;
+
+/// Like minimk_socket_sendall but for receiving.
+minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t count) MINIMK_NOEXCEPT;
+
 MINIMK_END_DECLS
 
 #endif // MINIMK_SOCKET_H
