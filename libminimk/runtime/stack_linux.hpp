@@ -18,12 +18,29 @@
 
 /// Ensure that the stack is an integral number of pages and possibly equal to a desired size.
 static inline size_t __minimk_coro_stack_size(size_t page_size) noexcept {
-    size_t desired = 1 << 16;
-    if (desired < page_size) {
+    // We aim to have 64 KiB of coroutine stack plus one guard page.
+    static constexpr size_t desired = 64 << 10;
+
+    // However, if the page size is bigger than the stack we want (e.g., if it is 4 MiB), then it
+    // does not make sense to micro-allocate since mmap is page aligned anyway.
+    if (page_size > desired) {
         return page_size;
     }
-    size_t page_offset_mask = (page_size - 1);
-    return desired & ~page_offset_mask;
+
+    // Compute the mask to align a value to the page size. With 4 KiB (0x01000) this
+    // means that we use a 0x00fff mask to align a value to the page size.
+    size_t page_mask = (page_size - 1);
+
+    // Round the stack size up to the largest page size multiple. This means that with
+    // a 4 KiB page size and a desired value of 65000 (0x0fde8), we perform the
+    // following computation:
+    //
+    //     (0x0fde8 + 0x00fff) & ~0x00fff =
+    //          0x10de7        &  0xff000 =
+    //          0x10000
+    //
+    // This is the the smallest multiple of page size that fits the desired size.
+    return (desired + page_mask) & ~page_mask;
 }
 
 /// Testable implementation of minimk_runtime_stack_alloc
