@@ -51,6 +51,10 @@ minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) noexcept 
     return __minimk_socket_listen(sock, backlog);
 }
 
+minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_t sock) noexcept {
+    return __minimk_socket_accept(client_sock, sock);
+}
+
 minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) noexcept {
     return __minimk_socket_recv(sock, data, count, nread);
 }

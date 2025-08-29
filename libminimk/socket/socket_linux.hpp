@@ -110,6 +110,21 @@ minimk_error_t __minimk_socket_listen(minimk_socket_t sock, int backlog) noexcep
     return (rv == 0) ? 0 : __minimk_errno_get();
 }
 
+// Testable minimk_socket_accept implementation.
+template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
+          decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
+          decltype(accept) __sys_accept = accept>
+minimk_error_t __minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_t sock) noexcept {
+    __minimk_errno_clear();
+    *client_sock = -1;
+    int client_fd = __sys_accept((int)sock, nullptr, nullptr);
+    if (client_fd == -1) {
+        return __minimk_errno_get();
+    }
+    *client_sock = (minimk_socket_t)client_fd;
+    return 0;
+}
+
 // Testable minimk_socket_recv implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
