@@ -132,6 +132,9 @@ template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(recv) __sys_recv = recv>
 minimk_error_t __minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) noexcept {
+    // Initialize output parameter immediately
+    *nread = 0;
+
     // As documented, reject zero-byte reads
     if (count <= 0) {
         MINIMK_TRACE("trace: suspicious recv 0x%llx with zero bytes size\n", (unsigned long long)sock);
@@ -145,7 +148,6 @@ minimk_error_t __minimk_socket_recv(minimk_socket_t sock, void *data, size_t cou
 
     // Handle the case of error
     if (rv == -1) {
-        *nread = 0;
         return __minimk_errno_get();
     }
 
@@ -164,6 +166,9 @@ template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(send) __sys_send = send>
 minimk_error_t __minimk_socket_send(minimk_socket_t sock, const void *data, size_t count, size_t *nwritten) noexcept {
+    // Initialize output parameter immediately
+    *nwritten = 0;
+
     // As documented, reject zero-byte reads
     if (count <= 0) {
         MINIMK_TRACE("trace: suspicious send 0x%llx with zero bytes size\n", (unsigned long long)sock);
@@ -177,7 +182,6 @@ minimk_error_t __minimk_socket_send(minimk_socket_t sock, const void *data, size
 
     // Handle the case of error
     if (rv == -1) {
-        *nwritten = 0;
         return __minimk_errno_get();
     }
 
