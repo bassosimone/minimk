@@ -23,7 +23,7 @@ MINIMK_END_DECLS
 #define MINIMK_TRACE(fmt, ...)                                                                                         \
     do {                                                                                                               \
         if (__MINIMK_TRACE) {                                                                                          \
-            __minimk_trace(fmt, __VA_ARGS__);                                                                          \
+            __minimk_trace(fmt, ##__VA_ARGS__);                                                                        \
         }                                                                                                              \
     } while (0)
 
