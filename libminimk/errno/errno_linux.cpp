@@ -59,6 +59,12 @@ minimk_error_t minimk_errno_get(void) noexcept {
     case ENOMEM:
         return MINIMK_ENOMEM;
 
+    case EBADF:
+        return MINIMK_EBADF;
+
+    case EMFILE:
+        return MINIMK_EMFILE;
+
     default:
         return MINIMK_EUNKNOWN;
     }
@@ -126,6 +132,12 @@ const char *minimk_errno_name(minimk_error_t code) noexcept {
 
     case MINIMK_EOF:
         return "EOF";
+
+    case MINIMK_EBADF:
+        return "EBADF";
+
+    case MINIMK_EMFILE:
+        return "EMFILE";
 
     default:
         return "UNKNOWN";

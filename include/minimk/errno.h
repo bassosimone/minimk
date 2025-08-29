@@ -71,6 +71,12 @@ typedef uint32_t minimk_error_t;
 /// We reached the end of the stream.
 #define MINIMK_EOF 18
 
+/// Bad file descriptor.
+#define MINIMK_EBADF 19
+
+/// Too many locally open files.
+#define MINIMK_EMFILE 20
+
 MINIMK_BEGIN_DECLS
 
 /// Clears the current errno value before invoking a system call.
