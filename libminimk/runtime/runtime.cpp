@@ -185,6 +185,7 @@ static void sched_maybe_resume(coroutine *coro, uint64_t now, short revents) noe
         coro->deadline = 0;
         coro->state = CORO_RUNNABLE;
         coro->sock = minimk_socket_invalid();
+        coro->events = 0;
         coro->revents = revents;
         return;
     }
@@ -255,7 +256,7 @@ static void block_on_poll(void) noexcept {
     // On linux/amd64 each structure is 8 byte and we have 16 coroutines
     // which causes the stack to grow by 128 bytes.
     minimk_pollfd fds[MAX_COROS] = {};
-    size_t numfds = 0;
+    size_t numfds = MAX_COROS;
 
     // 3. scan the coroutines list and init deadline and fds.
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
@@ -415,6 +416,11 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     current->events = events;
     current->revents = 0;
 
+    MINIMK_TRACE("trace: suspend coroutine<0x%llx> on fd=%llu events=%llu\n",
+                 (unsigned long long)current,
+                 (unsigned long long)sock,
+                 (unsigned long long)events);
+
     // Suspend and wait for resume
     minimk_runtime_yield();
 
@@ -424,6 +430,12 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     MINIMK_ASSERT(current->deadline == 0);
     MINIMK_ASSERT(current->sock == minimk_socket_invalid());
     MINIMK_ASSERT(current->events == 0);
+
+    MINIMK_TRACE("trace: resume coroutine<0x%llx> on fd=%llu events=%llu revents=%llu\n",
+                 (unsigned long long)current,
+                 (unsigned long long)sock,
+                 (unsigned long long)events,
+                 (unsigned long long)revents);
 
     // We have a successful I/O suspend if the event we expected occurred.
     if ((revents & events) != 0) {
