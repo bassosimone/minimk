@@ -7,8 +7,12 @@ rule cxx
   description = CXX $out
 
 rule cc
-  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra $in -o $out
+  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -c $in -o $out
   description = CC $out
+
+rule link
+  command = clang $in -o $out
+  description = LINK $out
 
 rule asm
   command = clang -O2 -c $in -o $out
@@ -47,10 +51,17 @@ build libminimk.a: ar $
   libminimk/socket/socket_linux.o $
   libminimk/time/monotonic_linux.o
 
-build examples/runtime/00_coroutine_hello.exe: cc examples/runtime/00_coroutine_hello.c libminimk.a
+build examples/runtime/00_coroutine_hello.o: cc examples/runtime/00_coroutine_hello.c
+build examples/runtime/00_coroutine_hello.exe: link examples/runtime/00_coroutine_hello.o libminimk.a
 
-build examples/runtime/01_coroutine_pingpong.exe: cc examples/runtime/01_coroutine_pingpong.c libminimk.a
+build examples/runtime/01_coroutine_pingpong.o: cc examples/runtime/01_coroutine_pingpong.c
+build examples/runtime/01_coroutine_pingpong.exe: link examples/runtime/01_coroutine_pingpong.o libminimk.a
 
-build examples/runtime/02_coroutine_sleep.exe: cc examples/runtime/02_coroutine_sleep.c libminimk.a
+build examples/runtime/02_coroutine_sleep.o: cc examples/runtime/02_coroutine_sleep.c
+build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutine_sleep.o libminimk.a
 
-build examples/time/00_monotonic.exe: cc examples/time/00_monotonic.c libminimk.a
+build examples/socket/00_echo_server_blocking.o: cxx examples/socket/00_echo_server_blocking.cpp
+build examples/socket/00_echo_server_blocking.exe: link examples/socket/00_echo_server_blocking.o libminimk.a
+
+build examples/time/00_monotonic.o: cc examples/time/00_monotonic.c
+build examples/time/00_monotonic.exe: link examples/time/00_monotonic.o libminimk.a

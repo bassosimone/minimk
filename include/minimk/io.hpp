@@ -11,11 +11,16 @@
 #include <stddef.h> // for size_t
 
 /// Write as much data as possible from the underlying buffer.
+///
+/// This function automatically resumes sending when interrupted by a signal.
 template <decltype(minimk_socket_send) __minimk_socket_send>
 minimk_error_t minimk_io_writeall(minimk_socket_t sock, const void *buf, size_t count, size_t *total) noexcept {
     for (*total = 0; *total < count;) {
         size_t actual = 0;
         minimk_error_t rv = __minimk_socket_send(sock, (const char *)buf + *total, count - *total, &actual);
+        if (rv == MINIMK_EINTR) {
+            continue;
+        }
         if (rv != 0) {
             return (*total > 0) ? 0 : rv;
         }
@@ -25,11 +30,16 @@ minimk_error_t minimk_io_writeall(minimk_socket_t sock, const void *buf, size_t 
 }
 
 /// Read as much data as possible into the given buffer.
+///
+/// This function automatically resumes receiving when interrupted by a signal.
 template <decltype(minimk_socket_recv) __minimk_socket_recv>
 minimk_error_t minimk_io_readall(minimk_socket_t sock, void *buf, size_t count, size_t *total) noexcept {
     for (*total = 0; *total < count;) {
         size_t actual = 0;
         minimk_error_t rv = __minimk_socket_recv(sock, (char *)buf + *total, count - *total, &actual);
+        if (rv == MINIMK_EINTR) {
+            continue;
+        }
         if (rv != 0) {
             return (*total > 0) ? 0 : rv;
         }
