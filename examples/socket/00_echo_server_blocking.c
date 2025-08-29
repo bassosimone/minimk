@@ -4,7 +4,7 @@
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
 #include <minimk/errno.h>  // for minimk_errno_name
-#include <minimk/io.hpp>   // for minimk_io_readall
+#include <minimk/io.h>     // for minimk_io_socket_writeall
 #include <minimk/socket.h> // for minimk_socket_*
 
 #include <stdio.h>  // for fprintf
@@ -32,7 +32,7 @@ static void handle_client(minimk_socket_t client_sock) {
 
         // Echo back the data
         size_t nwritten = 0;
-        rv = minimk_io_writeall<minimk_socket_send>(client_sock, buffer, nread, &nwritten);
+        rv = minimk_io_socket_writeall(client_sock, buffer, nread, &nwritten);
 
         // Handle potential errors
         if (rv != 0) {

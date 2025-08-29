@@ -60,7 +60,7 @@ build examples/runtime/01_coroutine_pingpong.exe: link examples/runtime/01_corou
 build examples/runtime/02_coroutine_sleep.o: cc examples/runtime/02_coroutine_sleep.c
 build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutine_sleep.o libminimk.a
 
-build examples/socket/00_echo_server_blocking.o: cxx examples/socket/00_echo_server_blocking.cpp
+build examples/socket/00_echo_server_blocking.o: cc examples/socket/00_echo_server_blocking.c
 build examples/socket/00_echo_server_blocking.exe: link examples/socket/00_echo_server_blocking.o libminimk.a
 
 build examples/time/00_monotonic.o: cc examples/time/00_monotonic.c
