@@ -33,7 +33,7 @@ build libminimk/runtime/trace.o: cc libminimk/runtime/trace.c
 
 build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
-build libminimk/syscall/poll_linux.o: cxx libminimk/syscall/poll_linux.cpp
+build libminimk/syscall/poll_posix.o: cxx libminimk/syscall/poll_posix.cpp
 build libminimk/syscall/socket_init_posix.o: cc libminimk/syscall/socket_init_posix.c
 build libminimk/syscall/socket_posix.o: cxx libminimk/syscall/socket_posix.cpp
 
@@ -48,7 +48,7 @@ build libminimk.a: ar $
   libminimk/runtime/switch_linux_amd64.o $
   libminimk/runtime/trace.o $
   libminimk/socket/socket_linux.o $
-  libminimk/syscall/poll_linux.o $
+  libminimk/syscall/poll_posix.o $
   libminimk/syscall/socket_init_posix.o $
   libminimk/syscall/socket_posix.o $
   libminimk/time/monotonic_linux.o

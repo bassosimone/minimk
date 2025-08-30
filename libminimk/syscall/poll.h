@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_SYSCALL_POLL_H
 #define LIBMINIMK_SYSCALL_POLL_H
 
-#include "../socket/socket.h" // for minimk_socket_t
+#include "socket.h" // for minimk_syscall_socket_t
 
 #include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
@@ -16,27 +16,12 @@
 /// Each port should ensure that this type is binary
 /// compatible with the platform's `struct poll`.
 struct minimk_syscall_pollfd {
-    minimk_socket_t fd;
+    minimk_syscall_socket_t fd;
     short events;
     short revents;
 };
 
 MINIMK_BEGIN_DECLS
-
-/// Function returning the POLLIN value used by the platform.
-///
-/// This function is thread-safe.
-short minimk_syscall_pollin(void) MINIMK_NOEXCEPT;
-
-/// Function returning the POLLOUT value used by the platform.
-///
-/// This function is thread-safe.
-short minimk_syscall_pollout(void) MINIMK_NOEXCEPT;
-
-/// Function returning the POLLERR value used by the platform.
-///
-/// This function is thread-safe.
-short minimk_syscall_pollerr(void) MINIMK_NOEXCEPT;
 
 /// Function that blocks until sockets become readable/writable, a timeout expires
 /// or we are interrupted by a signal (thus returning MINIMK_EINTR).
@@ -59,5 +44,14 @@ minimk_error_t minimk_syscall_poll(struct minimk_syscall_pollfd *fds, size_t siz
                                    size_t *nready) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
+
+/// Variable containing the platform's POLLIN definition.
+extern short minimk_syscall_pollin;
+
+/// Variable containing the platform's POLLOUT definition.
+extern short minimk_syscall_pollout;
+
+/// Variable containing the platform's POLLERR definition.
+extern short minimk_syscall_pollerr;
 
 #endif // LIBMINIMK_SYSCALL_POLL_H

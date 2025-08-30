@@ -440,7 +440,7 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
 
     // We also have some kind of success if there is an error in the sense that
     // the caller should retry the I/O operation to get the error.
-    if ((revents & minimk_syscall_pollerr()) != 0) {
+    if ((revents & minimk_syscall_pollerr) != 0) {
         return 0;
     }
 
@@ -449,10 +449,10 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
 }
 
 minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
-    return __minimk_suspend_io(sock, minimk_syscall_pollin(), nanosec);
+    return __minimk_suspend_io(sock, minimk_syscall_pollin, nanosec);
 }
 
 minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock,
                                             uint64_t nanosec) MINIMK_NOEXCEPT {
-    return __minimk_suspend_io(sock, minimk_syscall_pollout(), nanosec);
+    return __minimk_suspend_io(sock, minimk_syscall_pollout, nanosec);
 }

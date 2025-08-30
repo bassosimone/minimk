@@ -1,8 +1,8 @@
-// File: libminimk/syscall/poll_linux.hpp
-// Purpose: linux poll(2) wrapper
+// File: libminimk/syscall/poll_posix.hpp
+// Purpose: POSIX poll(2) wrapper
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef LIBMINIMK_SYSCALL_POLL_LINUX_HPP
-#define LIBMINIMK_SYSCALL_POLL_LINUX_HPP
+#ifndef LIBMINIMK_SYSCALL_POLL_POSIX_HPP
+#define LIBMINIMK_SYSCALL_POLL_POSIX_HPP
 
 #include "../errno/errno.h" // for minimk_errno_get
 
@@ -53,4 +53,4 @@ minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t s
     return (success) ? 0 : minimk_errno_get__();
 }
 
-#endif // LIBMINIMK_SYSCALL_POLL_LINUX_HPP
+#endif // LIBMINIMK_SYSCALL_POLL_POSIX_HPP
