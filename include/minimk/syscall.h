@@ -8,6 +8,7 @@
 #include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
+#include <stdint.h> // for uint64_t
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -129,6 +130,19 @@ minimk_error_t minimk_syscall_geterrno(void) MINIMK_NOEXCEPT;
 /// error code on failure (getsockopt failed).
 minimk_error_t minimk_syscall_getsockopt_error(minimk_syscall_socket_t sock,
                                                minimk_error_t *error) MINIMK_NOEXCEPT;
+
+/// Function to read the monotonic clock.
+///
+/// This function is thread safe.
+///
+/// The sec return argument receives the seconds since the monotonic clock zero.
+///
+/// The nsec return argument receives the nanoseconds.
+///
+/// The monotonic clock zero is an unspecified time in the past.
+///
+/// The return value is zero on success and a nonzero error code on failure.
+minimk_error_t minimk_syscall_gettime_monotonic(uint64_t *sec, uint64_t *nsec) MINIMK_NOEXCEPT;
 
 /// Function to mark a socket as passive, ready to accept connections.
 ///
