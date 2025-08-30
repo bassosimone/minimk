@@ -42,7 +42,7 @@ minimk_error_t __minimk_io_readall(T sock, void *buf, size_t count) noexcept {
         if (rv != 0) {
             return rv; // all-or-nothing semantics
         }
-        MINIMK_ASSERT(nread > 0); // minimk_socket_recv uses MINIMK_EOF on EOF
+        MINIMK_ASSERT(nread > 0); // minimk_syscall_recv uses MINIMK_EOF on EOF
         total += nread;
     }
     return 0;

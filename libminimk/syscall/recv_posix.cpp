@@ -1,0 +1,15 @@
+// File: libminimk/syscall/recv_posix.cpp
+// Purpose: recv(2) implemented for POSIX
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "recv_posix.h"   // for minimk_syscall_recv
+#include "recv_posix.hpp" // for minimk_syscall_recv__
+
+#include <minimk/errno.h> // for minimk_error_t
+
+#include <stddef.h> // for size_t
+
+minimk_error_t minimk_syscall_recv(minimk_syscall_socket_t sock, void *data, size_t count,
+                                   size_t *nread) noexcept {
+    return minimk_syscall_recv__(sock, data, count, nread);
+}

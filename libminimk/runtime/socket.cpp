@@ -8,6 +8,8 @@
 #include "../syscall/bind_posix.h"        // for minimk_syscall_bind
 #include "../syscall/closesocket_posix.h" // for minimk_syscall_closesocket
 #include "../syscall/listen_posix.h"      // for minimk_syscall_listen
+#include "../syscall/recv_posix.h"        // for minimk_syscall_recv
+#include "../syscall/send_posix.h"        // for minimk_syscall_send
 
 #include "handle.h"  // for __make_handle
 #include "runtime.h" // for minimk_runtime_suspend_read/write
@@ -256,9 +258,9 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *da
     for (;;) {
         // Attempt to read data
         *nread = 0;
-        minimk_error_t rv = minimk_socket_recv(info->fd, data, count, nread);
+        minimk_error_t rv = minimk_syscall_recv(info->fd, data, count, nread);
 
-        MINIMK_TRACE("trace: minimk_socket_recv returned: rv=%d nread=%zu\n", rv, *nread);
+        MINIMK_TRACE("trace: minimk_syscall_recv returned: rv=%d nread=%zu\n", rv, *nread);
 
         // We only need to continue trying on EAGAIN
         if (rv != MINIMK_EAGAIN) {
@@ -289,9 +291,9 @@ minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const vo
     for (;;) {
         // Attempt to send data
         *nwritten = 0;
-        minimk_error_t rv = minimk_socket_send(info->fd, data, count, nwritten);
+        minimk_error_t rv = minimk_syscall_send(info->fd, data, count, nwritten);
 
-        MINIMK_TRACE("trace: minimk_socket_send returned: rv=%d nwritten=%zu\n", rv, *nwritten);
+        MINIMK_TRACE("trace: minimk_syscall_send returned: rv=%d nwritten=%zu\n", rv, *nwritten);
 
         // We only need to continue trying on EAGAIN
         if (rv != MINIMK_EAGAIN) {

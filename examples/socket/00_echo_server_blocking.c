@@ -7,6 +7,7 @@
 #include "../../libminimk/syscall/bind_posix.h"        // for minimk_syscall_bind
 #include "../../libminimk/syscall/closesocket_posix.h" // for minimk_syscall_closesocket
 #include "../../libminimk/syscall/listen_posix.h"      // for minimk_syscall_listen
+#include "../../libminimk/syscall/recv_posix.h"        // for minimk_syscall_recv
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name
@@ -22,7 +23,7 @@ static void handle_client(minimk_socket_t client_sock) {
     for (;;) {
         // Read some bytes from the client
         size_t nread = 0;
-        minimk_error_t rv = minimk_socket_recv(client_sock, buffer, sizeof(buffer), &nread);
+        minimk_error_t rv = minimk_syscall_recv(client_sock, buffer, sizeof(buffer), &nread);
 
         // Handle the potential errors
         if (rv == MINIMK_EOF) {
