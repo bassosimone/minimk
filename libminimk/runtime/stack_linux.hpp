@@ -5,17 +5,16 @@
 #define LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 
 #include "../syscall/errno.h" // for minimk_syscall_clearerrno
-#include "stack.h"             // for struct stack
+#include "stack.h"            // for struct stack
 
 #include <minimk/errno.h> // for minimk_error_t
+#include <minimk/trace.h> // for MINIMK_TRACE
 
 #include <sys/mman.h> // for mmap
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uintptr_t
 #include <unistd.h> // for getpagesize
-
-#include "trace.h" // for MINIMK_TRACE
 
 /// Ensure that the stack is an integral number of pages and possibly equal to a desired size.
 static inline size_t minimk_coro_stack_size__(size_t page_size) noexcept {
@@ -45,9 +44,10 @@ static inline size_t minimk_coro_stack_size__(size_t page_size) noexcept {
 }
 
 /// Testable implementation of minimk_runtime_stack_alloc
-template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-          decltype(getpagesize) sys_getpagesize__ = getpagesize, decltype(mmap) sys_mmap__ = mmap,
-          decltype(mprotect) sys_mprotect__ = mprotect, decltype(munmap) sys_munmap__ = munmap>
+template <
+        decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+        decltype(getpagesize) sys_getpagesize__ = getpagesize, decltype(mmap) sys_mmap__ = mmap,
+        decltype(mprotect) sys_mprotect__ = mprotect, decltype(munmap) sys_munmap__ = munmap>
 minimk_error_t minimk_runtime_stack_alloc__(struct stack *sp) noexcept {
     // Initialize the total amount of memory to allocate including the guard page.
     size_t page_size = sys_getpagesize__();
@@ -85,9 +85,10 @@ minimk_error_t minimk_runtime_stack_alloc__(struct stack *sp) noexcept {
     return 0;
 }
 
-template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-          decltype(munmap) sys_munmap__ = munmap>
+template <
+        decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
+        decltype(munmap) sys_munmap__ = munmap>
 minimk_error_t minimk_runtime_stack_free__(struct stack *sp) noexcept {
     // Unmap the stack from memory
     minimk_syscall_clearerrno__();

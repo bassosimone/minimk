@@ -9,13 +9,13 @@
 #include "runtime.h" // for minimk_suspend_read
 #include "stack.h"   // for struct stack
 #include "switch.h"  // for minimk_switch
-#include "trace.h"   // for MINIMK_TRACE
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_run
 #include <minimk/time.h>    // for minimk_time_monotonic_now
+#include <minimk/trace.h>   // for MINIMK_TRACE
 
 #include <limits.h> // for INT_MAX
 #include <stddef.h> // for size_t

@@ -14,10 +14,10 @@
 
 #include "handle.h"  // for make_handle__
 #include "runtime.h" // for minimk_runtime_suspend_read/write
-#include "trace.h"   // for MINIMK_TRACE
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_socket_t
+#include <minimk/trace.h>   // for MINIMK_TRACE
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for UINT64_MAX

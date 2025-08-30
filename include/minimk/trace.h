@@ -4,14 +4,7 @@
 #ifndef LIBMINIMK_RUNTIME_TRACE_H
 #define LIBMINIMK_RUNTIME_TRACE_H
 
-#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
-
-MINIMK_BEGIN_DECLS
-
-/// Internal implementation of MINIMK_TRACE
-void minimk_trace__(const char *fmt, ...) MINIMK_NOEXCEPT __attribute__((format(printf, 1, 2)));
-
-MINIMK_END_DECLS
+#include <minimk/log.h> // for minimk_log_printf
 
 #ifdef MINIMK_ENABLE_TRACE
 #define MINIMK_TRACE__ 1
@@ -23,7 +16,7 @@ MINIMK_END_DECLS
 #define MINIMK_TRACE(fmt, ...)                                                                     \
     do {                                                                                           \
         if (MINIMK_TRACE__) {                                                                      \
-            minimk_trace__(fmt, ##__VA_ARGS__);                                                    \
+            minimk_log_printf(fmt, ##__VA_ARGS__);                                                 \
         }                                                                                          \
     } while (0)
 

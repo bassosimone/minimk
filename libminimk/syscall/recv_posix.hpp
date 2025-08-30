@@ -4,11 +4,11 @@
 #ifndef LIBMINIMK_SYSCALL_RECV_POSIX_HPP
 #define LIBMINIMK_SYSCALL_RECV_POSIX_HPP
 
-#include "errno.h"             // for minimk_syscall_geterrno
-#include "../runtime/trace.h" // for MINIMK_TRACE
-#include "socket.h"           // for minimk_syscall_socket_t
+#include "errno.h"  // for minimk_syscall_geterrno
+#include "socket.h" // for minimk_syscall_socket_t
 
 #include <minimk/errno.h> // for minimk_error_t
+#include <minimk/trace.h> // for MINIMK_TRACE
 
 #include <sys/socket.h> // for recv
 #include <sys/types.h>  // for ssize_t
@@ -17,9 +17,10 @@
 #include <stddef.h> // for size_t
 
 /// Testable minimk_syscall_recv implementation.
-template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-          decltype(recv) sys_recv__ = recv>
+template <
+        decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
+        decltype(recv) sys_recv__ = recv>
 minimk_error_t minimk_syscall_recv__(minimk_syscall_socket_t sock, void *data, size_t count,
                                      size_t *nread) noexcept {
     // Initialize output parameter immediately

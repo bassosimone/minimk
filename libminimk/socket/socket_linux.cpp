@@ -6,8 +6,7 @@
 #include "../syscall/recv.h" // for minimk_syscall_recv
 #include "../syscall/send.h" // for minimk_syscall_send
 
-#include "socket.h"         // for minimk_socket_t
-#include "socket_linux.hpp" // for minimk_socket_create__
+#include "socket.h" // for minimk_socket_t
 
 #include <minimk/errno.h> // for minimk_error_t
 
