@@ -7,5 +7,5 @@
 #include <minimk/time.h> // for minimk_time_monotonic_now
 
 uint64_t minimk_time_monotonic_now(void) noexcept {
-    return __minimk_time_monotonic_now();
+    return minimk_time_monotonic_now__();
 }

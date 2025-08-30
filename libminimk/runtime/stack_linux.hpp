@@ -18,7 +18,7 @@
 #include "trace.h" // for MINIMK_TRACE
 
 /// Ensure that the stack is an integral number of pages and possibly equal to a desired size.
-static inline size_t __minimk_coro_stack_size(size_t page_size) noexcept {
+static inline size_t minimk_coro_stack_size__(size_t page_size) noexcept {
     // We aim to have 64 KiB of coroutine stack plus one guard page.
     static constexpr size_t desired = 64 << 10;
 
@@ -45,18 +45,18 @@ static inline size_t __minimk_coro_stack_size(size_t page_size) noexcept {
 }
 
 /// Testable implementation of minimk_runtime_stack_alloc
-template <decltype(minimk_syscall_clearerrno) __minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-          decltype(getpagesize) __sys_getpagesize = getpagesize, decltype(mmap) __sys_mmap = mmap,
-          decltype(mprotect) __sys_mprotect = mprotect, decltype(munmap) __sys_munmap = munmap>
-minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
+template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+          decltype(getpagesize) sys_getpagesize__ = getpagesize, decltype(mmap) sys_mmap__ = mmap,
+          decltype(mprotect) sys_mprotect__ = mprotect, decltype(munmap) sys_munmap__ = munmap>
+minimk_error_t minimk_runtime_stack_alloc__(struct stack *sp) noexcept {
     // Initialize the total amount of memory to allocate including the guard page.
-    size_t page_size = __sys_getpagesize();
-    size_t coro_stack_size = __minimk_coro_stack_size(page_size);
+    size_t page_size = sys_getpagesize__();
+    size_t coro_stack_size = minimk_coro_stack_size__(page_size);
     sp->size = coro_stack_size + page_size;
 
     // Use mmap to create a memory mapping of the desired size.
-    __minimk_syscall_clearerrno();
-    void *base = __sys_mmap(nullptr, sp->size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+    minimk_syscall_clearerrno__();
+    void *base = sys_mmap__(nullptr, sp->size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
                             -1, 0);
     if (base == MAP_FAILED) {
         return MINIMK_ENOMEM;
@@ -66,10 +66,10 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
     sp->top = sp->base + sp->size;
 
     // Use mprotect to create a safety guard page.
-    __minimk_syscall_clearerrno();
-    if (__sys_mprotect(base, page_size, PROT_NONE) == -1) {
-        __minimk_syscall_clearerrno();
-        __sys_munmap(base, sp->size);
+    minimk_syscall_clearerrno__();
+    if (sys_mprotect__(base, page_size, PROT_NONE) == -1) {
+        minimk_syscall_clearerrno__();
+        sys_munmap__(base, sp->size);
         return MINIMK_ENOMEM;
     }
 
@@ -85,13 +85,13 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
     return 0;
 }
 
-template <decltype(minimk_syscall_clearerrno) __minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-          decltype(minimk_syscall_geterrno) __minimk_syscall_geterrno = minimk_syscall_geterrno,
-          decltype(munmap) __sys_munmap = munmap>
-minimk_error_t __minimk_runtime_stack_free(struct stack *sp) noexcept {
+template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
+          decltype(munmap) sys_munmap__ = munmap>
+minimk_error_t minimk_runtime_stack_free__(struct stack *sp) noexcept {
     // Unmap the stack from memory
-    __minimk_syscall_clearerrno();
-    int rv = __sys_munmap((void *)sp->base, sp->size);
+    minimk_syscall_clearerrno__();
+    int rv = sys_munmap__((void *)sp->base, sp->size);
 
     // Let the user know what we have done
     MINIMK_TRACE("trace: freed previously allocated stack<base=0x%llx, size=0x%llx>\n",
@@ -102,7 +102,7 @@ minimk_error_t __minimk_runtime_stack_free(struct stack *sp) noexcept {
     sp->size = 0;
 
     // Assemble the correct return value
-    return (rv == -1) ? __minimk_syscall_geterrno() : 0;
+    return (rv == -1) ? minimk_syscall_geterrno__() : 0;
 }
 
 #endif // LIBMINIMK_RUNTIME_STACK_LINUX_HPP
