@@ -79,12 +79,6 @@ typedef uint32_t minimk_error_t;
 
 MINIMK_BEGIN_DECLS
 
-/// Clears the current errno value before invoking a system call.
-void minimk_errno_clear(void) MINIMK_NOEXCEPT;
-
-/// Returns the portable version of the current errno value after a system call failure.
-minimk_error_t minimk_errno_get(void) MINIMK_NOEXCEPT;
-
 /// Return the name of the errno value (i.e., MINIMK_EINTR => "EINTR").
 const char *minimk_errno_name(minimk_error_t code) MINIMK_NOEXCEPT;
 

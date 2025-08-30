@@ -4,6 +4,8 @@
 #ifndef LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 #define LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 
+#include "../errno/errno.h" // for minimk_errno_get
+
 #include "stack.h" // for struct stack
 
 #include <minimk/errno.h> // for minimk_error_t
@@ -45,10 +47,8 @@ static inline size_t __minimk_coro_stack_size(size_t page_size) noexcept {
 
 /// Testable implementation of minimk_runtime_stack_alloc
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
-          decltype(getpagesize) __sys_getpagesize = getpagesize,
-          decltype(mmap) __sys_mmap = mmap,
-          decltype(mprotect) __sys_mprotect = mprotect,
-          decltype(munmap) __sys_munmap = munmap>
+          decltype(getpagesize) __sys_getpagesize = getpagesize, decltype(mmap) __sys_mmap = mmap,
+          decltype(mprotect) __sys_mprotect = mprotect, decltype(munmap) __sys_munmap = munmap>
 minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
     // Initialize the total amount of memory to allocate including the guard page.
     size_t page_size = __sys_getpagesize();
@@ -57,7 +57,8 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
 
     // Use mmap to create a memory mapping of the desired size.
     __minimk_errno_clear();
-    void *base = __sys_mmap(nullptr, sp->size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void *base = __sys_mmap(nullptr, sp->size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
+                            -1, 0);
     if (base == MAP_FAILED) {
         return MINIMK_ENOMEM;
     }
@@ -75,14 +76,11 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
 
     // Let the user know about the stack we have created
     MINIMK_TRACE("trace: allocated new stack<base=0x%llx, size=0x%llx> with layout:\n",
-                 (unsigned long long)sp->base,
-                 (unsigned long long)sp->size);
-    MINIMK_TRACE("    [0x%llx, 0x%llx) role=guard_page PROT_NONE\n",
-                 (unsigned long long)sp->base,
+                 (unsigned long long)sp->base, (unsigned long long)sp->size);
+    MINIMK_TRACE("    [0x%llx, 0x%llx) role=guard_page PROT_NONE\n", (unsigned long long)sp->base,
                  (unsigned long long)sp->base + page_size);
     MINIMK_TRACE("    [0x%llx, 0x%llx) role=coro_stack PROT_READ|PROT_WRITE\n",
-                 (unsigned long long)sp->base + page_size,
-                 (unsigned long long)sp->base + sp->size);
+                 (unsigned long long)sp->base + page_size, (unsigned long long)sp->base + sp->size);
 
     // Return indicating success
     return 0;
@@ -98,8 +96,7 @@ minimk_error_t __minimk_runtime_stack_free(struct stack *sp) noexcept {
 
     // Let the user know what we have done
     MINIMK_TRACE("trace: freed previously allocated stack<base=0x%llx, size=0x%llx>\n",
-                 (unsigned long long)sp->base,
-                 (unsigned long long)sp->size);
+                 (unsigned long long)sp->base, (unsigned long long)sp->size);
 
     // Clear the stack structure
     sp->base = 0;

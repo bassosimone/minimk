@@ -4,6 +4,8 @@
 #ifndef LIBMINIMK_POLL_POLL_LINUX_HPP
 #define LIBMINIMK_POLL_POLL_LINUX_HPP
 
+#include "../errno/errno.h" // for minimk_errno_get
+
 #include "poll.h" // for minimk_poll
 
 #include <minimk/errno.h> // for minimk_error_t

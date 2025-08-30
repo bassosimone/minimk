@@ -4,6 +4,7 @@
 #ifndef LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 #define LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 
+#include "../errno/errno.h" // for minimk_errno_clear
 #include "../integer/u64.h" // for minimk_integer_u64_satmul
 
 #include <minimk/assert.h> // for MINIMK_ASSERT

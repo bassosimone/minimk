@@ -2,6 +2,8 @@
 // Purpose: errno handling for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "errno.h" // for minimk_errno_get
+
 #include <minimk/errno.h> // for minimk_errno_clear
 
 #include <errno.h> // for errno

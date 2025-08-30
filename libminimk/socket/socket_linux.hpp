@@ -4,6 +4,7 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 #define LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 
+#include "../errno/errno.h"   // for minimk_errno_get
 #include "../runtime/trace.h" // for MINIMK_TRACE
 
 #include "socket.h" // for minimk_socket_t
