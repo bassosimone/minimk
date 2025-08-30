@@ -3,7 +3,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "../../libminimk/socket/socket.h"             // for minimk_socket_* operations
+#include "../../libminimk/syscall/accept_posix.h"      // for minimk_syscall_accept
+#include "../../libminimk/syscall/bind_posix.h"        // for minimk_syscall_bind
 #include "../../libminimk/syscall/closesocket_posix.h" // for minimk_syscall_closesocket
+#include "../../libminimk/syscall/listen_posix.h"      // for minimk_syscall_listen
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name
@@ -62,7 +65,7 @@ int main(void) {
     }
 
     // Bind to localhost:9774
-    rv = minimk_socket_bind(server_sock, "127.0.0.1", "9774");
+    rv = minimk_syscall_bind(server_sock, "127.0.0.1", "9774");
     if (rv != 0) {
         fprintf(stderr, "Socket bind failed: %s\n", minimk_errno_name(rv));
         minimk_syscall_closesocket(&server_sock);
@@ -70,7 +73,7 @@ int main(void) {
     }
 
     // Start listening
-    rv = minimk_socket_listen(server_sock, 128);
+    rv = minimk_syscall_listen(server_sock, 128);
     if (rv != 0) {
         fprintf(stderr, "Socket listen failed: %s\n", minimk_errno_name(rv));
         minimk_syscall_closesocket(&server_sock);
@@ -83,7 +86,7 @@ int main(void) {
     // Accept connections
     for (;;) {
         minimk_socket_t client_sock = minimk_syscall_invalid_socket;
-        rv = minimk_socket_accept(&client_sock, server_sock);
+        rv = minimk_syscall_accept(&client_sock, server_sock);
 
         if (rv != 0) {
             fprintf(stderr, "Socket accept failed: %s\n", minimk_errno_name(rv));

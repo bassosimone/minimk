@@ -35,7 +35,11 @@ build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
 build libminimk/syscall/poll_posix.o: cxx libminimk/syscall/poll_posix.cpp
 build libminimk/syscall/socket_init_posix.o: cc libminimk/syscall/socket_init_posix.c
+build libminimk/syscall/accept_posix.o: cxx libminimk/syscall/accept_posix.cpp
+build libminimk/syscall/bind_posix.o: cxx libminimk/syscall/bind_posix.cpp
 build libminimk/syscall/closesocket_posix.o: cxx libminimk/syscall/closesocket_posix.cpp
+build libminimk/syscall/connect_posix.o: cxx libminimk/syscall/connect_posix.cpp
+build libminimk/syscall/listen_posix.o: cxx libminimk/syscall/listen_posix.cpp
 build libminimk/syscall/socket_posix.o: cxx libminimk/syscall/socket_posix.cpp
 
 build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
@@ -49,7 +53,11 @@ build libminimk.a: ar $
   libminimk/runtime/switch_linux_amd64.o $
   libminimk/runtime/trace.o $
   libminimk/socket/socket_linux.o $
+  libminimk/syscall/accept_posix.o $
+  libminimk/syscall/bind_posix.o $
   libminimk/syscall/closesocket_posix.o $
+  libminimk/syscall/connect_posix.o $
+  libminimk/syscall/listen_posix.o $
   libminimk/syscall/poll_posix.o $
   libminimk/syscall/socket_init_posix.o $
   libminimk/syscall/socket_posix.o $

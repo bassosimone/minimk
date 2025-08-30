@@ -27,65 +27,6 @@ MINIMK_BEGIN_DECLS
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_socket_setnonblock(minimk_socket_t sock) MINIMK_NOEXCEPT;
 
-/// Function to establish a connection with a remote endpoint.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The address argument must be a valid IPv4 or IPv6 address in numeric format
-/// represented as a string (e.g., "127.0.0.1", "::1").
-///
-/// The port argument must be a valid port number represented as a string (e.g., "80").
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address,
-                                     const char *port) MINIMK_NOEXCEPT;
-
-/// Function to bind a socket to a local address and port.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The address argument must be a valid IPv4 or IPv6 address in numeric format
-/// represented as a string (e.g., "127.0.0.1", "::1"). Use "0.0.0.0" for IPv4
-/// or "::" for IPv6 to bind to all available interfaces.
-///
-/// The port argument must be a valid port number represented as a string (e.g., "8080").
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address,
-                                  const char *port) MINIMK_NOEXCEPT;
-
-/// Function to mark a socket as listening for incoming connections.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create
-/// and bound using minimk_socket_bind.
-///
-/// The backlog argument specifies the maximum length of the queue of pending
-/// connections. A value of 128 is typically reasonable for most applications.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NOEXCEPT;
-
-/// Function to accept an incoming connection on a listening socket.
-///
-/// This function is thread-safe.
-///
-/// The client_sock return argument will be set to the invalid socket when the function
-/// is invoked and later changed to a valid socket on success representing the
-/// accepted client connection.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create,
-/// bound using minimk_socket_bind, and marked as listening using minimk_socket_listen.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock,
-                                    minimk_socket_t sock) MINIMK_NOEXCEPT;
-
 /// Function to read bytes from a given socket.
 ///
 /// This function is thread-safe.

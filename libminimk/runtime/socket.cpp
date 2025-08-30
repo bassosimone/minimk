@@ -4,7 +4,10 @@
 
 #include "../socket/socket.h"             // for minimk_socket_t and operations
 #include "../io/io.hpp"                   // for __minimk_io_readall
+#include "../syscall/accept_posix.h"      // for minimk_syscall_accept
+#include "../syscall/bind_posix.h"        // for minimk_syscall_bind
 #include "../syscall/closesocket_posix.h" // for minimk_syscall_closesocket
+#include "../syscall/listen_posix.h"      // for minimk_syscall_listen
 
 #include "handle.h"  // for __make_handle
 #include "runtime.h" // for minimk_runtime_suspend_read/write
@@ -176,13 +179,13 @@ minimk_error_t minimk_runtime_socket_bind(minimk_runtime_socket_t sock, const ch
                                           const char *port) noexcept {
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
-    return (rv != 0) ? rv : minimk_socket_bind(info->fd, address, port);
+    return (rv != 0) ? rv : minimk_syscall_bind(info->fd, address, port);
 }
 
 minimk_error_t minimk_runtime_socket_listen(minimk_runtime_socket_t sock, int backlog) noexcept {
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
-    return (rv != 0) ? rv : minimk_socket_listen(info->fd, backlog);
+    return (rv != 0) ? rv : minimk_syscall_listen(info->fd, backlog);
 }
 
 minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock,
@@ -200,7 +203,7 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
     for (;;) {
         // Attempt to accept a connection
         minimk_socket_t client_fd = minimk_syscall_invalid_socket;
-        minimk_error_t rv = minimk_socket_accept(&client_fd, listener_info->fd);
+        minimk_error_t rv = minimk_syscall_accept(&client_fd, listener_info->fd);
 
         // Suspend if needed
         if (rv == MINIMK_EAGAIN) {
