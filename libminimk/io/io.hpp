@@ -6,7 +6,7 @@
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
 #include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/socket.h> // for minimk_socket_send
+#include "../socket/socket.h" // for minimk_socket_send
 
 #include <stddef.h> // for size_t
 

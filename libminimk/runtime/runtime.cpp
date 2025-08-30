@@ -2,23 +2,23 @@
 // Purpose: cooperative coroutine runtime implementation
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "../integer/u64.h" // for minimk_integer_u64_satadd
+#include "../poll/poll.h"    // for minimk_poll
+#include "../socket/socket.h"  // for minimk_socket_t
+#include "stack.h"  // for struct stack
+#include "switch.h" // for minimk_switch
+#include "trace.h"  // for MINIMK_TRACE
+
 #include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/core.h>    // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>   // for minimk_error_t
-#include <minimk/poll.h>    // for minimk_poll
 #include <minimk/runtime.h> // for minimk_runtime_run
-#include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/time.h>    // for minimk_time_monotonic_now
 
 #include <limits.h> // for INT_MAX
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uintptr_t
 #include <string.h> // for memset
-
-#include "stack.h"  // for struct stack
-#include "switch.h" // for minimk_switch
-#include "trace.h"  // for MINIMK_TRACE
-
-#include "../integer/u64.h" // for minimk_integer_u64_satadd
 
 /// Unused coroutine slot.
 #define CORO_NULL 0
@@ -452,10 +452,14 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     return MINIMK_ETIMEDOUT;
 }
 
-minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) noexcept {
+MINIMK_BEGIN_DECLS
+
+minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
     return __minimk_suspend_io(sock, minimk_poll_pollin(), nanosec);
 }
 
-minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock, uint64_t nanosec) noexcept {
+minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
     return __minimk_suspend_io(sock, minimk_poll_pollout(), nanosec);
 }
+
+MINIMK_END_DECLS

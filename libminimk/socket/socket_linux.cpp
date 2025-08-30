@@ -2,11 +2,11 @@
 // Purpose: socket library implemented for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/socket.h> // for minimk_socket_t
-
 #include "../io/io.hpp"
+#include "socket.h" // for minimk_socket_t
 #include "socket_linux.hpp"
+
+#include <minimk/errno.h>  // for minimk_error_t
 
 minimk_error_t minimk_socket_init(void) noexcept {
     return 0;

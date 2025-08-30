@@ -4,8 +4,9 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 #define LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 
+#include "socket.h" // for minimk_socket_t
+
 #include <minimk/errno.h>  // for minimk_errno_clear
-#include <minimk/socket.h> // for minimk_socket_t
 
 #include <sys/socket.h> // for recv
 #include <sys/types.h>  // for ssize_t

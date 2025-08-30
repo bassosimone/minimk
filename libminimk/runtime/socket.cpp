@@ -2,18 +2,20 @@
 // Purpose: runtime-managed socket table with ECS-style resource management
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include "../io/io.hpp" // for __minimk_io_readall
+#include "../poll/poll.h" // for minimk_poll functions
+#include "../socket/socket.h"  // for minimk_socket_t and operations
+#include "handle.h"     // for __make_handle
+#include "runtime.h"    // for minimk_runtime_suspend_read/write
+#include "trace.h"      // for MINIMK_TRACE
+
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_socket_t
-#include <minimk/socket.h>  // for minimk_socket_t
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for UINT64_MAX
 #include <string.h> // for memset
-
-#include "../io/io.hpp" // for __minimk_io_readall
-#include "handle.h"     // for __make_handle
-#include "trace.h"      // for MINIMK_TRACE
 
 /// Maximum number of sockets managed by the runtime.
 #define MAX_SOCKETS __MAX_HANDLES

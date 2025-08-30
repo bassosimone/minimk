@@ -2,10 +2,10 @@
 // Purpose: poll library implemented for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <minimk/errno.h> // for minimk_error_t
-#include <minimk/poll.h>  // for minimk_poll
-
+#include "poll.h"  // for minimk_poll
 #include "poll_linux.hpp"
+
+#include <minimk/errno.h> // for minimk_error_t
 
 short minimk_poll_pollin(void) noexcept {
     return POLLIN;

@@ -5,7 +5,7 @@
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name
 #include <minimk/runtime.h> // for minimk_runtime_go
-#include <minimk/socket.h>  // for minimk_socket_*
+#include <minimk/socket.h>  // for minimk_socket_init + constants
 
 #include <stdio.h>  // for fprintf
 #include <stdlib.h> // for exit

@@ -1,12 +1,12 @@
-// File: include/minimk/poll.h
-// Purpose: poll library
+// File: libminimk/poll/poll.h
+// Purpose: private poll library
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef MINIMK_POLL_H
-#define MINIMK_POLL_H
+#ifndef LIBMINIMK_POLL_POLL_H
+#define LIBMINIMK_POLL_POLL_H
 
 #include <minimk/core.h>   // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/socket.h> // for minimk_socket_t
+#include "../socket/socket.h" // for minimk_socket_t
 
 #include <stddef.h> // for size_t
 
@@ -55,4 +55,4 @@ minimk_error_t minimk_poll(struct minimk_pollfd *fds, size_t size, int timeout, 
 
 MINIMK_END_DECLS
 
-#endif // MINIMK_POLL_H
+#endif // LIBMINIMK_POLL_POLL_H

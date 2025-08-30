@@ -1,26 +1,11 @@
 // File: include/minimk/socket.h
-// Purpose: socket library
+// Purpose: socket library public API (init and constants only)
 // SPDX-License-Identifier: GPL-3.0-or-later
 #ifndef MINIMK_SOCKET_H
 #define MINIMK_SOCKET_H
 
 #include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
-
-#include <stddef.h> // for size_t
-
-#ifdef _WIN32
-#include <stdint.h> // for uintptr_t
-#endif
-
-/// Type representing a socket descriptor.
-///
-/// The type is uintptr_t on Windows and int on POSIX.
-#ifdef _WIN32
-typedef uintptr_t minimk_socket_t;
-#else
-typedef int minimk_socket_t;
-#endif
 
 MINIMK_BEGIN_DECLS
 
@@ -60,158 +45,6 @@ int minimk_socket_sock_stream(void) MINIMK_NOEXCEPT;
 /// The return value is SOCK_DGRAM.
 int minimk_socket_sock_dgram(void) MINIMK_NOEXCEPT;
 
-/// Function returning the platform-specific canonical invalid socket value.
-///
-/// This function is thread-safe.
-///
-/// The return value is -1 on Unix and INVALID_SOCKET on Windows.
-minimk_socket_t minimk_socket_invalid(void) MINIMK_NOEXCEPT;
-
-/// Function to create a new socket instance.
-///
-/// This function is thread-safe.
-///
-/// The sock return argument will be set to the invalid socket when the function
-/// is invoked and later changed to a valid socket on success.
-///
-/// The domain MUST be AF_INET or AF_INET6.
-///
-/// The type MUST be SOCK_STREAM or SOCK_DGRAM.
-///
-/// The protocol must be zero.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type, int protocol) MINIMK_NOEXCEPT;
-
-/// Function to configure a socket as nonblocking.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_setnonblock(minimk_socket_t sock) MINIMK_NOEXCEPT;
-
-/// Function to establish a connection with a remote endpoint.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The address argument must be a valid IPv4 or IPv6 address in numeric format
-/// represented as a string (e.g., "127.0.0.1", "::1").
-///
-/// The port argument must be a valid port number represented as a string (e.g., "80").
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address, const char *port) MINIMK_NOEXCEPT;
-
-/// Function to bind a socket to a local address and port.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The address argument must be a valid IPv4 or IPv6 address in numeric format
-/// represented as a string (e.g., "127.0.0.1", "::1"). Use "0.0.0.0" for IPv4
-/// or "::" for IPv6 to bind to all available interfaces.
-///
-/// The port argument must be a valid port number represented as a string (e.g., "8080").
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address, const char *port) MINIMK_NOEXCEPT;
-
-/// Function to mark a socket as listening for incoming connections.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create
-/// and bound using minimk_socket_bind.
-///
-/// The backlog argument specifies the maximum length of the queue of pending
-/// connections. A value of 128 is typically reasonable for most applications.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NOEXCEPT;
-
-/// Function to accept an incoming connection on a listening socket.
-///
-/// This function is thread-safe.
-///
-/// The client_sock return argument will be set to the invalid socket when the function
-/// is invoked and later changed to a valid socket on success representing the
-/// accepted client connection.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create,
-/// bound using minimk_socket_bind, and marked as listening using minimk_socket_listen.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_t sock) MINIMK_NOEXCEPT;
-
-/// Function to read bytes from a given socket.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The data argument must be a valid array for receiving the data.
-///
-/// The count argument must be the size of the array.
-///
-/// The nread argument is set to zero when the function is called and updated
-/// to be the number of bytes read on success.
-///
-/// This function increases robustness as follows:
-///
-/// 1. if count is zero, it returns MINIMK_EINVAL since reading zero bytes is most
-/// likely a bug in the code and should not actually happen.
-///
-/// 2. otherwise, if recv returns zero, it returns MINIMK_EOF.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) MINIMK_NOEXCEPT;
-
-/// Function to write bytes to a given socket.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The data argument must be a valid array containing the data to send.
-///
-/// The count argument must be the size of the array.
-///
-/// The nwritten argument is set to zero when the function is called and updated
-/// to be the number of bytes written on success.
-///
-/// This function increases robustness as follows:
-///
-/// 1. if count is zero, it returns MINIMK_EINVAL since writing zero bytes is most
-/// likely a bug in the code and should not actually happen.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t
-minimk_socket_send(minimk_socket_t sock, const void *data, size_t count, size_t *nwritten) MINIMK_NOEXCEPT;
-
-/// Function to destroy a socket instance.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-/// On return, the sock argument is unconditionally set to be an invalid socket.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_destroy(minimk_socket_t *sock) MINIMK_NOEXCEPT;
-
-/// Like minimk_socket_send but sends all the content of the buffer unless an error occurs.
-///
-/// In case of short write, returns the error that occurred. This is an all-or-nothing operation.
-///
-/// When interruped by a signal, this function continues to write relentlessly.
-minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) MINIMK_NOEXCEPT;
-
-/// Like minimk_socket_sendall but for receiving.
-minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t count) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 
