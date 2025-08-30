@@ -51,6 +51,8 @@ build libminimk/syscall/socket_setnonblock_posix.o: cxx libminimk/syscall/socket
 
 build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 
+build libminimk/trace/trace.o: cc libminimk/trace/trace.c
+
 build libminimk.a: ar $
   libminimk/errno/errno.o $
   libminimk/errno/errno_posix.o $
@@ -74,7 +76,8 @@ build libminimk.a: ar $
   libminimk/syscall/socket_init_posix.o $
   libminimk/syscall/socket_posix.o $
   libminimk/syscall/socket_setnonblock_posix.o $
-  libminimk/time/monotonic_linux.o
+  libminimk/time/monotonic_linux.o $
+  libminimk/trace/trace.o
 
 build examples/runtime/00_coroutine_hello.o: cc examples/runtime/00_coroutine_hello.c
 build examples/runtime/00_coroutine_hello.exe: link examples/runtime/00_coroutine_hello.o libminimk.a

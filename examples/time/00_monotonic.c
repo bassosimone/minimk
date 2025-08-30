@@ -2,12 +2,15 @@
 // Purpose: read the monotonic clock
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <minimk/time.h> // for minimk_time_monotonic_now
+#include <minimk/time.h>  // for minimk_time_monotonic_now
+#include <minimk/trace.h> // for minimk_trace_enable
 
 #include <stdint.h> // for uint64_t
 #include <stdio.h>  // for fprintf
 
 int main(void) {
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_SYSCALL;
+
     uint64_t first = minimk_time_monotonic_now();
     fprintf(stderr, "%llu\n", (unsigned long long)first);
 
