@@ -1,8 +1,8 @@
-// File: include/minimk/core.h
-// Purpose: core library
+// File: include/minimk/cdefs.h
+// Purpose: C compiler definitions
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef MINIMK_CORE_H
-#define MINIMK_CORE_H
+#ifndef MINIMK_CDEFS_H
+#define MINIMK_CDEFS_H
 
 /// Macro identifying the beginning of C declarations.
 #ifdef __cplusplus
@@ -25,4 +25,4 @@
 #define MINIMK_NOEXCEPT /* Nothing */
 #endif
 
-#endif // MINIMK_CORE_H
+#endif // MINIMK_CDEFS_H

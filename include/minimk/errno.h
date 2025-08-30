@@ -4,7 +4,7 @@
 #ifndef MINIMK_ERRNO_H
 #define MINIMK_ERRNO_H
 
-#include <minimk/core.h> // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 
 #include <stdint.h> // for uint32_t
 

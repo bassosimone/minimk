@@ -4,7 +4,7 @@
 #ifndef MINIMK_SOCKET_H
 #define MINIMK_SOCKET_H
 
-#include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
 
 MINIMK_BEGIN_DECLS

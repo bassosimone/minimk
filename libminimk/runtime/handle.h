@@ -5,7 +5,7 @@
 #define LIBMINIMK_RUNTIME_HANDLE_H
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/core.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
 
 #include <stdint.h> // for uint8_t
 

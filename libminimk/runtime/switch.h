@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_RUNTIME_SWITCH_H
 #define LIBMINIMK_RUNTIME_SWITCH_H
 
-#include <minimk/core.h> // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 
 #include <stdint.h> // for uintptr_t
 

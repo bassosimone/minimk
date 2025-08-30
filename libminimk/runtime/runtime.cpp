@@ -10,7 +10,7 @@
 #include "trace.h"            // for MINIMK_TRACE
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
-#include <minimk/core.h>    // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>    // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_run
 #include <minimk/time.h>    // for minimk_time_monotonic_now

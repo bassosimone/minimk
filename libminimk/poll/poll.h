@@ -5,7 +5,7 @@
 #define LIBMINIMK_POLL_POLL_H
 
 #include "../socket/socket.h" // for minimk_socket_t
-#include <minimk/core.h>      // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>      // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>     // for minimk_error_t
 
 #include <stddef.h> // for size_t

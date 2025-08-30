@@ -4,7 +4,7 @@
 #ifndef MINIMK_TIME_H
 #define MINIMK_TIME_H
 
-#include <minimk/core.h> // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 
 #include <stdint.h> // for int64_t
 

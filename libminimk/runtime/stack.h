@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_RUNTIME_STACK_H
 #define LIBMINIMK_RUNTIME_STACK_H
 
-#include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t

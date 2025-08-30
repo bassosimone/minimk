@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_H
 #define LIBMINIMK_SOCKET_SOCKET_H
 
-#include <minimk/core.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>  // for minimk_error_t
 #include <minimk/socket.h> // for init and constants
 

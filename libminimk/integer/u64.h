@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_INTEGER_U64_H
 #define LIBMINIMK_INTEGER_U64_H
 
-#include <minimk/core.h> // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 
 #include <inttypes.h> // for uint64_t
 
