@@ -2,12 +2,12 @@
 // Purpose: cooperative coroutine runtime implementation
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../integer/u64.h" // for minimk_integer_u64_satadd
-#include "../poll/poll.h"    // for minimk_poll
-#include "../socket/socket.h"  // for minimk_socket_t
-#include "stack.h"  // for struct stack
-#include "switch.h" // for minimk_switch
-#include "trace.h"  // for MINIMK_TRACE
+#include "../integer/u64.h"   // for minimk_integer_u64_satadd
+#include "../poll/poll.h"     // for minimk_poll
+#include "../socket/socket.h" // for minimk_socket_t
+#include "stack.h"            // for struct stack
+#include "switch.h"           // for minimk_switch
+#include "trace.h"            // for MINIMK_TRACE
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/core.h>    // for MINIMK_BEGIN_DECLS

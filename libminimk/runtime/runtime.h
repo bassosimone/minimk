@@ -6,8 +6,8 @@
 
 #include "../socket/socket.h" // for minimk_socket_t
 
-#include <minimk/core.h>      // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h>     // for minimk_error_t
+#include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h> // for minimk_error_t
 
 #include <stdint.h> // for uint64_t
 

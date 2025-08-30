@@ -2,10 +2,10 @@
 // Purpose: blocking TCP echo server using socket API
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/errno.h>  // for minimk_errno_name
-#include <minimk/socket.h> // for minimk_socket_init + constants
 #include "../../libminimk/socket/socket.h" // for minimk_socket_* operations
+#include <minimk/assert.h>                 // for MINIMK_ASSERT
+#include <minimk/errno.h>                  // for minimk_errno_name
+#include <minimk/socket.h>                 // for minimk_socket_init + constants
 
 #include <stdio.h>  // for fprintf
 #include <stdlib.h> // for exit

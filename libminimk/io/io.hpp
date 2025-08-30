@@ -4,9 +4,8 @@
 #ifndef LIBMINIMK_IO_IO_HPP
 #define LIBMINIMK_IO_IO_HPP
 
-#include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/errno.h>  // for minimk_error_t
-#include "../socket/socket.h" // for minimk_socket_send
+#include <minimk/assert.h>    // for MINIMK_ASSERT
+#include <minimk/errno.h>     // for minimk_error_t
 
 #include <stddef.h> // for size_t
 

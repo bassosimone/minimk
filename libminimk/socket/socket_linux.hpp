@@ -6,7 +6,7 @@
 
 #include "socket.h" // for minimk_socket_t
 
-#include <minimk/errno.h>  // for minimk_errno_clear
+#include <minimk/errno.h> // for minimk_errno_clear
 
 #include <sys/socket.h> // for recv
 #include <sys/types.h>  // for ssize_t

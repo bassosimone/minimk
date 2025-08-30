@@ -45,7 +45,6 @@ int minimk_socket_sock_stream(void) MINIMK_NOEXCEPT;
 /// The return value is SOCK_DGRAM.
 int minimk_socket_sock_dgram(void) MINIMK_NOEXCEPT;
 
-
 MINIMK_END_DECLS
 
 #endif // MINIMK_SOCKET_H

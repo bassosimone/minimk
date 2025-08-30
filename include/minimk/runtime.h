@@ -4,8 +4,8 @@
 #ifndef MINIMK_RUNTIME_H
 #define MINIMK_RUNTIME_H
 
-#include <minimk/core.h>   // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h>  // for minimk_error_t
+#include <minimk/core.h>  // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uint64_t
@@ -49,7 +49,6 @@ void minimk_runtime_yield(void) MINIMK_NOEXCEPT;
 ///
 /// This function must be called by a running goroutine.
 void minimk_runtime_nanosleep(uint64_t nanosec) MINIMK_NOEXCEPT;
-
 
 /// Function to create a new socket instance.
 ///
