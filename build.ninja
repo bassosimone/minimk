@@ -23,6 +23,7 @@ rule ar
   description = AR $out
 
 build libminimk/errno/errno.o: cc libminimk/errno/errno.c
+build libminimk/errno/errno_posix.o: cc libminimk/errno/errno_posix.c
 
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
 build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
@@ -45,11 +46,13 @@ build libminimk/syscall/send_posix.o: cxx libminimk/syscall/send_posix.cpp
 build libminimk/syscall/socket_posix.o: cxx libminimk/syscall/socket_posix.cpp
 build libminimk/syscall/socket_setnonblock_posix.o: cxx libminimk/syscall/socket_setnonblock_posix.cpp
 build libminimk/syscall/setsockopt_nosigpipe_posix.o: cxx libminimk/syscall/setsockopt_nosigpipe_posix.cpp
+build libminimk/syscall/getsockopt_error_posix.o: cxx libminimk/syscall/getsockopt_error_posix.cpp
 
 build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 
 build libminimk.a: ar $
   libminimk/errno/errno.o $
+  libminimk/errno/errno_posix.o $
   libminimk/runtime/runtime.o $
   libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $
@@ -69,6 +72,7 @@ build libminimk.a: ar $
   libminimk/syscall/socket_posix.o $
   libminimk/syscall/socket_setnonblock_posix.o $
   libminimk/syscall/setsockopt_nosigpipe_posix.o $
+  libminimk/syscall/getsockopt_error_posix.o $
   libminimk/time/monotonic_linux.o
 
 build examples/runtime/00_coroutine_hello.o: cc examples/runtime/00_coroutine_hello.c
