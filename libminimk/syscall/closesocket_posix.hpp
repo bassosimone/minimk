@@ -12,15 +12,16 @@
 #include <unistd.h> // for close
 
 /// Testable minimk_syscall_closesocket implementation.
-template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-          decltype(close) M_sys_close = close>
+template <
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+        decltype(close) M_sys_close = close>
 minimk_error_t minimk_syscall_closesocket_impl(minimk_syscall_socket_t *sock) noexcept {
     // Clear the errno ahead of the syscall
     M_minimk_syscall_clearerrno();
 
     // Issue the syscall proper
-    int rv = M_sys_close((int)*sock);
+    int rv = M_sys_close(*sock);
 
     // Set socket to invalid state
     *sock = -1;

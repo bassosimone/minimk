@@ -20,7 +20,7 @@ template <
         decltype(getsockopt) M_sys_getsockopt = getsockopt,
         decltype(minimk_errno_map) M_minimk_errno_map = minimk_errno_map>
 minimk_error_t minimk_syscall_getsockopt_error_impl(minimk_syscall_socket_t sock,
-                                                 minimk_error_t *error) noexcept {
+                                                    minimk_error_t *error) noexcept {
     int soerr = 0;
     socklen_t soerrlen = sizeof(soerr);
 
@@ -28,7 +28,7 @@ minimk_error_t minimk_syscall_getsockopt_error_impl(minimk_syscall_socket_t sock
     M_minimk_syscall_clearerrno();
 
     // Get the socket error
-    if (M_sys_getsockopt((int)sock, SOL_SOCKET, SO_ERROR, (void *)&soerr, &soerrlen) != 0) {
+    if (M_sys_getsockopt(sock, SOL_SOCKET, SO_ERROR, static_cast<void *>(&soerr), &soerrlen) != 0) {
         return M_minimk_syscall_geterrno();
     }
 

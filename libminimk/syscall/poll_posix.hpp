@@ -42,13 +42,13 @@ minimk_error_t minimk_syscall_poll_impl(struct minimk_syscall_pollfd *fds, size_
 
     // Clear errno and issues the system call.
     M_minimk_syscall_clearerrno();
-    int rv = M_sys_poll((struct pollfd *)fds, (nfds_t)size, timeout);
+    int rv = M_sys_poll((struct pollfd *)fds, static_cast<nfds_t>(size), timeout);
 
     // Determine whether poll succeeded.
     int success = (rv >= 0);
 
     // Set nready according to whether we succeeded.
-    *nready = (success) ? (size_t)rv : 0;
+    *nready = (success) ? static_cast<size_t>(rv) : 0;
 
     // Set return value according to whether we succeded.
     return (success) ? 0 : M_minimk_syscall_geterrno();

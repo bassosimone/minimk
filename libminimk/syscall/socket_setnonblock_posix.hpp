@@ -19,7 +19,7 @@ template <
 minimk_error_t minimk_syscall_socket_setnonblock_impl(minimk_syscall_socket_t sock) noexcept {
     // Get the flags
     M_minimk_syscall_clearerrno();
-    int flags = M_sys_fcntl2((int)sock, F_GETFL);
+    int flags = M_sys_fcntl2(sock, F_GETFL);
     if (flags == -1) {
         return M_minimk_syscall_geterrno();
     }
@@ -29,7 +29,7 @@ minimk_error_t minimk_syscall_socket_setnonblock_impl(minimk_syscall_socket_t so
 
     // Set the flags
     M_minimk_syscall_clearerrno();
-    if (M_sys_fcntl3((int)sock, F_SETFL, flags) == -1) {
+    if (M_sys_fcntl3(sock, F_SETFL, flags) == -1) {
         return M_minimk_syscall_geterrno();
     }
     return 0;

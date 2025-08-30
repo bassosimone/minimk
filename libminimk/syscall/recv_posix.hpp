@@ -22,14 +22,14 @@ template <
         decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
         decltype(recv) M_sys_recv = recv>
 minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data, size_t count,
-                                     size_t *nread) noexcept {
+                                        size_t *nread) noexcept {
     // Initialize output parameter immediately
     *nread = 0;
 
     // As documented, reject zero-byte reads
     if (count <= 0) {
         MINIMK_TRACE("trace: suspicious recv 0x%llx with zero bytes size\n",
-                     (unsigned long long)sock);
+                     static_cast<unsigned long long>(sock));
         return MINIMK_EINVAL;
     }
 
@@ -42,7 +42,7 @@ minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data
     // Issue the recv system call proper
     M_minimk_syscall_clearerrno();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
-    ssize_t rv = M_sys_recv((int)sock, data, count, flags);
+    ssize_t rv = M_sys_recv(sock, data, count, flags);
 
     // Handle the case of error
     if (rv == -1) {
@@ -55,7 +55,7 @@ minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data
     }
 
     // Handle the case of success
-    *nread = (size_t)rv;
+    *nread = static_cast<size_t>(rv);
     return 0;
 }
 

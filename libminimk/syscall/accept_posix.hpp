@@ -20,11 +20,11 @@ minimk_error_t minimk_syscall_accept_impl(minimk_syscall_socket_t *client_sock,
                                           minimk_syscall_socket_t sock) noexcept {
     M_minimk_syscall_clearerrno();
     *client_sock = -1;
-    int client_fd = M_sys_accept((int)sock, nullptr, nullptr);
+    int client_fd = M_sys_accept(sock, nullptr, nullptr);
     if (client_fd == -1) {
         return M_minimk_syscall_geterrno();
     }
-    *client_sock = (minimk_syscall_socket_t)client_fd;
+    *client_sock = client_fd;
     return 0;
 }
 

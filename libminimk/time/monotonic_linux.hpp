@@ -22,9 +22,9 @@ uint64_t minimk_time_monotonic_now_impl(void) noexcept {
     int clock_gettime_rv = M_vdso_clock_gettime(CLOCK_MONOTONIC, &ts);
     MINIMK_ASSERT(clock_gettime_rv == 0);
     M_minimk_syscall_clearerrno();
-    uint64_t now = (uint64_t)ts.tv_sec;
+    uint64_t now = static_cast<uint64_t>(ts.tv_sec);
     now = minimk_integer_u64_satmul(now, 1000000000LL);
-    now = minimk_integer_u64_satadd(now, (uint64_t)ts.tv_nsec);
+    now = minimk_integer_u64_satadd(now, static_cast<uint64_t>(ts.tv_nsec));
     return now;
 }
 

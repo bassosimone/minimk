@@ -21,15 +21,15 @@ template <
         decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
         decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
         decltype(send) M_sys_send = send>
-minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void *data, size_t count,
-                                     size_t *nwritten) noexcept {
+minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void *data,
+                                        size_t count, size_t *nwritten) noexcept {
     // Initialize output parameter immediately
     *nwritten = 0;
 
     // As documented, reject zero-byte writes
     if (count <= 0) {
         MINIMK_TRACE("trace: suspicious send 0x%llx with zero bytes size\n",
-                     (unsigned long long)sock);
+                     static_cast<unsigned long long>(sock));
         return MINIMK_EINVAL;
     }
 
@@ -42,7 +42,7 @@ minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void
     // Issue the send system call proper
     M_minimk_syscall_clearerrno();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
-    ssize_t rv = M_sys_send((int)sock, data, count, flags);
+    ssize_t rv = M_sys_send(sock, data, count, flags);
 
     // Handle the case of error
     if (rv == -1) {
@@ -50,7 +50,7 @@ minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void
     }
 
     // Handle the case of success
-    *nwritten = (size_t)rv;
+    *nwritten = static_cast<size_t>(rv);
     return 0;
 }
 

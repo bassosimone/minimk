@@ -55,7 +55,7 @@ static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_
     // Zero the return argument
     *pinfo = nullptr;
 
-    MINIMK_TRACE("trace: find_socketinfo handle=0x%llx\n", (unsigned long long)handle);
+    MINIMK_TRACE("trace: find_socketinfo handle=0x%llx\n", static_cast<unsigned long long>(handle));
 
     // Reject handles owned by other subsystems
     uint8_t type = handle_type(handle);
@@ -68,13 +68,15 @@ static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_
     uint64_t index = handle_index(handle);
     socketinfo *info = &sockets[index];
 
-    MINIMK_TRACE("trace: checking slot %llu, stored_handle=0x%llx\n", (unsigned long long)index,
-                 (unsigned long long)info->handle);
+    MINIMK_TRACE("trace: checking slot %llu, stored_handle=0x%llx\n",
+                 static_cast<unsigned long long>(index),
+                 static_cast<unsigned long long>(info->handle));
 
     // Ensure the handle is actually correct
     if (info->handle != handle) {
         MINIMK_TRACE("trace: handle mismatch: expected=0x%llx, found=0x%llx\n",
-                     (unsigned long long)handle, (unsigned long long)info->handle);
+                     static_cast<unsigned long long>(handle),
+                     static_cast<unsigned long long>(info->handle));
         return MINIMK_EBADF;
     }
 
@@ -88,7 +90,8 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
     *pinfo = nullptr;
 
     MINIMK_TRACE("trace: create_socketinfo fd=%llu, next_slot=%zu, generation=%llu\n",
-                 (unsigned long long)fd, next_slot, (unsigned long long)generation);
+                 static_cast<unsigned long long>(fd), next_slot,
+                 static_cast<unsigned long long>(generation));
 
     // We need to search at most MAX_SOCKETS times before giving up
     for (size_t idx = 0; idx < MAX_SOCKETS && *pinfo == nullptr; idx++) {
@@ -97,7 +100,7 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
         socketinfo *info = &sockets[slot_index];
 
         MINIMK_TRACE("trace: checking slot %zu (next_slot=%zu), handle=0x%llx\n", slot_index,
-                     next_slot, (unsigned long long)info->handle);
+                     next_slot, static_cast<unsigned long long>(info->handle));
 
         // A completely zero handle indicates that the slot is actually free
         if (info->handle == 0) {
@@ -108,7 +111,8 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
             info->write_timeout = UINT64_MAX;
 
             MINIMK_TRACE("trace: allocated slot %zu, handle=0x%llx, fd=%llu\n", slot_index,
-                         (unsigned long long)info->handle, (unsigned long long)fd);
+                         static_cast<unsigned long long>(info->handle),
+                         static_cast<unsigned long long>(fd));
             // FALLTHROUGH
         }
 
@@ -118,7 +122,8 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
         // Check for a jump to the next generation
         if (next_slot >= 2 && (next_slot % MAX_SOCKETS) == 0) {
             generation++;
-            MINIMK_TRACE("trace: generation incremented to %llu\n", (unsigned long long)generation);
+            MINIMK_TRACE("trace: generation incremented to %llu\n",
+                         static_cast<unsigned long long>(generation));
         }
     }
 
@@ -151,7 +156,8 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
         return rv;
     }
 
-    MINIMK_TRACE("trace: created underlying socket fd=%llu\n", (unsigned long long)sockfd);
+    MINIMK_TRACE("trace: created underlying socket fd=%llu\n",
+                 static_cast<unsigned long long>(sockfd));
 
     // Make it nonblocking
     rv = minimk_syscall_socket_setnonblock(sockfd);
@@ -173,7 +179,7 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
     // Return the socket handle to the caller
     *sock = info->handle;
     MINIMK_TRACE("trace: minimk_runtime_socket_create success: handle=0x%llx\n",
-                 (unsigned long long)*sock);
+                 static_cast<unsigned long long>(*sock));
     return 0;
 }
 
@@ -253,7 +259,8 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *da
     }
 
     MINIMK_TRACE("trace: minimk_runtime_socket_recv handle=0x%llx fd=%llu count=%zu\n",
-                 (unsigned long long)sock, (unsigned long long)info->fd, count);
+                 static_cast<unsigned long long>(sock), static_cast<unsigned long long>(info->fd),
+                 count);
 
     for (;;) {
         // Attempt to read data

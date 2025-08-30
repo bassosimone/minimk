@@ -28,7 +28,7 @@ minimk_error_t minimk_syscall_socket_impl(minimk_syscall_socket_t *sock, int dom
     int ok = (fdesc >= 0);
 
     // Assign the resulting socket depending on whether it succeeded
-    *sock = ok ? (minimk_syscall_socket_t)fdesc : -1;
+    *sock = ok ? fdesc : -1;
 
     // Assign retval depending on whether it succeeded
     return ok ? 0 : M_minimk_syscall_geterrno();
