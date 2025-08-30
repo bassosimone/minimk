@@ -2,7 +2,7 @@
 // Purpose: accept(2) implemented for POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "accept_posix.h"   // for minimk_syscall_accept
+#include "accept.h"   // for minimk_syscall_accept
 #include "accept_posix.hpp" // for minimk_syscall_accept__
 
 #include <minimk/errno.h> // for minimk_error_t

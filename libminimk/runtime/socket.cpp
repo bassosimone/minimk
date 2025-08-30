@@ -4,13 +4,13 @@
 
 #include "../socket/socket.h"                    // for minimk_socket_t and operations
 #include "../io/io.hpp"                          // for __minimk_io_readall
-#include "../syscall/accept_posix.h"             // for minimk_syscall_accept
-#include "../syscall/bind_posix.h"               // for minimk_syscall_bind
-#include "../syscall/closesocket_posix.h"        // for minimk_syscall_closesocket
-#include "../syscall/listen_posix.h"             // for minimk_syscall_listen
-#include "../syscall/recv_posix.h"               // for minimk_syscall_recv
-#include "../syscall/send_posix.h"               // for minimk_syscall_send
-#include "../syscall/socket_setnonblock_posix.h" // for minimk_syscall_socket_setnonblock
+#include "../syscall/accept.h"             // for minimk_syscall_accept
+#include "../syscall/bind.h"               // for minimk_syscall_bind
+#include "../syscall/closesocket.h"        // for minimk_syscall_closesocket
+#include "../syscall/listen.h"             // for minimk_syscall_listen
+#include "../syscall/recv.h"               // for minimk_syscall_recv
+#include "../syscall/send.h"               // for minimk_syscall_send
+#include "../syscall/socket_setnonblock.h" // for minimk_syscall_socket_setnonblock
 
 #include "handle.h"  // for __make_handle
 #include "runtime.h" // for minimk_runtime_suspend_read/write

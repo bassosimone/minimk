@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "../io/io.hpp"
-#include "../syscall/recv_posix.h" // for minimk_syscall_recv
-#include "../syscall/send_posix.h" // for minimk_syscall_send
+#include "../syscall/recv.h" // for minimk_syscall_recv
+#include "../syscall/send.h" // for minimk_syscall_send
 
 #include "socket.h"         // for minimk_socket_t
 #include "socket_linux.hpp" // for __minimk_socket_create

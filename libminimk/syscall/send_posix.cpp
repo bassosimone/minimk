@@ -2,7 +2,7 @@
 // Purpose: send(2) implemented for POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "send_posix.h"   // for minimk_syscall_send
+#include "send.h"   // for minimk_syscall_send
 #include "send_posix.hpp" // for minimk_syscall_send__
 
 #include <minimk/errno.h> // for minimk_error_t

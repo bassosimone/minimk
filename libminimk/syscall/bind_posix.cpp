@@ -2,7 +2,7 @@
 // Purpose: bind(2) implemented for POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "bind_posix.h"   // for minimk_syscall_bind
+#include "bind.h"   // for minimk_syscall_bind
 #include "bind_posix.hpp" // for minimk_syscall_bind__
 
 #include <minimk/errno.h> // for minimk_error_t

@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "../../libminimk/socket/socket.h"             // for minimk_socket_* operations
-#include "../../libminimk/syscall/accept_posix.h"      // for minimk_syscall_accept
-#include "../../libminimk/syscall/bind_posix.h"        // for minimk_syscall_bind
-#include "../../libminimk/syscall/closesocket_posix.h" // for minimk_syscall_closesocket
-#include "../../libminimk/syscall/listen_posix.h"      // for minimk_syscall_listen
-#include "../../libminimk/syscall/recv_posix.h"        // for minimk_syscall_recv
+#include "../../libminimk/syscall/accept.h"      // for minimk_syscall_accept
+#include "../../libminimk/syscall/bind.h"        // for minimk_syscall_bind
+#include "../../libminimk/syscall/closesocket.h" // for minimk_syscall_closesocket
+#include "../../libminimk/syscall/listen.h"      // for minimk_syscall_listen
+#include "../../libminimk/syscall/recv.h"        // for minimk_syscall_recv
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name

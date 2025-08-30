@@ -2,7 +2,7 @@
 // Purpose: connect(2) implemented for POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "connect_posix.h"   // for minimk_syscall_connect
+#include "connect.h"   // for minimk_syscall_connect
 #include "connect_posix.hpp" // for minimk_syscall_connect__
 
 #include <minimk/errno.h> // for minimk_error_t

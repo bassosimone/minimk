@@ -2,7 +2,7 @@
 // Purpose: recv(2) implemented for POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "recv_posix.h"   // for minimk_syscall_recv
+#include "recv.h"   // for minimk_syscall_recv
 #include "recv_posix.hpp" // for minimk_syscall_recv__
 
 #include <minimk/errno.h> // for minimk_error_t

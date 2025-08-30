@@ -2,7 +2,7 @@
 // Purpose: close(2) implemented for POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "closesocket_posix.h"   // for minimk_syscall_closesocket
+#include "closesocket.h"   // for minimk_syscall_closesocket
 #include "closesocket_posix.hpp" // for minimk_syscall_closesocket__
 
 #include <minimk/errno.h> // for minimk_error_t
