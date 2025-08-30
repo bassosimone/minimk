@@ -61,9 +61,18 @@ minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
     M_minimk_syscall_clearerrno();
     int prot = PROT_READ | PROT_WRITE;
     int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+    MINIMK_TRACE_SYSCALL("mmap: addr=%s\n", "nullptr");
+    MINIMK_TRACE_SYSCALL("mmap: length=%zu\n", sp->size);
+    MINIMK_TRACE_SYSCALL("mmap: prot=0x%x\n", static_cast<unsigned>(prot));
+    MINIMK_TRACE_SYSCALL("mmap: flags=0x%x\n", static_cast<unsigned>(flags));
+    MINIMK_TRACE_SYSCALL("mmap: fd=%d\n", -1);
+    MINIMK_TRACE_SYSCALL("mmap: offset=0x%x\n", 0U);
     void *base = M_sys_mmap(nullptr, sp->size, prot, flags, -1, 0);
-    if (base == MAP_FAILED) {
-        return MINIMK_ENOMEM;
+    minimk_error_t mmap_res = (base == MAP_FAILED) ? MINIMK_ENOMEM : 0;
+    MINIMK_TRACE_SYSCALL("mmap: result=%s\n", minimk_errno_name(mmap_res));
+    MINIMK_TRACE_SYSCALL("mmap: addr=%p\n", base);
+    if (mmap_res != 0) {
+        return mmap_res;
     }
     sp->base = reinterpret_cast<uintptr_t>(base);
     sp->bottom = sp->base + page_size;
@@ -71,10 +80,19 @@ minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
 
     // Use mprotect to create a safety guard page.
     M_minimk_syscall_clearerrno();
-    if (M_sys_mprotect(base, page_size, PROT_NONE) == -1) {
+    MINIMK_TRACE_SYSCALL("mprotect: addr=%p\n", base);
+    MINIMK_TRACE_SYSCALL("mprotect: len=%zu\n", page_size);
+    MINIMK_TRACE_SYSCALL("mprotect: prot=0x%x\n", static_cast<unsigned>(PROT_NONE));
+    int mprotect_rv = M_sys_mprotect(base, page_size, PROT_NONE);
+    minimk_error_t mprotect_res = (mprotect_rv == -1) ? MINIMK_ENOMEM : 0;
+    MINIMK_TRACE_SYSCALL("mprotect: result=%s\n", minimk_errno_name(mprotect_res));
+    if (mprotect_res != 0) {
         M_minimk_syscall_clearerrno();
+        MINIMK_TRACE_SYSCALL("munmap: addr=%p\n", base);
+        MINIMK_TRACE_SYSCALL("munmap: length=%zu\n", sp->size);
         M_sys_munmap(base, sp->size);
-        return MINIMK_ENOMEM;
+        MINIMK_TRACE_SYSCALL("munmap: result=%s\n", "success (cleanup)");
+        return mprotect_res;
     }
 
     // Let the user know about the stack we have created
@@ -99,7 +117,11 @@ template <
 minimk_error_t minimk_runtime_stack_free_impl(struct stack *sp) noexcept {
     // Unmap the stack from memory
     M_minimk_syscall_clearerrno();
+    MINIMK_TRACE_SYSCALL("munmap: addr=%p\n", reinterpret_cast<void *>(sp->base));
+    MINIMK_TRACE_SYSCALL("munmap: length=%zu\n", sp->size);
     int rv = M_sys_munmap(reinterpret_cast<void *>(sp->base), sp->size);
+    minimk_error_t munmap_res = (rv == -1) ? M_minimk_syscall_geterrno() : 0;
+    MINIMK_TRACE_SYSCALL("munmap: result=%s\n", minimk_errno_name(munmap_res));
 
     // Let the user know what we have done
     MINIMK_TRACE("trace: freed previously allocated stack<base=0x%llx, size=0x%llx>\n",
@@ -110,8 +132,8 @@ minimk_error_t minimk_runtime_stack_free_impl(struct stack *sp) noexcept {
     sp->base = 0;
     sp->size = 0;
 
-    // Assemble the correct return value
-    return (rv == -1) ? M_minimk_syscall_geterrno() : 0;
+    // Finally, return to the caller
+    return munmap_res;
 }
 
 #endif // LIBMINIMK_RUNTIME_STACK_LINUX_HPP
