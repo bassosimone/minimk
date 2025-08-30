@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "../integer/u64.h"   // for minimk_integer_u64_satadd
-#include "../poll/poll.h"     // for minimk_poll
 #include "../socket/socket.h" // for minimk_socket_t
+#include "../syscall/poll.h"  // for minimk_syscall_poll
 
 #include "runtime.h" // for minimk_suspend_read
 #include "stack.h"   // for struct stack
@@ -257,7 +257,7 @@ static void block_on_poll(void) noexcept {
     //
     // On linux/amd64 each structure is 8 byte and we have 16 coroutines
     // which causes the stack to grow by 128 bytes.
-    minimk_pollfd fds[MAX_COROS] = {};
+    minimk_syscall_pollfd fds[MAX_COROS] = {};
     size_t numfds = MAX_COROS;
 
     // 3. scan the coroutines list and init deadline and fds.
@@ -308,7 +308,7 @@ static void block_on_poll(void) noexcept {
                  (unsigned long long)numfds, (unsigned long)poll_timeout);
 
     size_t active = 0;
-    auto poll_rc = minimk_poll(fds, numfds, poll_timeout, &active);
+    auto poll_rc = minimk_syscall_poll(fds, numfds, poll_timeout, &active);
 
     MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", (unsigned long long)poll_rc,
                  (unsigned long long)active);
@@ -440,7 +440,7 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
 
     // We also have some kind of success if there is an error in the sense that
     // the caller should retry the I/O operation to get the error.
-    if ((revents & minimk_poll_pollerr()) != 0) {
+    if ((revents & minimk_syscall_pollerr()) != 0) {
         return 0;
     }
 
@@ -449,10 +449,10 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
 }
 
 minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
-    return __minimk_suspend_io(sock, minimk_poll_pollin(), nanosec);
+    return __minimk_suspend_io(sock, minimk_syscall_pollin(), nanosec);
 }
 
 minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock,
                                             uint64_t nanosec) MINIMK_NOEXCEPT {
-    return __minimk_suspend_io(sock, minimk_poll_pollout(), nanosec);
+    return __minimk_suspend_io(sock, minimk_syscall_pollout(), nanosec);
 }

@@ -25,8 +25,6 @@ rule ar
 build libminimk/errno/errno.o: cc libminimk/errno/errno.c
 build libminimk/errno/errno_posix.o: cc libminimk/errno/errno_posix.c
 
-build libminimk/poll/poll_linux.o: cxx libminimk/poll/poll_linux.cpp
-
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
 build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
@@ -35,18 +33,20 @@ build libminimk/runtime/trace.o: cc libminimk/runtime/trace.c
 
 build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
+build libminimk/syscall/poll_linux.o: cxx libminimk/syscall/poll_linux.cpp
+
 build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 
 build libminimk.a: ar $
   libminimk/errno/errno.o $
   libminimk/errno/errno_posix.o $
-  libminimk/poll/poll_linux.o $
   libminimk/runtime/runtime.o $
   libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
   libminimk/runtime/trace.o $
   libminimk/socket/socket_linux.o $
+  libminimk/syscall/poll_linux.o $
   libminimk/time/monotonic_linux.o
 
 build examples/runtime/00_coroutine_hello.o: cc examples/runtime/00_coroutine_hello.c
