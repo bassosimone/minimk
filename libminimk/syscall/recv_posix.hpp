@@ -4,12 +4,11 @@
 #ifndef LIBMINIMK_SYSCALL_RECV_POSIX_HPP
 #define LIBMINIMK_SYSCALL_RECV_POSIX_HPP
 
-#include "../errno/errno.h"   // for minimk_errno_get
+#include "errno.h"             // for minimk_syscall_geterrno
 #include "../runtime/trace.h" // for MINIMK_TRACE
+#include "socket.h"           // for minimk_syscall_socket_t
 
-#include "socket.h" // for minimk_syscall_socket_t
-
-#include <minimk/errno.h> // for minimk_errno_clear
+#include <minimk/errno.h> // for minimk_error_t
 
 #include <sys/socket.h> // for recv
 #include <sys/types.h>  // for ssize_t
@@ -18,8 +17,8 @@
 #include <stddef.h> // for size_t
 
 /// Testable minimk_syscall_recv implementation.
-template <decltype(minimk_errno_clear) minimk_errno_clear__ = minimk_errno_clear,
-          decltype(minimk_errno_get) minimk_errno_get__ = minimk_errno_get,
+template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
           decltype(recv) sys_recv__ = recv>
 minimk_error_t minimk_syscall_recv__(minimk_syscall_socket_t sock, void *data, size_t count,
                                      size_t *nread) noexcept {
@@ -40,13 +39,13 @@ minimk_error_t minimk_syscall_recv__(minimk_syscall_socket_t sock, void *data, s
 #endif
 
     // Issue the recv system call proper
-    minimk_errno_clear__();
+    minimk_syscall_clearerrno__();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
     ssize_t rv = sys_recv__((int)sock, data, count, flags);
 
     // Handle the case of error
     if (rv == -1) {
-        return minimk_errno_get__();
+        return minimk_syscall_geterrno__();
     }
 
     // Handle the case of EOF

@@ -4,9 +4,8 @@
 #ifndef LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 #define LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 
-#include "../errno/errno.h" // for minimk_errno_get
-
-#include "stack.h" // for struct stack
+#include "../syscall/errno.h" // for minimk_syscall_clearerrno
+#include "stack.h"             // for struct stack
 
 #include <minimk/errno.h> // for minimk_error_t
 
@@ -46,7 +45,7 @@ static inline size_t __minimk_coro_stack_size(size_t page_size) noexcept {
 }
 
 /// Testable implementation of minimk_runtime_stack_alloc
-template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
+template <decltype(minimk_syscall_clearerrno) __minimk_syscall_clearerrno = minimk_syscall_clearerrno,
           decltype(getpagesize) __sys_getpagesize = getpagesize, decltype(mmap) __sys_mmap = mmap,
           decltype(mprotect) __sys_mprotect = mprotect, decltype(munmap) __sys_munmap = munmap>
 minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
@@ -56,7 +55,7 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
     sp->size = coro_stack_size + page_size;
 
     // Use mmap to create a memory mapping of the desired size.
-    __minimk_errno_clear();
+    __minimk_syscall_clearerrno();
     void *base = __sys_mmap(nullptr, sp->size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
                             -1, 0);
     if (base == MAP_FAILED) {
@@ -67,9 +66,9 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
     sp->top = sp->base + sp->size;
 
     // Use mprotect to create a safety guard page.
-    __minimk_errno_clear();
+    __minimk_syscall_clearerrno();
     if (__sys_mprotect(base, page_size, PROT_NONE) == -1) {
-        __minimk_errno_clear();
+        __minimk_syscall_clearerrno();
         __sys_munmap(base, sp->size);
         return MINIMK_ENOMEM;
     }
@@ -86,12 +85,12 @@ minimk_error_t __minimk_runtime_stack_alloc(struct stack *sp) noexcept {
     return 0;
 }
 
-template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
-          decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
+template <decltype(minimk_syscall_clearerrno) __minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) __minimk_syscall_geterrno = minimk_syscall_geterrno,
           decltype(munmap) __sys_munmap = munmap>
 minimk_error_t __minimk_runtime_stack_free(struct stack *sp) noexcept {
     // Unmap the stack from memory
-    __minimk_errno_clear();
+    __minimk_syscall_clearerrno();
     int rv = __sys_munmap((void *)sp->base, sp->size);
 
     // Let the user know what we have done
@@ -103,7 +102,7 @@ minimk_error_t __minimk_runtime_stack_free(struct stack *sp) noexcept {
     sp->size = 0;
 
     // Assemble the correct return value
-    return (rv == -1) ? __minimk_errno_get() : 0;
+    return (rv == -1) ? __minimk_syscall_geterrno() : 0;
 }
 
 #endif // LIBMINIMK_RUNTIME_STACK_LINUX_HPP

@@ -1,17 +1,17 @@
-// File: libminimk/errno/errno_posix.c
-// Purpose: functions to set/get errno on POSIX systems
+// File: libminimk/syscall/errno_posix.c
+// Purpose: syscall errno functions on POSIX
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "errno.h" // for minimk_errno_get
+#include "errno.h" // for minimk_syscall_geterrno
 
-#include <minimk/errno.h> // for minimk_errno_clear
+#include <minimk/errno.h> // for minimk_error_t
 
 #include <errno.h> // for errno
 
 // Ensure that our assumption about EAGAIN and EWOULDBLOCK holds
 _Static_assert(EAGAIN == EWOULDBLOCK, "EAGAIN assumed to be == EWOULDBLOCK");
 
-minimk_error_t minimk_errno_get(void) {
+minimk_error_t minimk_syscall_geterrno(void) {
     switch (errno) {
     case 0:
         return 0;
@@ -75,6 +75,6 @@ minimk_error_t minimk_errno_get(void) {
     }
 }
 
-void minimk_errno_clear(void) {
+void minimk_syscall_clearerrno(void) {
     errno = 0;
 }

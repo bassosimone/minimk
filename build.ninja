@@ -23,7 +23,6 @@ rule ar
   description = AR $out
 
 build libminimk/errno/errno.o: cc libminimk/errno/errno.c
-build libminimk/errno/errno_posix.o: cc libminimk/errno/errno_posix.c
 
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
 build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
@@ -33,6 +32,7 @@ build libminimk/runtime/trace.o: cc libminimk/runtime/trace.c
 
 build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
+build libminimk/syscall/errno_posix.o: cc libminimk/syscall/errno_posix.c
 build libminimk/syscall/poll_posix.o: cxx libminimk/syscall/poll_posix.cpp
 build libminimk/syscall/socket_init_posix.o: cc libminimk/syscall/socket_init_posix.c
 build libminimk/syscall/accept_posix.o: cxx libminimk/syscall/accept_posix.cpp
@@ -49,7 +49,6 @@ build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 
 build libminimk.a: ar $
   libminimk/errno/errno.o $
-  libminimk/errno/errno_posix.o $
   libminimk/runtime/runtime.o $
   libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $
@@ -60,6 +59,7 @@ build libminimk.a: ar $
   libminimk/syscall/bind_posix.o $
   libminimk/syscall/closesocket_posix.o $
   libminimk/syscall/connect_posix.o $
+  libminimk/syscall/errno_posix.o $
   libminimk/syscall/listen_posix.o $
   libminimk/syscall/poll_posix.o $
   libminimk/syscall/recv_posix.o $

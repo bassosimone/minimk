@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_SYSCALL_POLL_POSIX_HPP
 #define LIBMINIMK_SYSCALL_POLL_POSIX_HPP
 
-#include "../errno/errno.h" // for minimk_errno_get
+#include "errno.h" // for minimk_syscall_geterrno
 
 #include "poll.h" // for minimk_syscall_pollfd
 
@@ -28,8 +28,8 @@ static_assert(offsetof(struct minimk_syscall_pollfd, revents) == offsetof(struct
               "minimk_syscall_pollfd.revents offset must match pollfd.revents");
 
 /// Testable minimk_syscall_poll implementation.
-template <decltype(minimk_errno_clear) minimk_errno_clear__ = minimk_errno_clear,
-          decltype(minimk_errno_get) minimk_errno_get__ = minimk_errno_get,
+template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
           decltype(poll) sys_poll__ = poll>
 minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t size, int timeout,
                                      size_t *nready) noexcept {
@@ -40,7 +40,7 @@ minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t s
     static_assert(sizeof(nfds_t) >= sizeof(uint16_t), "nfds_t must be larger than uint16_t");
 
     // Clear errno and issues the system call.
-    minimk_errno_clear__();
+    minimk_syscall_clearerrno__();
     int rv = sys_poll__((struct pollfd *)fds, (nfds_t)size, timeout);
 
     // Determine whether poll succeeded.
@@ -50,7 +50,7 @@ minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t s
     *nready = (success) ? (size_t)rv : 0;
 
     // Set return value according to whether we succeded.
-    return (success) ? 0 : minimk_errno_get__();
+    return (success) ? 0 : minimk_syscall_geterrno__();
 }
 
 #endif // LIBMINIMK_SYSCALL_POLL_POSIX_HPP

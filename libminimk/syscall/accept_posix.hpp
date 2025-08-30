@@ -4,25 +4,24 @@
 #ifndef LIBMINIMK_SYSCALL_ACCEPT_POSIX_HPP
 #define LIBMINIMK_SYSCALL_ACCEPT_POSIX_HPP
 
-#include "../errno/errno.h" // for minimk_errno_get
-
+#include "errno.h"  // for minimk_syscall_clearerrno
 #include "socket.h" // for minimk_syscall_socket_t
 
-#include <minimk/errno.h> // for minimk_errno_clear
+#include <minimk/errno.h> // for minimk_error_t
 
 #include <sys/socket.h> // for accept
 
 /// Testable minimk_syscall_accept implementation.
-template <decltype(minimk_errno_clear) minimk_errno_clear__ = minimk_errno_clear,
-          decltype(minimk_errno_get) minimk_errno_get__ = minimk_errno_get,
+template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
           decltype(accept) sys_accept__ = accept>
 minimk_error_t minimk_syscall_accept__(minimk_syscall_socket_t *client_sock,
                                        minimk_syscall_socket_t sock) noexcept {
-    minimk_errno_clear__();
+    minimk_syscall_clearerrno__();
     *client_sock = -1;
     int client_fd = sys_accept__((int)sock, nullptr, nullptr);
     if (client_fd == -1) {
-        return minimk_errno_get__();
+        return minimk_syscall_geterrno__();
     }
     *client_sock = (minimk_syscall_socket_t)client_fd;
     return 0;
