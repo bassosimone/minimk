@@ -326,7 +326,7 @@ static void block_on_poll(void) noexcept {
 }
 
 /// Utility function to factor code for switching coroutine.
-static inline void sched_switch__(void) noexcept {
+static inline void sched_switch(void) noexcept {
     // Log the state before switching
     MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
                  (unsigned long long)current, (unsigned long long)current->sp);
@@ -369,7 +369,7 @@ void minimk_runtime_run(void) noexcept {
         }
 
         // Transfer the control to the current coroutine
-        sched_switch__();
+        sched_switch();
 
         // We're now inside the scheduler again.
         current = nullptr;
@@ -399,8 +399,8 @@ void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
 }
 
 /// Internal function to uniformly handle suspending for I/O.
-static inline minimk_error_t minimk_suspend_io__(minimk_socket_t sock, short events,
-                                                 uint64_t nanosec) noexcept {
+static inline minimk_error_t minimk_suspend_io(minimk_socket_t sock, short events,
+                                               uint64_t nanosec) noexcept {
     // Ensure we're inside the coroutine world.
     MINIMK_ASSERT(current != nullptr);
 
@@ -449,10 +449,10 @@ static inline minimk_error_t minimk_suspend_io__(minimk_socket_t sock, short eve
 }
 
 minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
-    return minimk_suspend_io__(sock, minimk_syscall_pollin, nanosec);
+    return minimk_suspend_io(sock, minimk_syscall_pollin, nanosec);
 }
 
 minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock,
                                             uint64_t nanosec) MINIMK_NOEXCEPT {
-    return minimk_suspend_io__(sock, minimk_syscall_pollout, nanosec);
+    return minimk_suspend_io(sock, minimk_syscall_pollout, nanosec);
 }

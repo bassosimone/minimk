@@ -11,9 +11,9 @@
 #include <minimk/errno.h> // for minimk_error_t
 
 minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) noexcept {
-    return minimk_io_writeall__<minimk_socket_t, minimk_syscall_send>(sock, buf, count);
+    return minimk_io_writeall_impl<minimk_socket_t, minimk_syscall_send>(sock, buf, count);
 }
 
 minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t count) noexcept {
-    return minimk_io_readall__<minimk_socket_t, minimk_syscall_recv>(sock, buf, count);
+    return minimk_io_readall_impl<minimk_socket_t, minimk_syscall_recv>(sock, buf, count);
 }

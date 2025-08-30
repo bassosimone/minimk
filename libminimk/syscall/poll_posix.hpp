@@ -28,11 +28,12 @@ static_assert(offsetof(struct minimk_syscall_pollfd, revents) == offsetof(struct
               "minimk_syscall_pollfd.revents offset must match pollfd.revents");
 
 /// Testable minimk_syscall_poll implementation.
-template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-          decltype(poll) sys_poll__ = poll>
-minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t size, int timeout,
-                                     size_t *nready) noexcept {
+template <
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+        decltype(poll) M_sys_poll = poll>
+minimk_error_t minimk_syscall_poll_impl(struct minimk_syscall_pollfd *fds, size_t size, int timeout,
+                                        size_t *nready) noexcept {
     // As documented, camp the maximum number of descriptors.
     size = (size <= UINT16_MAX) ? size : UINT16_MAX;
 
@@ -40,8 +41,8 @@ minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t s
     static_assert(sizeof(nfds_t) >= sizeof(uint16_t), "nfds_t must be larger than uint16_t");
 
     // Clear errno and issues the system call.
-    minimk_syscall_clearerrno__();
-    int rv = sys_poll__((struct pollfd *)fds, (nfds_t)size, timeout);
+    M_minimk_syscall_clearerrno();
+    int rv = M_sys_poll((struct pollfd *)fds, (nfds_t)size, timeout);
 
     // Determine whether poll succeeded.
     int success = (rv >= 0);
@@ -50,7 +51,7 @@ minimk_error_t minimk_syscall_poll__(struct minimk_syscall_pollfd *fds, size_t s
     *nready = (success) ? (size_t)rv : 0;
 
     // Set return value according to whether we succeded.
-    return (success) ? 0 : minimk_syscall_geterrno__();
+    return (success) ? 0 : M_minimk_syscall_geterrno();
 }
 
 #endif // LIBMINIMK_SYSCALL_POLL_POSIX_HPP

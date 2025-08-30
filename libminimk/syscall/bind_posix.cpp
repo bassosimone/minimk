@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "bind.h"   // for minimk_syscall_bind
-#include "bind_posix.hpp" // for minimk_syscall_bind__
+#include "bind_posix.hpp" // for minimk_syscall_bind_impl
 
 #include <minimk/errno.h> // for minimk_error_t
 
 minimk_error_t minimk_syscall_bind(minimk_syscall_socket_t sock, const char *address,
                                    const char *port) noexcept {
-    return minimk_syscall_bind__(sock, address, port);
+    return minimk_syscall_bind_impl(sock, address, port);
 }

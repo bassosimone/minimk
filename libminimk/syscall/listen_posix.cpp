@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "listen.h"   // for minimk_syscall_listen
-#include "listen_posix.hpp" // for minimk_syscall_listen__
+#include "listen_posix.hpp" // for minimk_syscall_listen_impl
 
 #include <minimk/errno.h> // for minimk_error_t
 
 minimk_error_t minimk_syscall_listen(minimk_syscall_socket_t sock, int backlog) noexcept {
-    return minimk_syscall_listen__(sock, backlog);
+    return minimk_syscall_listen_impl(sock, backlog);
 }

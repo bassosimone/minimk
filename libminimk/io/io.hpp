@@ -12,11 +12,11 @@
 /// Write as much data as possible from the underlying buffer.
 ///
 /// This function automatically resumes sending when interrupted by a signal.
-template <typename T, minimk_error_t (*T_send__)(T, const void *, size_t, size_t *)>
-minimk_error_t minimk_io_writeall__(T sock, const void *buf, size_t count) noexcept {
+template <typename T, minimk_error_t (*M_T_send)(T, const void *, size_t, size_t *)>
+minimk_error_t minimk_io_writeall_impl(T sock, const void *buf, size_t count) noexcept {
     for (size_t total = 0; total < count;) {
         size_t nwritten = 0;
-        minimk_error_t rv = T_send__(sock, (const char *)buf + total, count - total, &nwritten);
+        minimk_error_t rv = M_T_send(sock, (const char *)buf + total, count - total, &nwritten);
         if (rv == MINIMK_EINTR) {
             continue;
         }
@@ -31,11 +31,11 @@ minimk_error_t minimk_io_writeall__(T sock, const void *buf, size_t count) noexc
 /// Read as much data as possible into the given buffer.
 ///
 /// This function automatically resumes receiving when interrupted by a signal.
-template <typename T, minimk_error_t (*T_recv__)(T, void *, size_t, size_t *)>
-minimk_error_t minimk_io_readall__(T sock, void *buf, size_t count) noexcept {
+template <typename T, minimk_error_t (*M_T_recv)(T, void *, size_t, size_t *)>
+minimk_error_t minimk_io_readall_impl(T sock, void *buf, size_t count) noexcept {
     for (size_t total = 0; total < count;) {
         size_t nread = 0;
-        minimk_error_t rv = T_recv__(sock, (char *)buf + total, count - total, &nread);
+        minimk_error_t rv = M_T_recv(sock, (char *)buf + total, count - total, &nread);
         if (rv == MINIMK_EINTR) {
             continue;
         }

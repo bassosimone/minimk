@@ -18,10 +18,10 @@
 
 /// Testable minimk_syscall_send implementation.
 template <
-        decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-        decltype(send) sys_send__ = send>
-minimk_error_t minimk_syscall_send__(minimk_syscall_socket_t sock, const void *data, size_t count,
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+        decltype(send) M_sys_send = send>
+minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void *data, size_t count,
                                      size_t *nwritten) noexcept {
     // Initialize output parameter immediately
     *nwritten = 0;
@@ -40,13 +40,13 @@ minimk_error_t minimk_syscall_send__(minimk_syscall_socket_t sock, const void *d
 #endif
 
     // Issue the send system call proper
-    minimk_syscall_clearerrno__();
+    M_minimk_syscall_clearerrno();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
-    ssize_t rv = sys_send__((int)sock, data, count, flags);
+    ssize_t rv = M_sys_send((int)sock, data, count, flags);
 
     // Handle the case of error
     if (rv == -1) {
-        return minimk_syscall_geterrno__();
+        return M_minimk_syscall_geterrno();
     }
 
     // Handle the case of success

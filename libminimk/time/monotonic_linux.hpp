@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 #define LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 
-#include "../integer/u64.h"    // for minimk_integer_u64_satmul
+#include "../integer/u64.h"   // for minimk_integer_u64_satmul
 #include "../syscall/errno.h" // for minimk_syscall_clearerrno
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
@@ -14,13 +14,14 @@
 #include <time.h>   // for clock_gettime
 
 /// Testable implementation of minimk_time_monotonic_now
-template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-          decltype(clock_gettime) vdso_clock_gettime__ = clock_gettime>
-uint64_t minimk_time_monotonic_now__(void) noexcept {
-    struct timespec ts = {.tv_sec = 0, .tv_nsec = 0};
-    int clock_gettime_rv = vdso_clock_gettime__(CLOCK_MONOTONIC, &ts);
+template <
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(clock_gettime) M_vdso_clock_gettime = clock_gettime>
+uint64_t minimk_time_monotonic_now_impl(void) noexcept {
+    struct timespec ts = {};
+    int clock_gettime_rv = M_vdso_clock_gettime(CLOCK_MONOTONIC, &ts);
     MINIMK_ASSERT(clock_gettime_rv == 0);
-    minimk_syscall_clearerrno__();
+    M_minimk_syscall_clearerrno();
     uint64_t now = (uint64_t)ts.tv_sec;
     now = minimk_integer_u64_satmul(now, 1000000000LL);
     now = minimk_integer_u64_satadd(now, (uint64_t)ts.tv_nsec);

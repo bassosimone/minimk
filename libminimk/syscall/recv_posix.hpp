@@ -18,10 +18,10 @@
 
 /// Testable minimk_syscall_recv implementation.
 template <
-        decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-        decltype(recv) sys_recv__ = recv>
-minimk_error_t minimk_syscall_recv__(minimk_syscall_socket_t sock, void *data, size_t count,
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+        decltype(recv) M_sys_recv = recv>
+minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data, size_t count,
                                      size_t *nread) noexcept {
     // Initialize output parameter immediately
     *nread = 0;
@@ -40,13 +40,13 @@ minimk_error_t minimk_syscall_recv__(minimk_syscall_socket_t sock, void *data, s
 #endif
 
     // Issue the recv system call proper
-    minimk_syscall_clearerrno__();
+    M_minimk_syscall_clearerrno();
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
-    ssize_t rv = sys_recv__((int)sock, data, count, flags);
+    ssize_t rv = M_sys_recv((int)sock, data, count, flags);
 
     // Handle the case of error
     if (rv == -1) {
-        return minimk_syscall_geterrno__();
+        return M_minimk_syscall_geterrno();
     }
 
     // Handle the case of EOF

@@ -7,9 +7,9 @@
 #include <minimk/errno.h> // for minimk_error_t
 
 minimk_error_t minimk_runtime_stack_alloc(struct stack *sp) noexcept {
-    return minimk_runtime_stack_alloc__(sp);
+    return minimk_runtime_stack_alloc_impl(sp);
 }
 
 minimk_error_t minimk_runtime_stack_free(struct stack *sp) noexcept {
-    return minimk_runtime_stack_free__(sp);
+    return minimk_runtime_stack_free_impl(sp);
 }

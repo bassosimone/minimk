@@ -12,24 +12,25 @@
 #include <fcntl.h> // for fcntl
 
 /// Testable minimk_syscall_socket_setnonblock implementation.
-template <decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-          decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-          decltype(fcntl) sys_fcntl2__ = fcntl, decltype(fcntl) sys_fcntl3__ = fcntl>
-minimk_error_t minimk_syscall_socket_setnonblock__(minimk_syscall_socket_t sock) noexcept {
+template <
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+        decltype(fcntl) M_sys_fcntl2 = fcntl, decltype(fcntl) M_sys_fcntl3 = fcntl>
+minimk_error_t minimk_syscall_socket_setnonblock_impl(minimk_syscall_socket_t sock) noexcept {
     // Get the flags
-    minimk_syscall_clearerrno__();
-    int flags = sys_fcntl2__((int)sock, F_GETFL);
+    M_minimk_syscall_clearerrno();
+    int flags = M_sys_fcntl2((int)sock, F_GETFL);
     if (flags == -1) {
-        return minimk_syscall_geterrno__();
+        return M_minimk_syscall_geterrno();
     }
 
     // Enable nonblocking
     flags |= O_NONBLOCK;
 
     // Set the flags
-    minimk_syscall_clearerrno__();
-    if (sys_fcntl3__((int)sock, F_SETFL, flags) == -1) {
-        return minimk_syscall_geterrno__();
+    M_minimk_syscall_clearerrno();
+    if (M_sys_fcntl3((int)sock, F_SETFL, flags) == -1) {
+        return M_minimk_syscall_geterrno();
     }
     return 0;
 }

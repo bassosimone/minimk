@@ -15,25 +15,25 @@
 
 /// Testable minimk_syscall_getsockopt_error implementation.
 template <
-        decltype(minimk_syscall_clearerrno) minimk_syscall_clearerrno__ = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) minimk_syscall_geterrno__ = minimk_syscall_geterrno,
-        decltype(getsockopt) sys_getsockopt__ = getsockopt,
-        decltype(minimk_errno_map) minimk_errno_map__ = minimk_errno_map>
-minimk_error_t minimk_syscall_getsockopt_error__(minimk_syscall_socket_t sock,
+        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+        decltype(getsockopt) M_sys_getsockopt = getsockopt,
+        decltype(minimk_errno_map) M_minimk_errno_map = minimk_errno_map>
+minimk_error_t minimk_syscall_getsockopt_error_impl(minimk_syscall_socket_t sock,
                                                  minimk_error_t *error) noexcept {
     int soerr = 0;
     socklen_t soerrlen = sizeof(soerr);
 
     // Clear errno before the syscall
-    minimk_syscall_clearerrno__();
+    M_minimk_syscall_clearerrno();
 
     // Get the socket error
-    if (sys_getsockopt__((int)sock, SOL_SOCKET, SO_ERROR, (void *)&soerr, &soerrlen) != 0) {
-        return minimk_syscall_geterrno__();
+    if (M_sys_getsockopt((int)sock, SOL_SOCKET, SO_ERROR, (void *)&soerr, &soerrlen) != 0) {
+        return M_minimk_syscall_geterrno();
     }
 
     // Map the socket error to minimk_error_t
-    *error = minimk_errno_map__(soerr);
+    *error = M_minimk_errno_map(soerr);
     return 0;
 }
 

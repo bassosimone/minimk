@@ -7,15 +7,15 @@
 #include <minimk/log.h> // for minimk_log_printf
 
 #ifdef MINIMK_ENABLE_TRACE
-#define MINIMK_TRACE__ 1
+#define MINIMK_TRACE_IS_ENABLED 1
 #else
-#define MINIMK_TRACE__ 0
+#define MINIMK_TRACE_IS_ENABLED 0
 #endif
 
 /// Traces execution and prints specific values
 #define MINIMK_TRACE(fmt, ...)                                                                     \
     do {                                                                                           \
-        if (MINIMK_TRACE__) {                                                                      \
+        if (MINIMK_TRACE_IS_ENABLED) {                                                             \
             minimk_log_printf(fmt, ##__VA_ARGS__);                                                 \
         }                                                                                          \
     } while (0)

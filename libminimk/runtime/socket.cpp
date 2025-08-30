@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "../socket/socket.h"              // for minimk_socket_t and operations
-#include "../io/io.hpp"                    // for minimk_io_readall__
+#include "../io/io.hpp"                    // for minimk_io_readall_impl
 #include "../syscall/accept.h"             // for minimk_syscall_accept
 #include "../syscall/bind.h"               // for minimk_syscall_bind
 #include "../syscall/closesocket.h"        // for minimk_syscall_closesocket
@@ -12,7 +12,7 @@
 #include "../syscall/send.h"               // for minimk_syscall_send
 #include "../syscall/socket_setnonblock.h" // for minimk_syscall_socket_setnonblock
 
-#include "handle.h"  // for make_handle__
+#include "handle.h"  // for make_handle
 #include "runtime.h" // for minimk_runtime_suspend_read/write
 
 #include <minimk/errno.h>   // for minimk_error_t
@@ -24,7 +24,7 @@
 #include <string.h> // for memset
 
 /// Maximum number of sockets managed by the runtime.
-#define MAX_SOCKETS MAX_HANDLES__
+#define MAX_SOCKETS MAX_HANDLES
 
 /// Socket slot in the runtime table.
 struct socketinfo {
@@ -58,15 +58,14 @@ static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_
     MINIMK_TRACE("trace: find_socketinfo handle=0x%llx\n", (unsigned long long)handle);
 
     // Reject handles owned by other subsystems
-    uint8_t handle_type = handle_type__(handle);
-    if (handle_type != HANDLE_TYPE_SOCKET__) {
-        MINIMK_TRACE("trace: invalid handle type=%u, expected=%u\n", handle_type,
-                     HANDLE_TYPE_SOCKET__);
+    uint8_t type = handle_type(handle);
+    if (type != HANDLE_TYPE_SOCKET) {
+        MINIMK_TRACE("trace: invalid handle type=%u, expected=%u\n", type, HANDLE_TYPE_SOCKET);
         return MINIMK_EBADF;
     }
 
     // Access the corresponding slot
-    uint64_t index = handle_index__(handle);
+    uint64_t index = handle_index(handle);
     socketinfo *info = &sockets[index];
 
     MINIMK_TRACE("trace: checking slot %llu, stored_handle=0x%llx\n", (unsigned long long)index,
@@ -103,7 +102,7 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
         // A completely zero handle indicates that the slot is actually free
         if (info->handle == 0) {
             *pinfo = info;
-            info->handle = make_handle__(HANDLE_TYPE_SOCKET__, generation, slot_index);
+            info->handle = make_handle(HANDLE_TYPE_SOCKET, generation, slot_index);
             info->fd = fd;
             info->read_timeout = UINT64_MAX;
             info->write_timeout = UINT64_MAX;
@@ -338,8 +337,8 @@ minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) noex
 
 minimk_error_t minimk_runtime_socket_sendall(minimk_runtime_socket_t sock, const void *buf,
                                              size_t count) noexcept {
-    return minimk_io_writeall__<minimk_runtime_socket_t, minimk_runtime_socket_send>(sock, buf,
-                                                                                     count);
+    return minimk_io_writeall_impl<minimk_runtime_socket_t, minimk_runtime_socket_send>(sock, buf,
+                                                                                        count);
 }
 
 minimk_error_t minimk_runtime_socket_set_read_timeout(minimk_runtime_socket_t sock,
@@ -368,6 +367,6 @@ minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t s
 
 minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf,
                                              size_t count) noexcept {
-    return minimk_io_readall__<minimk_runtime_socket_t, minimk_runtime_socket_recv>(sock, buf,
-                                                                                    count);
+    return minimk_io_readall_impl<minimk_runtime_socket_t, minimk_runtime_socket_recv>(sock, buf,
+                                                                                       count);
 }

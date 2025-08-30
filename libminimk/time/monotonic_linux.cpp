@@ -4,8 +4,8 @@
 
 #include "monotonic_linux.hpp"
 
-#include <minimk/time.h> // for minimk_time_monotonic_now
+#include <minimk/time.h> // for minimk_time_monotonic_now_impl
 
 uint64_t minimk_time_monotonic_now(void) noexcept {
-    return minimk_time_monotonic_now__();
+    return minimk_time_monotonic_now_impl();
 }
