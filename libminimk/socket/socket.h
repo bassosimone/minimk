@@ -4,17 +4,11 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_H
 #define LIBMINIMK_SOCKET_SOCKET_H
 
-#include "../syscall/socket.h"
-
-#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_*
 
 #include <stddef.h> // for size_t
-
-/// Type representing a socket descriptor.
-///
-/// The type is uintptr_t on Windows and int on POSIX.
-#define minimk_socket_t minimk_syscall_socket_t
 
 MINIMK_BEGIN_DECLS
 
@@ -23,7 +17,7 @@ MINIMK_BEGIN_DECLS
 /// In case of short write, returns the error that occurred. This is an all-or-nothing operation.
 ///
 /// When interruped by a signal, this function continues to write relentlessly.
-minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf,
+minimk_error_t minimk_socket_sendall(minimk_syscall_socket_t sock, const void *buf,
                                      size_t count) MINIMK_NOEXCEPT;
 
 /// Like recv but receives all requested bytes unless an error occurs.
@@ -31,7 +25,8 @@ minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf,
 /// In case of short read, returns the error that occurred. This is an all-or-nothing operation.
 ///
 /// When interrupted by a signal, this function continues to read relentlessly.
-minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t count) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_recvall(minimk_syscall_socket_t sock, void *buf,
+                                     size_t count) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

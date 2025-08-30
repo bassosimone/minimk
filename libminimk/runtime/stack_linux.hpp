@@ -4,12 +4,12 @@
 #ifndef LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 #define LIBMINIMK_RUNTIME_STACK_LINUX_HPP
 
-#include "../syscall/errno.h" // for minimk_syscall_clearerrno
-#include "stack.h"            // for struct stack
+#include "stack.h" // for struct stack
 
-#include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/trace.h>  // for MINIMK_TRACE
+#include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_clearerrno
+#include <minimk/trace.h>   // for MINIMK_TRACE
 
 #include <sys/mman.h> // for mmap
 

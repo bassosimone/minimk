@@ -4,10 +4,9 @@
 #ifndef LIBMINIMK_RUNTIME_RUNTIME_H
 #define LIBMINIMK_RUNTIME_RUNTIME_H
 
-#include "../socket/socket.h" // for minimk_socket_t
-
-#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_socket_t
 
 #include <stdint.h> // for uint64_t
 
@@ -21,10 +20,12 @@ MINIMK_BEGIN_DECLS
 ///
 /// Returns zero if read would not block and an error otherwise. Typically, the
 /// error is MINIMK_ETIMEDOUT in case of I/O timeout.
-minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock,
+                                           uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Like minimk_runtime_suspend_read but for writability.
-minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock,
+                                            uint64_t nanosec) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

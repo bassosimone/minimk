@@ -4,12 +4,12 @@
 #ifndef LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 #define LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 
-#include "../integer/u64.h"   // for minimk_integer_u64_satmul
-#include "../syscall/errno.h" // for minimk_syscall_clearerrno
+#include "../integer/u64.h" // for minimk_integer_u64_satmul
 
-#include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/trace.h>  // for MINIMK_TRACE
+#include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_clearerrno
+#include <minimk/trace.h>   // for MINIMK_TRACE
 
 #include <stdint.h> // for uint64_t
 #include <time.h>   // for clock_gettime

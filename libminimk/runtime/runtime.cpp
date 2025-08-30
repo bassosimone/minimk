@@ -2,11 +2,9 @@
 // Purpose: cooperative coroutine runtime implementation
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../integer/u64.h"   // for minimk_integer_u64_satadd
-#include "../socket/socket.h" // for minimk_socket_t
-#include "../syscall/poll.h"  // for minimk_syscall_poll
+#include "../integer/u64.h" // for minimk_integer_u64_satadd
 
-#include "runtime.h" // for minimk_suspend_read
+#include "runtime.h" // for prototypes
 #include "stack.h"   // for struct stack
 #include "switch.h"  // for minimk_switch
 
@@ -14,6 +12,7 @@
 #include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_run
+#include <minimk/syscall.h> // for minimk_syscall_*
 #include <minimk/time.h>    // for minimk_time_monotonic_now
 #include <minimk/trace.h>   // for MINIMK_TRACE
 
@@ -56,7 +55,7 @@ struct coroutine {
 
     /// Management of the blocked state.
     uint64_t deadline;
-    minimk_socket_t sock;
+    minimk_syscall_socket_t sock;
     short events;
     short revents;
 
@@ -434,7 +433,7 @@ void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
 }
 
 /// Internal function to uniformly handle suspending for I/O.
-static inline minimk_error_t minimk_suspend_io(minimk_socket_t sock, short events,
+static inline minimk_error_t minimk_suspend_io(minimk_syscall_socket_t sock, short events,
                                                uint64_t nanosec) noexcept {
     // Ensure we're inside the coroutine world.
     MINIMK_ASSERT(current != nullptr);
@@ -485,11 +484,12 @@ static inline minimk_error_t minimk_suspend_io(minimk_socket_t sock, short event
     return MINIMK_ETIMEDOUT;
 }
 
-minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
+minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock,
+                                           uint64_t nanosec) MINIMK_NOEXCEPT {
     return minimk_suspend_io(sock, minimk_syscall_pollin, nanosec);
 }
 
-minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock,
+minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock,
                                             uint64_t nanosec) MINIMK_NOEXCEPT {
     return minimk_suspend_io(sock, minimk_syscall_pollout, nanosec);
 }

@@ -2,8 +2,6 @@
 // Purpose: POSIX minimk_syscall_socket_init implementation
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "socket.h" // for minimk_socket_t
-
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for C function declarations
 

@@ -4,11 +4,9 @@
 #ifndef LIBMINIMK_SYSCALL_SEND_POSIX_HPP
 #define LIBMINIMK_SYSCALL_SEND_POSIX_HPP
 
-#include "errno.h"  // for minimk_syscall_geterrno
-#include "socket.h" // for minimk_syscall_socket_t
-
-#include <minimk/errno.h> // for minimk_error_t
-#include <minimk/trace.h> // for MINIMK_TRACE
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_geterrno
+#include <minimk/trace.h>   // for MINIMK_TRACE
 
 #include <sys/socket.h> // for send
 #include <sys/types.h>  // for ssize_t

@@ -4,11 +4,8 @@
 #ifndef LIBMINIMK_SYSCALL_POLL_POSIX_HPP
 #define LIBMINIMK_SYSCALL_POLL_POSIX_HPP
 
-#include "errno.h" // for minimk_syscall_geterrno
-
-#include "poll.h" // for minimk_syscall_pollfd
-
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_geterrno
 
 #include <poll.h>   // for poll
 #include <stddef.h> // for offsetof

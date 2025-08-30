@@ -2,21 +2,14 @@
 // Purpose: runtime-managed socket table with ECS-style resource management
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../socket/socket.h"              // for minimk_socket_t and operations
-#include "../io/io.hpp"                    // for minimk_io_readall_impl
-#include "../syscall/accept.h"             // for minimk_syscall_accept
-#include "../syscall/bind.h"               // for minimk_syscall_bind
-#include "../syscall/closesocket.h"        // for minimk_syscall_closesocket
-#include "../syscall/listen.h"             // for minimk_syscall_listen
-#include "../syscall/recv.h"               // for minimk_syscall_recv
-#include "../syscall/send.h"               // for minimk_syscall_send
-#include "../syscall/socket_setnonblock.h" // for minimk_syscall_socket_setnonblock
+#include "../io/io.hpp" // for minimk_io_readall_impl
 
 #include "handle.hpp" // for make_handle
 #include "runtime.h"  // for minimk_runtime_suspend_read/write
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_socket_t
+#include <minimk/syscall.h> // for minimk_syscall_*
 #include <minimk/trace.h>   // for MINIMK_TRACE
 
 #include <stddef.h> // for size_t
@@ -96,7 +89,7 @@ static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_
 }
 
 /// Create socketinfo for an existing socket fd.
-static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) noexcept {
+static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_syscall_socket_t fd) noexcept {
     // Zero the return argument
     *pinfo = nullptr;
 
@@ -162,7 +155,7 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
                  type, protocol);
 
     // Create the underlying socket
-    minimk_socket_t sockfd = minimk_syscall_invalid_socket;
+    minimk_syscall_socket_t sockfd = minimk_syscall_invalid_socket;
     minimk_error_t rv = minimk_syscall_socket(&sockfd, domain, type, protocol);
     if (rv != 0) {
         MINIMK_TRACE("trace: minimk_socket_create failed: %s\n", minimk_errno_name(rv));
@@ -224,7 +217,7 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
 
     for (;;) {
         // Attempt to accept a connection
-        minimk_socket_t client_fd = minimk_syscall_invalid_socket;
+        minimk_syscall_socket_t client_fd = minimk_syscall_invalid_socket;
         rv = minimk_syscall_accept(&client_fd, listener_info->fd);
 
         // Suspend if needed

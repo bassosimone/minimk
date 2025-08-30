@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "socket_posix.hpp" // for minimk_syscall_socket_impl
-#include "socket.h"         // for minimk_socket_t
 
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_socket_t
 
 minimk_error_t minimk_syscall_socket(minimk_syscall_socket_t *sock, int domain, int type,
                                      int protocol) noexcept {

@@ -4,12 +4,10 @@
 #ifndef LIBMINIMK_SYSCALL_GETSOCKOPT_ERROR_POSIX_HPP
 #define LIBMINIMK_SYSCALL_GETSOCKOPT_ERROR_POSIX_HPP
 
-#include "errno.h"  // for minimk_syscall_geterrno
-#include "socket.h" // for minimk_syscall_socket_t
-
 #include "../errno/errno_posix.h" // for minimk_errno_map
 
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_geterrno
 
 #include <sys/socket.h> // for getsockopt
 

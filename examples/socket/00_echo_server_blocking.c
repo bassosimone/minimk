@@ -2,12 +2,7 @@
 // Purpose: blocking TCP echo server using socket API
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../../libminimk/socket/socket.h"       // for minimk_socket_* operations
-#include "../../libminimk/syscall/accept.h"      // for minimk_syscall_accept
-#include "../../libminimk/syscall/bind.h"        // for minimk_syscall_bind
-#include "../../libminimk/syscall/closesocket.h" // for minimk_syscall_closesocket
-#include "../../libminimk/syscall/listen.h"      // for minimk_syscall_listen
-#include "../../libminimk/syscall/recv.h"        // for minimk_syscall_recv
+#include "../libminimk/socket/socket.h" // for minimk_socket_sendall
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name
@@ -17,7 +12,7 @@
 #include <stdlib.h> // for exit
 
 /// Takes ownweship of the socket and echoes back data to the client.
-static void handle_client(minimk_socket_t client_sock) {
+static void handle_client(minimk_syscall_socket_t client_sock) {
     char buffer[4096];
 
     for (;;) {
@@ -58,7 +53,7 @@ int main(void) {
     }
 
     // Create listening socket
-    minimk_socket_t server_sock = minimk_syscall_invalid_socket;
+    minimk_syscall_socket_t server_sock = minimk_syscall_invalid_socket;
     rv = minimk_syscall_socket(&server_sock, minimk_syscall_af_inet, minimk_syscall_sock_stream, 0);
     if (rv != 0) {
         fprintf(stderr, "Socket create failed: %s\n", minimk_errno_name(rv));
@@ -86,7 +81,7 @@ int main(void) {
 
     // Accept connections
     for (;;) {
-        minimk_socket_t client_sock = minimk_syscall_invalid_socket;
+        minimk_syscall_socket_t client_sock = minimk_syscall_invalid_socket;
         rv = minimk_syscall_accept(&client_sock, server_sock);
 
         if (rv != 0) {

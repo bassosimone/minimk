@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "poll_posix.hpp" // for minimk_syscall_poll_impl
-#include "poll.h"         // for minimk_syscall_poll
 
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_poll
 
 short minimk_syscall_pollin = POLLIN;
 short minimk_syscall_pollout = POLLOUT;
