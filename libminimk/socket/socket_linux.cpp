@@ -11,10 +11,6 @@
 
 #include <minimk/errno.h> // for minimk_error_t
 
-minimk_error_t minimk_socket_setnonblock(minimk_socket_t sock) noexcept {
-    return __minimk_socket_setnonblock(sock);
-}
-
 minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) noexcept {
     return __minimk_io_writeall<minimk_socket_t, minimk_syscall_send>(sock, buf, count);
 }

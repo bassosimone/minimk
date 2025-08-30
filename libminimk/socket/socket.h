@@ -18,15 +18,6 @@
 
 MINIMK_BEGIN_DECLS
 
-/// Function to configure a socket as nonblocking.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_setnonblock(minimk_socket_t sock) MINIMK_NOEXCEPT;
-
 /// Like send but sends all the content of the buffer unless an error occurs.
 ///
 /// In case of short write, returns the error that occurred. This is an all-or-nothing operation.

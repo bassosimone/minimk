@@ -2,14 +2,15 @@
 // Purpose: runtime-managed socket table with ECS-style resource management
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../socket/socket.h"             // for minimk_socket_t and operations
-#include "../io/io.hpp"                   // for __minimk_io_readall
-#include "../syscall/accept_posix.h"      // for minimk_syscall_accept
-#include "../syscall/bind_posix.h"        // for minimk_syscall_bind
-#include "../syscall/closesocket_posix.h" // for minimk_syscall_closesocket
-#include "../syscall/listen_posix.h"      // for minimk_syscall_listen
-#include "../syscall/recv_posix.h"        // for minimk_syscall_recv
-#include "../syscall/send_posix.h"        // for minimk_syscall_send
+#include "../socket/socket.h"                    // for minimk_socket_t and operations
+#include "../io/io.hpp"                          // for __minimk_io_readall
+#include "../syscall/accept_posix.h"             // for minimk_syscall_accept
+#include "../syscall/bind_posix.h"               // for minimk_syscall_bind
+#include "../syscall/closesocket_posix.h"        // for minimk_syscall_closesocket
+#include "../syscall/listen_posix.h"             // for minimk_syscall_listen
+#include "../syscall/recv_posix.h"               // for minimk_syscall_recv
+#include "../syscall/send_posix.h"               // for minimk_syscall_send
+#include "../syscall/socket_setnonblock_posix.h" // for minimk_syscall_socket_setnonblock
 
 #include "handle.h"  // for __make_handle
 #include "runtime.h" // for minimk_runtime_suspend_read/write
@@ -154,9 +155,9 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
     MINIMK_TRACE("trace: created underlying socket fd=%llu\n", (unsigned long long)sockfd);
 
     // Make it nonblocking
-    rv = minimk_socket_setnonblock(sockfd);
+    rv = minimk_syscall_socket_setnonblock(sockfd);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_socket_setnonblock failed: %d\n", rv);
+        MINIMK_TRACE("trace: minimk_syscall_socket_setnonblock failed: %d\n", rv);
         minimk_syscall_closesocket(&sockfd);
         return rv;
     }
@@ -222,7 +223,7 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
         }
 
         // Make socket nonblocking
-        rv = minimk_socket_setnonblock(client_fd);
+        rv = minimk_syscall_socket_setnonblock(client_fd);
         if (rv != 0) {
             minimk_syscall_closesocket(&client_fd);
             return rv;

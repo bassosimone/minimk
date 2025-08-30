@@ -43,6 +43,7 @@ build libminimk/syscall/listen_posix.o: cxx libminimk/syscall/listen_posix.cpp
 build libminimk/syscall/recv_posix.o: cxx libminimk/syscall/recv_posix.cpp
 build libminimk/syscall/send_posix.o: cxx libminimk/syscall/send_posix.cpp
 build libminimk/syscall/socket_posix.o: cxx libminimk/syscall/socket_posix.cpp
+build libminimk/syscall/socket_setnonblock_posix.o: cxx libminimk/syscall/socket_setnonblock_posix.cpp
 
 build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 
@@ -65,6 +66,7 @@ build libminimk.a: ar $
   libminimk/syscall/send_posix.o $
   libminimk/syscall/socket_init_posix.o $
   libminimk/syscall/socket_posix.o $
+  libminimk/syscall/socket_setnonblock_posix.o $
   libminimk/time/monotonic_linux.o
 
 build examples/runtime/00_coroutine_hello.o: cc examples/runtime/00_coroutine_hello.c
