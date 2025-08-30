@@ -41,10 +41,6 @@ minimk_error_t minimk_socket_send(minimk_socket_t sock, const void *data, size_t
     return __minimk_socket_send(sock, data, count, nwritten);
 }
 
-minimk_error_t minimk_socket_destroy(minimk_socket_t *sock) noexcept {
-    return __minimk_socket_destroy(sock);
-}
-
 minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) noexcept {
     return __minimk_io_writeall<minimk_socket_t, minimk_socket_send>(sock, buf, count);
 }

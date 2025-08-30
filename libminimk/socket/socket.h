@@ -14,7 +14,7 @@
 /// Type representing a socket descriptor.
 ///
 /// The type is uintptr_t on Windows and int on POSIX.
-typedef minimk_syscall_socket_t minimk_socket_t;
+#define minimk_socket_t minimk_syscall_socket_t
 
 MINIMK_BEGIN_DECLS
 
@@ -146,16 +146,6 @@ minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t cou
 /// When interruped by a signal, this function continues to write relentlessly.
 minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf,
                                      size_t count) MINIMK_NOEXCEPT;
-
-/// Function to destroy a socket instance.
-///
-/// This function is thread-safe.
-///
-/// The sock argument must be a valid socket created using minimk_socket_create.
-/// On return, the sock argument is unconditionally set to be an invalid socket.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_destroy(minimk_socket_t *sock) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

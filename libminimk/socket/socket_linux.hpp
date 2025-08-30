@@ -185,15 +185,4 @@ minimk_error_t __minimk_socket_send(minimk_socket_t sock, const void *data, size
     return 0;
 }
 
-// Testable minimk_socket_destroy implementation.
-template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
-          decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
-          decltype(close) __sys_close = close>
-minimk_error_t __minimk_socket_destroy(minimk_socket_t *sock) noexcept {
-    __minimk_errno_clear();
-    int rc = __sys_close((int)*sock);
-    *sock = -1;
-    return (rc == 0) ? 0 : __minimk_errno_get();
-}
-
 #endif // LIBMINIMK_SOCKET_SOCKET_LINUX_HPP

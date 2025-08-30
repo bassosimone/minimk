@@ -2,7 +2,8 @@
 // Purpose: blocking TCP echo server using socket API
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../../libminimk/socket/socket.h" // for minimk_socket_* operations
+#include "../../libminimk/socket/socket.h"             // for minimk_socket_* operations
+#include "../../libminimk/syscall/closesocket_posix.h" // for minimk_syscall_closesocket
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name
@@ -41,7 +42,7 @@ static void handle_client(minimk_socket_t client_sock) {
         }
     }
 
-    minimk_socket_destroy(&client_sock);
+    minimk_syscall_closesocket(&client_sock);
 }
 
 int main(void) {
@@ -64,7 +65,7 @@ int main(void) {
     rv = minimk_socket_bind(server_sock, "127.0.0.1", "9774");
     if (rv != 0) {
         fprintf(stderr, "Socket bind failed: %s\n", minimk_errno_name(rv));
-        minimk_socket_destroy(&server_sock);
+        minimk_syscall_closesocket(&server_sock);
         exit(1);
     }
 
@@ -72,7 +73,7 @@ int main(void) {
     rv = minimk_socket_listen(server_sock, 128);
     if (rv != 0) {
         fprintf(stderr, "Socket listen failed: %s\n", minimk_errno_name(rv));
-        minimk_socket_destroy(&server_sock);
+        minimk_syscall_closesocket(&server_sock);
         exit(1);
     }
 
@@ -93,6 +94,6 @@ int main(void) {
         handle_client(client_sock);
     }
 
-    minimk_socket_destroy(&server_sock);
+    minimk_syscall_closesocket(&server_sock);
     return 0;
 }
