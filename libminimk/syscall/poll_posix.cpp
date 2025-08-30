@@ -11,7 +11,7 @@ short minimk_syscall_pollin = POLLIN;
 short minimk_syscall_pollout = POLLOUT;
 short minimk_syscall_pollerr = POLLERR;
 
-minimk_error_t minimk_syscall_poll(struct minimk_syscall_pollfd *fds, size_t size, int timeout,
+minimk_error_t minimk_syscall_poll(minimk_syscall_pollfd_t *fds, size_t size, int timeout,
                                    size_t *nready) noexcept {
     return minimk_syscall_poll_impl(fds, size, timeout, nready);
 }

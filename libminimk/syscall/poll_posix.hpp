@@ -14,25 +14,12 @@
 #include <stddef.h> // for offsetof
 #include <stdint.h> // for UINT16_MAX
 
-// Ensure the structure definition is binary compatible
-static_assert(sizeof(struct minimk_syscall_pollfd) == sizeof(struct pollfd),
-              "minimk_syscall_pollfd must have same size as pollfd");
-
-static_assert(offsetof(struct minimk_syscall_pollfd, fd) == offsetof(struct pollfd, fd),
-              "minimk_syscall_pollfd.fd offset must match pollfd.fd");
-
-static_assert(offsetof(struct minimk_syscall_pollfd, events) == offsetof(struct pollfd, events),
-              "minimk_syscall_pollfd.events offset must match pollfd.events");
-
-static_assert(offsetof(struct minimk_syscall_pollfd, revents) == offsetof(struct pollfd, revents),
-              "minimk_syscall_pollfd.revents offset must match pollfd.revents");
-
 /// Testable minimk_syscall_poll implementation.
 template <
         decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
         decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
         decltype(poll) M_sys_poll = poll>
-minimk_error_t minimk_syscall_poll_impl(struct minimk_syscall_pollfd *fds, size_t size, int timeout,
+minimk_error_t minimk_syscall_poll_impl(minimk_syscall_pollfd_t *fds, size_t size, int timeout,
                                         size_t *nready) noexcept {
     // As documented, camp the maximum number of descriptors.
     size = (size <= UINT16_MAX) ? size : UINT16_MAX;
@@ -42,7 +29,7 @@ minimk_error_t minimk_syscall_poll_impl(struct minimk_syscall_pollfd *fds, size_
 
     // Clear errno and issues the system call.
     M_minimk_syscall_clearerrno();
-    int rv = M_sys_poll((struct pollfd *)fds, static_cast<nfds_t>(size), timeout);
+    int rv = M_sys_poll(fds, static_cast<nfds_t>(size), timeout);
 
     // Determine whether poll succeeded.
     int success = (rv >= 0);

@@ -4,22 +4,23 @@
 #ifndef LIBMINIMK_SYSCALL_POLL_H
 #define LIBMINIMK_SYSCALL_POLL_H
 
-#include "socket.h" // for minimk_syscall_socket_t
-
 #include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
 
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <poll.h>
+#endif
+
 /// Type representing a pollable descriptor.
-///
-/// Each port should ensure that this type is binary
-/// compatible with the platform's `struct poll`.
-struct minimk_syscall_pollfd {
-    minimk_syscall_socket_t fd;
-    short events;
-    short revents;
-};
+#ifdef _WIN32
+typedef WSAPOLLFD minimk_syscall_pollfd_t;
+#else
+typedef struct pollfd minimk_syscall_pollfd_t;
+#endif
 
 MINIMK_BEGIN_DECLS
 
@@ -40,7 +41,7 @@ MINIMK_BEGIN_DECLS
 ///
 /// The return value is zero on success or a nonzero error code on failure. Note
 /// that success includes the case where no descriptors are ready.
-minimk_error_t minimk_syscall_poll(struct minimk_syscall_pollfd *fds, size_t size, int timeout,
+minimk_error_t minimk_syscall_poll(minimk_syscall_pollfd_t *fds, size_t size, int timeout,
                                    size_t *nready) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS

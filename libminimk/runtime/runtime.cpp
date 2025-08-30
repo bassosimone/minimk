@@ -263,7 +263,7 @@ static void block_on_poll(void) noexcept {
     //
     // On linux/amd64 each structure is 8 byte and we have 16 coroutines
     // which causes the stack to grow by 128 bytes.
-    minimk_syscall_pollfd fds[MAX_COROS] = {};
+    minimk_syscall_pollfd_t fds[MAX_COROS] = {};
     size_t numfds = MAX_COROS;
 
     // 3. scan the coroutines list and init deadline and fds.
