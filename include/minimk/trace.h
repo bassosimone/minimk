@@ -16,7 +16,7 @@
 #define MINIMK_TRACE(fmt, ...)                                                                     \
     do {                                                                                           \
         if (MINIMK_TRACE_IS_ENABLED) {                                                             \
-            minimk_log_printf(fmt, ##__VA_ARGS__);                                                 \
+            minimk_log_printf(fmt, __VA_ARGS__);                                                   \
         }                                                                                          \
     } while (0)
 

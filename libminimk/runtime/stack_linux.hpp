@@ -7,8 +7,9 @@
 #include "../syscall/errno.h" // for minimk_syscall_clearerrno
 #include "stack.h"            // for struct stack
 
-#include <minimk/errno.h> // for minimk_error_t
-#include <minimk/trace.h> // for MINIMK_TRACE
+#include <minimk/assert.h> // for MINIMK_ASSERT
+#include <minimk/errno.h>  // for minimk_error_t
+#include <minimk/trace.h>  // for MINIMK_TRACE
 
 #include <sys/mman.h> // for mmap
 
@@ -50,7 +51,9 @@ template <
         decltype(mprotect) M_sys_mprotect = mprotect, decltype(munmap) M_sys_munmap = munmap>
 minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
     // Initialize the total amount of memory to allocate including the guard page.
-    size_t page_size = M_sys_getpagesize();
+    int page_size_signed = M_sys_getpagesize();
+    MINIMK_ASSERT(page_size_signed >= 0);
+    size_t page_size = static_cast<size_t>(page_size_signed);
     size_t coro_stack_size = minimk_coro_stack_size_impl(page_size);
     sp->size = coro_stack_size + page_size;
 

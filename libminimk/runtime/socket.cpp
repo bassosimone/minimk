@@ -31,14 +31,17 @@ struct socketinfo {
     /// The actual handle associated to this entry.
     minimk_runtime_socket_t handle;
 
-    /// The underlying OS socket file descriptor.
-    minimk_socket_t fd;
-
     /// Read timeout in nanoseconds.
     uint64_t read_timeout;
 
     /// Write timeout in nanoseconds.
     uint64_t write_timeout;
+
+    /// The underlying OS socket file descriptor.
+    minimk_syscall_socket_t fd;
+
+    /// Padding to align to 16 bytes.
+    uint32_t padding;
 };
 
 /// Global socket table managed by the runtime.
@@ -60,7 +63,7 @@ static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_
     // Reject handles owned by other subsystems
     uint8_t type = handle_type(handle);
     if (type != HANDLE_TYPE_SOCKET) {
-        MINIMK_TRACE("trace: invalid handle type=%u, expected=%u\n", type, HANDLE_TYPE_SOCKET);
+        MINIMK_TRACE("trace: invalid handle type=%u, expected=%d\n", type, HANDLE_TYPE_SOCKET);
         return MINIMK_EBADF;
     }
 
@@ -105,7 +108,9 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
         // A completely zero handle indicates that the slot is actually free
         if (info->handle == 0) {
             *pinfo = info;
-            info->handle = make_handle(HANDLE_TYPE_SOCKET, generation, slot_index);
+            MINIMK_ASSERT(slot_index <= UINT8_MAX);
+            info->handle = make_handle( //
+                    HANDLE_TYPE_SOCKET, generation, static_cast<uint8_t>(slot_index));
             info->fd = fd;
             info->read_timeout = UINT64_MAX;
             info->write_timeout = UINT64_MAX;
@@ -129,7 +134,7 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
 
     // Return the appropriate result
     if (*pinfo == nullptr) {
-        MINIMK_TRACE("trace: no free slots available (EMFILE)\n");
+        MINIMK_TRACE("trace: no free slots available: %s\n", "EMFILE");
         return MINIMK_EMFILE;
     }
     return 0;
@@ -137,7 +142,7 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
 
 /// Destroy socketinfo and free the slot.
 static void destroy_socketinfo(socketinfo *info) noexcept {
-    memset(info, 0, sizeof(*info));
+    *info = {};
 }
 
 minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int domain, int type,
@@ -152,7 +157,7 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
     minimk_socket_t sockfd = minimk_syscall_invalid_socket;
     minimk_error_t rv = minimk_syscall_socket(&sockfd, domain, type, protocol);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_socket_create failed: %d\n", rv);
+        MINIMK_TRACE("trace: minimk_socket_create failed: %s\n", minimk_errno_name(rv));
         return rv;
     }
 
@@ -162,7 +167,8 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
     // Make it nonblocking
     rv = minimk_syscall_socket_setnonblock(sockfd);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_syscall_socket_setnonblock failed: %d\n", rv);
+        MINIMK_TRACE("trace: minimk_syscall_socket_setnonblock failed: %s\n",
+                     minimk_errno_name(rv));
         minimk_syscall_closesocket(&sockfd);
         return rv;
     }
@@ -171,7 +177,7 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
     socketinfo *info = nullptr;
     rv = create_socketinfo(&info, sockfd);
     if (rv != 0) {
-        MINIMK_TRACE("trace: create_socketinfo failed: %d\n", rv);
+        MINIMK_TRACE("trace: create_socketinfo failed: %s\n", minimk_errno_name(rv));
         minimk_syscall_closesocket(&sockfd);
         return rv;
     }
@@ -211,7 +217,7 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
     for (;;) {
         // Attempt to accept a connection
         minimk_socket_t client_fd = minimk_syscall_invalid_socket;
-        minimk_error_t rv = minimk_syscall_accept(&client_fd, listener_info->fd);
+        rv = minimk_syscall_accept(&client_fd, listener_info->fd);
 
         // Suspend if needed
         if (rv == MINIMK_EAGAIN) {
@@ -254,7 +260,8 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *da
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_runtime_socket_recv find_socketinfo failed: %d\n", rv);
+        MINIMK_TRACE("trace: minimk_runtime_socket_recv find_socketinfo failed: %s\n",
+                     minimk_errno_name(rv));
         return rv;
     }
 
@@ -265,9 +272,10 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *da
     for (;;) {
         // Attempt to read data
         *nread = 0;
-        minimk_error_t rv = minimk_syscall_recv(info->fd, data, count, nread);
+        rv = minimk_syscall_recv(info->fd, data, count, nread);
 
-        MINIMK_TRACE("trace: minimk_syscall_recv returned: rv=%d nread=%zu\n", rv, *nread);
+        MINIMK_TRACE("trace: minimk_syscall_recv returned: rv=%s nread=%zu\n",
+                     minimk_errno_name(rv), *nread);
 
         // We only need to continue trying on EAGAIN
         if (rv != MINIMK_EAGAIN) {
@@ -288,7 +296,8 @@ minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const vo
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_runtime_socket_send find_socketinfo failed: %d\n", rv);
+        MINIMK_TRACE("trace: minimk_runtime_socket_send find_socketinfo failed: %s\n",
+                     minimk_errno_name(rv));
         return rv;
     }
 
@@ -299,9 +308,10 @@ minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const vo
     for (;;) {
         // Attempt to send data
         *nwritten = 0;
-        minimk_error_t rv = minimk_syscall_send(info->fd, data, count, nwritten);
+        rv = minimk_syscall_send(info->fd, data, count, nwritten);
 
-        MINIMK_TRACE("trace: minimk_syscall_send returned: rv=%d nwritten=%zu\n", rv, *nwritten);
+        MINIMK_TRACE("trace: minimk_syscall_send returned: rv=%s nwritten=%zu\n",
+                     minimk_errno_name(rv), *nwritten);
 
         // We only need to continue trying on EAGAIN
         if (rv != MINIMK_EAGAIN) {

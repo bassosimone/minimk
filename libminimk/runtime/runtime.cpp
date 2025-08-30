@@ -90,6 +90,8 @@ static minimk_error_t find_free_coroutine_slot(coroutine **found) noexcept {
 }
 
 /// Trampoline for starting to execute a coroutine.
+static void coro_trampoline(void) noexcept __attribute__((noreturn));
+
 static void coro_trampoline(void) noexcept {
     // Ensure that we're in the coroutine world.
     MINIMK_ASSERT(current != nullptr);
