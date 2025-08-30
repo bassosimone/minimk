@@ -53,6 +53,14 @@ static uint64_t generation = 0;
 /// Next slot to try allocating from.
 static size_t next_slot = 0;
 
+/// Common function for accessing the sockets array.
+static socketinfo *get_socketinfo(size_t idx) noexcept {
+    MINIMK_ASSERT(idx >= 0 && idx < MAX_SOCKETS);
+#pragma clang unsafe_buffer_usage begin
+    return &sockets[idx];
+#pragma clang unsafe_buffer_usage end
+}
+
 /// Find and validate socket info from ID, returning nullptr if invalid.
 static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_t handle) noexcept {
     // Zero the return argument
@@ -69,7 +77,7 @@ static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_
 
     // Access the corresponding slot
     uint64_t index = handle_index(handle);
-    socketinfo *info = &sockets[index];
+    socketinfo *info = get_socketinfo(index);
 
     MINIMK_TRACE("trace: checking slot %llu, stored_handle=0x%llx\n",
                  static_cast<unsigned long long>(index),
@@ -100,7 +108,7 @@ static minimk_error_t create_socketinfo(socketinfo **pinfo, minimk_socket_t fd) 
     for (size_t idx = 0; idx < MAX_SOCKETS && *pinfo == nullptr; idx++) {
         // Use modulo to stay within the bounds
         size_t slot_index = next_slot % MAX_SOCKETS;
-        socketinfo *info = &sockets[slot_index];
+        socketinfo *info = get_socketinfo(slot_index);
 
         MINIMK_TRACE("trace: checking slot %zu (next_slot=%zu), handle=0x%llx\n", slot_index,
                      next_slot, static_cast<unsigned long long>(info->handle));

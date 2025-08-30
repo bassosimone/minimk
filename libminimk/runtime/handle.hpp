@@ -53,7 +53,7 @@ static inline uint64_t handle_generation(uint64_t handle) MINIMK_NOEXCEPT {
 
 /// Function to extract the index from a handle.
 static inline uint64_t handle_index(uint64_t handle) MINIMK_NOEXCEPT {
-    return static_cast<uint8_t>(handle & 0x00000000000000ff);
+    return (handle & 0x00000000000000ff);
 }
 
 /// Function returning whether a given generation value is valid.

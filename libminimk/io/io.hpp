@@ -19,16 +19,22 @@
 template <typename T, minimk_error_t (*M_T_send)(T, const void *, size_t, size_t *)>
 minimk_error_t minimk_io_writeall_impl(T sock, const void *vbuf, size_t count) noexcept {
     const char *buf = static_cast<const char *>(vbuf);
+
     for (size_t total = 0; total < count;) {
         size_t nwritten = 0;
         size_t amount = count - total;
+
+#pragma clang unsafe_buffer_usage begin
         minimk_error_t rv = M_T_send(sock, buf + total, amount, &nwritten);
+#pragma clang unsafe_buffer_usage end
+
         if (rv == MINIMK_EINTR) {
             continue;
         }
         if (rv != 0) {
             return rv; // all-or-nothing semantics
         }
+
         MINIMK_ASSERT(nwritten > 0); // enforces documented assumptions
         MINIMK_ASSERT(nwritten <= amount);
         total += nwritten;
@@ -48,10 +54,15 @@ minimk_error_t minimk_io_writeall_impl(T sock, const void *vbuf, size_t count) n
 template <typename T, minimk_error_t (*M_T_recv)(T, void *, size_t, size_t *)>
 minimk_error_t minimk_io_readall_impl(T sock, void *vbuf, size_t count) noexcept {
     char *buf = static_cast<char *>(vbuf);
+
     for (size_t total = 0; total < count;) {
         size_t nread = 0;
         size_t amount = count - total;
+
+#pragma clang unsafe_buffer_usage begin
         minimk_error_t rv = M_T_recv(sock, buf + total, amount, &nread);
+#pragma clang unsafe_buffer_usage end
+
         if (rv == MINIMK_EINTR) {
             continue;
         }

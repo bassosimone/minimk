@@ -74,10 +74,18 @@ static coroutine *current;
 /// Stack pointer used by the scheduler.
 static uintptr_t scheduler_sp;
 
+/// Common function to access the corutine slot.
+static coroutine *get_coroutine_slot(size_t idx) noexcept {
+    MINIMK_ASSERT(idx >= 0 && idx < MAX_COROS);
+#pragma clang unsafe_buffer_usage begin
+    return &coroutines[idx];
+#pragma clang unsafe_buffer_usage end
+}
+
 /// Find a free coroutine slot or return a nonzero error.
 static minimk_error_t find_free_coroutine_slot(coroutine **found) noexcept {
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        coroutine *coro = &coroutines[idx];
+        coroutine *coro = get_coroutine_slot(idx);
         if (coro->state != CORO_NULL) {
             continue;
         }
@@ -172,7 +180,7 @@ minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) noex
 /// Frees resources used by all the exited coroutines.
 static void sched_clean_exited(void) noexcept {
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        auto coro = &coroutines[idx];
+        auto coro = get_coroutine_slot(idx);
         if (coro->state == CORO_EXITED) {
             destroy_coroutine(coro);
             continue;
@@ -205,7 +213,7 @@ static void sched_maybe_resume(coroutine *coro, uint64_t now, short revents) noe
 static void sched_expire_deadlines(void) noexcept {
     uint64_t now = minimk_time_monotonic_now();
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        sched_maybe_resume(&coroutines[idx], now, 0);
+        sched_maybe_resume(get_coroutine_slot(idx), now, 0);
     }
 }
 
@@ -213,7 +221,7 @@ static void sched_expire_deadlines(void) noexcept {
 static coroutine *sched_pick_runnable(size_t *fair) noexcept {
     // note that wrap is not UB for size_t
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        auto coro = &coroutines[(*fair) % MAX_COROS];
+        auto coro = get_coroutine_slot((*fair) % MAX_COROS);
         (*fair)++;
         if (coro->state == CORO_RUNNABLE) {
             return coro;
@@ -239,7 +247,7 @@ static inline void validate_coro_stack_pointer(const char *context, coroutine *c
 static size_t count_nonnull_coroutines(void) noexcept {
     size_t res = 0;
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        auto coro = &coroutines[idx];
+        auto coro = get_coroutine_slot(idx);
         if (coro->state != CORO_NULL) {
             res++;
             continue;
@@ -270,7 +278,7 @@ static void block_on_poll(void) noexcept {
 
     // 3. scan the coroutines list and init deadline and fds.
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        auto coro = &coroutines[idx];
+        auto coro = get_coroutine_slot(idx);
 
         // 3.1. arm timers
         if (coro->state == CORO_BLOCKED_ON_TIMER) {
@@ -284,8 +292,14 @@ static void block_on_poll(void) noexcept {
             MINIMK_ASSERT(coro->sock != minimk_syscall_invalid_socket);
             MINIMK_ASSERT(coro->events != 0);
             MINIMK_ASSERT(coro->revents == 0);
-            fds[idx].events = coro->events;
-            fds[idx].fd = coro->sock;
+
+#pragma clang unsafe_buffer_usage begin
+            auto fd = &fds[idx];
+#pragma clang unsafe_buffer_usage end
+
+            fd->events = coro->events;
+            fd->fd = coro->sock;
+
             MINIMK_TRACE("trace: poll fd=%llu events=%llu\n",
                          static_cast<unsigned long long>(coro->sock),
                          static_cast<unsigned long long>(coro->events));
@@ -333,7 +347,12 @@ static void block_on_poll(void) noexcept {
     // 6. check what we need to resume now
     now = minimk_time_monotonic_now();
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
-        sched_maybe_resume(&coroutines[idx], now, fds[idx].revents);
+
+#pragma clang unsafe_buffer_usage begin
+        auto fd = &fds[idx];
+#pragma clang unsafe_buffer_usage end
+
+        sched_maybe_resume(get_coroutine_slot(idx), now, fd->revents);
     }
 }
 
