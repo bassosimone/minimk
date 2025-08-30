@@ -2,8 +2,8 @@
 // Purpose: runtime-managed socket table with ECS-style resource management
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../socket/socket.h"                    // for minimk_socket_t and operations
-#include "../io/io.hpp"                          // for __minimk_io_readall
+#include "../socket/socket.h"              // for minimk_socket_t and operations
+#include "../io/io.hpp"                    // for __minimk_io_readall
 #include "../syscall/accept.h"             // for minimk_syscall_accept
 #include "../syscall/bind.h"               // for minimk_syscall_bind
 #include "../syscall/closesocket.h"        // for minimk_syscall_closesocket
