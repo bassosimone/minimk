@@ -26,7 +26,8 @@ void minimk_runtime_switch(uintptr_t *old_stack_ptr, uintptr_t new_stack_ptr) MI
 /// The stack_top should point to the top of the allocated stack memory.
 ///
 /// The trampoline is the address of the function that will be called when the coroutine first runs.
-void minimk_runtime_init_coro_stack(uintptr_t *stack_ptr, uintptr_t stack_top, uintptr_t trampoline) MINIMK_NOEXCEPT;
+void minimk_runtime_init_coro_stack(uintptr_t *stack_ptr, uintptr_t stack_top,
+                                    uintptr_t trampoline) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

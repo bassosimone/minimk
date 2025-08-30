@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "handle.hpp" // for make_handle
-#include "runtime.h"  // for minimk_runtime_suspend_read/write
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/io.hpp>    // for minimk_io_readall

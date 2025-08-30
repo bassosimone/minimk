@@ -4,8 +4,9 @@
 #ifndef MINIMK_RUNTIME_H
 #define MINIMK_RUNTIME_H
 
-#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_socket_t
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uint64_t
@@ -49,6 +50,21 @@ void minimk_runtime_yield(void) MINIMK_NOEXCEPT;
 ///
 /// This function must be called by a running goroutine.
 void minimk_runtime_nanosleep(uint64_t nanosec) MINIMK_NOEXCEPT;
+
+/// Put the coroutine to sleep until read would not block or there's a timeout.
+///
+/// A too large number of nanoseconds would be reasonably truncated by the
+/// runtime to avoid overflows. You do not actually need to sleep for so much
+/// time anyway. We will surely extinguish ourselves before that.
+///
+/// Returns zero if read would not block and an error otherwise. Typically, the
+/// error is MINIMK_ETIMEDOUT in case of I/O timeout.
+minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock,
+                                           uint64_t nanosec) MINIMK_NOEXCEPT;
+
+/// Like minimk_runtime_suspend_read but for writability.
+minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock,
+                                            uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Function to create a new socket instance.
 ///

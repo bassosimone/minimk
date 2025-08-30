@@ -4,9 +4,8 @@
 
 #include "../integer/u64.h" // for minimk_integer_u64_satadd
 
-#include "runtime.h" // for prototypes
-#include "stack.h"   // for struct stack
-#include "switch.h"  // for minimk_switch
+#include "stack.h"  // for struct stack
+#include "switch.h" // for minimk_switch
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
