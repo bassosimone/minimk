@@ -305,7 +305,7 @@ static void block_on_poll(void) noexcept {
     //
     // - ENOMEM Unable to allocate memory for kernel data structures.
     MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n", (unsigned long long)fds,
-                 (unsigned long long)numfds, (unsigned long)poll_timeout);
+                 (unsigned long long)numfds, (long long)poll_timeout);
 
     size_t active = 0;
     auto poll_rc = minimk_syscall_poll(fds, numfds, poll_timeout, &active);

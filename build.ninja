@@ -7,7 +7,7 @@ rule cxx
   description = CXX $out
 
 rule cc
-  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -c $in -o $out
+  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -Weverything -Wno-pre-c11-compat -Wno-declaration-after-statement -c $in -o $out
   description = CC $out
 
 rule link
@@ -24,6 +24,8 @@ rule ar
 
 build libminimk/errno/errno.o: cc libminimk/errno/errno.c
 build libminimk/errno/errno_posix.o: cc libminimk/errno/errno_posix.c
+
+build libminimk/log/log.o: cc libminimk/log/log.c
 
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
 build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
@@ -53,6 +55,7 @@ build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 build libminimk.a: ar $
   libminimk/errno/errno.o $
   libminimk/errno/errno_posix.o $
+  libminimk/log/log.o $
   libminimk/runtime/runtime.o $
   libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $

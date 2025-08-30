@@ -9,7 +9,7 @@
 MINIMK_BEGIN_DECLS
 
 /// Internal implementation of MINIMK_TRACE
-void minimk_trace__(const char *fmt, ...) MINIMK_NOEXCEPT;
+void minimk_trace__(const char *fmt, ...) MINIMK_NOEXCEPT __attribute__((format(printf, 1, 2)));
 
 MINIMK_END_DECLS
 
@@ -20,11 +20,11 @@ MINIMK_END_DECLS
 #endif
 
 /// Traces execution and prints specific values
-#define MINIMK_TRACE(fmt, ...)                                                                                         \
-    do {                                                                                                               \
-        if (MINIMK_TRACE__) {                                                                                          \
-            minimk_trace__(fmt, ##__VA_ARGS__);                                                                        \
-        }                                                                                                              \
+#define MINIMK_TRACE(fmt, ...)                                                                     \
+    do {                                                                                           \
+        if (MINIMK_TRACE__) {                                                                      \
+            minimk_trace__(fmt, ##__VA_ARGS__);                                                    \
+        }                                                                                          \
     } while (0)
 
 #endif // LIBMINIMK_RUNTIME_TRACE_H

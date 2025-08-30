@@ -48,6 +48,8 @@ static void handle_client(void *opaque) {
 }
 
 /// Borrow the server socket and accept connections.
+static void accept_loop(void *opaque) __attribute__((noreturn));
+
 static void accept_loop(void *opaque) {
     minimk_runtime_socket_t ssock = (minimk_runtime_socket_t)opaque;
 

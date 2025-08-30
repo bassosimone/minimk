@@ -2,7 +2,7 @@
 // Purpose: blocking TCP echo server using socket API
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../../libminimk/socket/socket.h"             // for minimk_socket_* operations
+#include "../../libminimk/socket/socket.h"       // for minimk_socket_* operations
 #include "../../libminimk/syscall/accept.h"      // for minimk_syscall_accept
 #include "../../libminimk/syscall/bind.h"        // for minimk_syscall_bind
 #include "../../libminimk/syscall/closesocket.h" // for minimk_syscall_closesocket
@@ -91,7 +91,7 @@ int main(void) {
 
         if (rv != 0) {
             fprintf(stderr, "Socket accept failed: %s\n", minimk_errno_name(rv));
-            continue;
+            break;
         }
 
         fprintf(stderr, "Client connected\n");

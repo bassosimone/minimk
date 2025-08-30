@@ -9,11 +9,11 @@
 
 int main(void) {
     uint64_t first = minimk_time_monotonic_now();
-    fprintf(stderr, "%lld\n", (unsigned long long)first);
+    fprintf(stderr, "%llu\n", (unsigned long long)first);
 
     uint64_t second = minimk_time_monotonic_now();
-    fprintf(stderr, "%lld\n", (unsigned long long)second);
+    fprintf(stderr, "%llu\n", (unsigned long long)second);
 
     uint64_t third = minimk_time_monotonic_now();
-    fprintf(stderr, "%lld\n", (unsigned long long)third);
+    fprintf(stderr, "%llu\n", (unsigned long long)third);
 }
