@@ -1,4 +1,4 @@
-// File: libminimk/runtime/trace.cpp
+// File: libminimk/runtime/trace.c
 // Purpose: utility to trace execution
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -7,7 +7,7 @@
 #include <stdarg.h> // for va_list
 #include <stdio.h>  // for stderr
 
-void __minimk_trace(const char *fmt, ...) noexcept {
+void __minimk_trace(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);

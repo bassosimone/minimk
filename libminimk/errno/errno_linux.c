@@ -1,4 +1,4 @@
-// File: libminimk/errno/errno_linux.cpp
+// File: libminimk/errno/errno_linux.c
 // Purpose: errno handling for linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,7 +6,7 @@
 
 #include <errno.h> // for errno
 
-minimk_error_t minimk_errno_get(void) noexcept {
+minimk_error_t minimk_errno_get(void) {
     switch (errno) {
     case 0:
         return 0;
@@ -70,11 +70,11 @@ minimk_error_t minimk_errno_get(void) noexcept {
     }
 }
 
-void minimk_errno_clear(void) noexcept {
+void minimk_errno_clear(void) {
     errno = 0;
 }
 
-const char *minimk_errno_name(minimk_error_t code) noexcept {
+const char *minimk_errno_name(minimk_error_t code) {
     switch (code) {
     case 0:
         return "SUCCESS";

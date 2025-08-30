@@ -22,9 +22,9 @@ rule ar
   command = ar rv $out $in
   description = AR $out
 
-build libminimk/assert/assert.o: cxx libminimk/assert/assert.cpp
+build libminimk/assert/assert.o: cc libminimk/assert/assert.c
 
-build libminimk/errno/errno_linux.o: cxx libminimk/errno/errno_linux.cpp
+build libminimk/errno/errno_linux.o: cc libminimk/errno/errno_linux.c
 
 build libminimk/poll/poll_linux.o: cxx libminimk/poll/poll_linux.cpp
 
@@ -32,7 +32,7 @@ build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
 build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
-build libminimk/runtime/trace.o: cxx libminimk/runtime/trace.cpp
+build libminimk/runtime/trace.o: cc libminimk/runtime/trace.c
 
 build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 

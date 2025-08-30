@@ -1,4 +1,4 @@
-// File: libminimk/assert/assert.cpp
+// File: libminimk/assert/assert.c
 // Purpose: like assert but not influenced by NDEBUG
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -8,7 +8,7 @@
 #include <stdio.h>  // for vfprintf
 #include <stdlib.h> // for abort
 
-void __minimk_assert(int should_abort, const char *fmt, ...) noexcept {
+void __minimk_assert(int should_abort, const char *fmt, ...) {
     if (should_abort) {
         va_list ap;
         va_start(ap, fmt);
