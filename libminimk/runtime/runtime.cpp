@@ -116,7 +116,7 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
     memset(coro, 0, sizeof(*coro));
 
     // Initialize the entry
-    coro->sock = minimk_socket_invalid();
+    coro->sock = minimk_syscall_invalid_socket;
     coro->entry = entry;
     coro->opaque = opaque;
 
@@ -188,7 +188,7 @@ static void sched_maybe_resume(coroutine *coro, uint64_t now, short revents) noe
         ((coro->events & revents) != 0 || now >= coro->deadline)) {
         coro->deadline = 0;
         coro->state = CORO_RUNNABLE;
-        coro->sock = minimk_socket_invalid();
+        coro->sock = minimk_syscall_invalid_socket;
         coro->events = 0;
         coro->revents = revents;
         return;
@@ -273,7 +273,7 @@ static void block_on_poll(void) noexcept {
         // 3.2. deal with I/O
         if (coro->state == CORO_BLOCKED_ON_IO) {
             deadline = (coro->deadline < deadline) ? coro->deadline : deadline;
-            MINIMK_ASSERT(coro->sock != minimk_socket_invalid());
+            MINIMK_ASSERT(coro->sock != minimk_syscall_invalid_socket);
             MINIMK_ASSERT(coro->events != 0);
             MINIMK_ASSERT(coro->revents == 0);
             fds[idx].events = coro->events;
@@ -411,7 +411,7 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     // Prepare for suspending
     current->state = CORO_BLOCKED_ON_IO;
     current->deadline = deadline;
-    MINIMK_ASSERT(sock != minimk_socket_invalid());
+    MINIMK_ASSERT(sock != minimk_syscall_invalid_socket);
     current->sock = sock;
     current->events = events;
     current->revents = 0;
@@ -426,7 +426,7 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     short revents = current->revents;
     current->revents = 0;
     MINIMK_ASSERT(current->deadline == 0);
-    MINIMK_ASSERT(current->sock == minimk_socket_invalid());
+    MINIMK_ASSERT(current->sock == minimk_syscall_invalid_socket);
     MINIMK_ASSERT(current->events == 0);
 
     MINIMK_TRACE("trace: resume coroutine<0x%llx> on fd=%llu events=%llu revents=%llu\n",

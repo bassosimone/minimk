@@ -20,19 +20,6 @@
 #include <stddef.h> // for size_t
 #include <unistd.h> // for close
 
-// Testable minimk_socket_create implementation.
-template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
-          decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
-          decltype(socket) __sys_socket = socket>
-minimk_error_t __minimk_socket_create(minimk_socket_t *sock, int domain, int type,
-                                      int protocol) noexcept {
-    __minimk_errno_clear();
-    int fdesc = __sys_socket(domain, type, protocol);
-    int ok = (fdesc >= 0);
-    *sock = ok ? (minimk_socket_t)fdesc : -1;
-    return ok ? 0 : __minimk_errno_get();
-}
-
 // Testable minimk_socket_setnonblock implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,

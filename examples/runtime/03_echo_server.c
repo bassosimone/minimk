@@ -5,7 +5,7 @@
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/errno.h>   // for minimk_errno_name
 #include <minimk/runtime.h> // for minimk_runtime_go
-#include <minimk/socket.h>  // for minimk_socket_init + constants
+#include <minimk/syscall.h> // for minimk_syscall_socket_init
 
 #include <stdio.h>  // for fprintf
 #include <stdlib.h> // for exit
@@ -69,7 +69,7 @@ static void accept_loop(void *opaque) {
 
 int main(void) {
     // Initialize socket library
-    minimk_error_t rv = minimk_socket_init();
+    minimk_error_t rv = minimk_syscall_socket_init();
     if (rv != 0) {
         fprintf(stderr, "Socket init failed: %s\n", minimk_errno_name(rv));
         exit(1);
@@ -77,8 +77,8 @@ int main(void) {
 
     // Create listening socket
     minimk_runtime_socket_t server_sock = MINIMK_RUNTIME_INVALID_HANDLE;
-    rv = minimk_runtime_socket_create(&server_sock, minimk_socket_af_inet(),
-                                      minimk_socket_sock_stream(), 0);
+    rv = minimk_runtime_socket_create(&server_sock, minimk_syscall_af_inet,
+                                      minimk_syscall_sock_stream, 0);
     if (rv != 0) {
         fprintf(stderr, "Socket create failed: %s\n", minimk_errno_name(rv));
         exit(1);

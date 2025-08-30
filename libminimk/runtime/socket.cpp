@@ -138,8 +138,8 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
                  type, protocol);
 
     // Create the underlying socket
-    minimk_socket_t sockfd = minimk_socket_invalid();
-    minimk_error_t rv = minimk_socket_create(&sockfd, domain, type, protocol);
+    minimk_socket_t sockfd = minimk_syscall_invalid_socket;
+    minimk_error_t rv = minimk_syscall_socket(&sockfd, domain, type, protocol);
     if (rv != 0) {
         MINIMK_TRACE("trace: minimk_socket_create failed: %d\n", rv);
         return rv;
@@ -198,7 +198,7 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
 
     for (;;) {
         // Attempt to accept a connection
-        minimk_socket_t client_fd = minimk_socket_invalid();
+        minimk_socket_t client_fd = minimk_syscall_invalid_socket;
         minimk_error_t rv = minimk_socket_accept(&client_fd, listener_info->fd);
 
         // Suspend if needed

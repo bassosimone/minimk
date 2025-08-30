@@ -27,7 +27,7 @@ static_assert(offsetof(struct minimk_syscall_pollfd, events) == offsetof(struct 
 static_assert(offsetof(struct minimk_syscall_pollfd, revents) == offsetof(struct pollfd, revents),
               "minimk_syscall_pollfd.revents offset must match pollfd.revents");
 
-// Testable minimk_syscall_poll implementation.
+/// Testable minimk_syscall_poll implementation.
 template <decltype(minimk_errno_clear) minimk_errno_clear__ = minimk_errno_clear,
           decltype(minimk_errno_get) minimk_errno_get__ = minimk_errno_get,
           decltype(poll) sys_poll__ = poll>

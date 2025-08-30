@@ -4,9 +4,9 @@
 
 #include "../../libminimk/socket/socket.h" // for minimk_socket_* operations
 
-#include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/errno.h>  // for minimk_errno_name
-#include <minimk/socket.h> // for minimk_socket_init + constants
+#include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/errno.h>   // for minimk_errno_name
+#include <minimk/syscall.h> // for minimk_syscall_socket_init
 
 #include <stdio.h>  // for fprintf
 #include <stdlib.h> // for exit
@@ -46,16 +46,15 @@ static void handle_client(minimk_socket_t client_sock) {
 
 int main(void) {
     // Initialize socket library
-    minimk_error_t rv = minimk_socket_init();
+    minimk_error_t rv = minimk_syscall_socket_init();
     if (rv != 0) {
         fprintf(stderr, "Socket init failed: %s\n", minimk_errno_name(rv));
         exit(1);
     }
 
     // Create listening socket
-    minimk_socket_t server_sock = minimk_socket_invalid();
-    rv = minimk_socket_create(&server_sock, minimk_socket_af_inet(), minimk_socket_sock_stream(),
-                              0);
+    minimk_socket_t server_sock = minimk_syscall_invalid_socket;
+    rv = minimk_syscall_socket(&server_sock, minimk_syscall_af_inet, minimk_syscall_sock_stream, 0);
     if (rv != 0) {
         fprintf(stderr, "Socket create failed: %s\n", minimk_errno_name(rv));
         exit(1);
@@ -82,7 +81,7 @@ int main(void) {
 
     // Accept connections
     for (;;) {
-        minimk_socket_t client_sock = minimk_socket_invalid();
+        minimk_socket_t client_sock = minimk_syscall_invalid_socket;
         rv = minimk_socket_accept(&client_sock, server_sock);
 
         if (rv != 0) {

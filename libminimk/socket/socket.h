@@ -4,50 +4,19 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_H
 #define LIBMINIMK_SOCKET_SOCKET_H
 
-#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h>  // for minimk_error_t
-#include <minimk/socket.h> // for init and constants
+#include "../syscall/socket.h"
+
+#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
-
-#ifdef _WIN32
-#include <stdint.h> // for uintptr_t
-#endif
 
 /// Type representing a socket descriptor.
 ///
 /// The type is uintptr_t on Windows and int on POSIX.
-#ifdef _WIN32
-typedef uintptr_t minimk_socket_t;
-#else
-typedef int minimk_socket_t;
-#endif
+typedef minimk_syscall_socket_t minimk_socket_t;
 
 MINIMK_BEGIN_DECLS
-
-/// Function returning the platform-specific canonical invalid socket value.
-///
-/// This function is thread-safe.
-///
-/// The return value is -1 on Unix and INVALID_SOCKET on Windows.
-minimk_socket_t minimk_socket_invalid(void) MINIMK_NOEXCEPT;
-
-/// Function to create a new socket instance.
-///
-/// This function is thread-safe.
-///
-/// The sock return argument will be set to the invalid socket when the function
-/// is invoked and later changed to a valid socket on success.
-///
-/// The domain MUST be AF_INET or AF_INET6.
-///
-/// The type MUST be SOCK_STREAM or SOCK_DGRAM.
-///
-/// The protocol must be zero.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type,
-                                    int protocol) MINIMK_NOEXCEPT;
 
 /// Function to configure a socket as nonblocking.
 ///
