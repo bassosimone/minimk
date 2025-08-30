@@ -99,8 +99,8 @@ build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutin
 build examples/runtime/03_echo_server.o: cc examples/runtime/03_echo_server.c
 build examples/runtime/03_echo_server.exe: link examples/runtime/03_echo_server.o libminimk.a
 
-build examples/socket/00_echo_server_blocking.o: cxx_app examples/socket/00_echo_server_blocking.cpp
-build examples/socket/00_echo_server_blocking.exe: link_app examples/socket/00_echo_server_blocking.o libminimk.a
+build examples/syscall/00_echo_server_blocking.o: cxx_app examples/syscall/00_echo_server_blocking.cpp
+build examples/syscall/00_echo_server_blocking.exe: link_app examples/syscall/00_echo_server_blocking.o libminimk.a
 
 build examples/time/00_monotonic.o: cc examples/time/00_monotonic.c
 build examples/time/00_monotonic.exe: link examples/time/00_monotonic.o libminimk.a

@@ -1,5 +1,5 @@
-// File: examples/socket/00_echo_server_blocking.cpp
-// Purpose: blocking TCP echo server using socket API
+// File: examples/syscall/00_echo_server_blocking.cpp
+// Purpose: blocking TCP echo server using raw syscalls API
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
