@@ -2,12 +2,11 @@
 // Purpose: runtime-managed socket table with ECS-style resource management
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "../io/io.hpp" // for minimk_io_readall_impl
-
 #include "handle.hpp" // for make_handle
 #include "runtime.h"  // for minimk_runtime_suspend_read/write
 
 #include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/io.hpp>    // for minimk_io_readall
 #include <minimk/runtime.h> // for minimk_runtime_socket_t
 #include <minimk/syscall.h> // for minimk_syscall_*
 #include <minimk/trace.h>   // for MINIMK_TRACE
@@ -356,8 +355,8 @@ minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) noex
 
 minimk_error_t minimk_runtime_socket_sendall(minimk_runtime_socket_t sock, const void *buf,
                                              size_t count) noexcept {
-    return minimk_io_writeall_impl<minimk_runtime_socket_t, minimk_runtime_socket_send>(sock, buf,
-                                                                                        count);
+    return minimk_io_writeall<minimk_runtime_socket_t, minimk_runtime_socket_send>(sock, buf,
+                                                                                   count);
 }
 
 minimk_error_t minimk_runtime_socket_set_read_timeout(minimk_runtime_socket_t sock,
@@ -386,6 +385,5 @@ minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t s
 
 minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf,
                                              size_t count) noexcept {
-    return minimk_io_readall_impl<minimk_runtime_socket_t, minimk_runtime_socket_recv>(sock, buf,
-                                                                                       count);
+    return minimk_io_readall<minimk_runtime_socket_t, minimk_runtime_socket_recv>(sock, buf, count);
 }

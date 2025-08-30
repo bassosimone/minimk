@@ -6,6 +6,10 @@ rule cxx
   command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -c $in -o $out
   description = CXX $out
 
+rule cxx_app
+  command = clang++ -Iinclude -O2 -std=c++11 -Wall -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -c $in -o $out
+  description = CXX_APP $out
+
 rule cc
   command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -Weverything -Wno-pre-c11-compat -Wno-declaration-after-statement -c $in -o $out
   description = CC $out
@@ -13,6 +17,10 @@ rule cc
 rule link
   command = clang $in -o $out
   description = LINK $out
+
+rule link_app
+  command = clang++ $in -o $out
+  description = LINK_APP $out
 
 rule asm
   command = clang -O2 -c $in -o $out
@@ -32,7 +40,6 @@ build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
 
-build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 
 build libminimk/syscall/accept_posix.o: cxx libminimk/syscall/accept_posix.cpp
 build libminimk/syscall/bind_posix.o: cxx libminimk/syscall/bind_posix.cpp
@@ -62,7 +69,6 @@ build libminimk.a: ar $
   libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
-  libminimk/socket/socket_linux.o $
   libminimk/syscall/accept_posix.o $
   libminimk/syscall/bind_posix.o $
   libminimk/syscall/closesocket_posix.o $
@@ -93,8 +99,8 @@ build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutin
 build examples/runtime/03_echo_server.o: cc examples/runtime/03_echo_server.c
 build examples/runtime/03_echo_server.exe: link examples/runtime/03_echo_server.o libminimk.a
 
-build examples/socket/00_echo_server_blocking.o: cc examples/socket/00_echo_server_blocking.c
-build examples/socket/00_echo_server_blocking.exe: link examples/socket/00_echo_server_blocking.o libminimk.a
+build examples/socket/00_echo_server_blocking.o: cxx_app examples/socket/00_echo_server_blocking.cpp
+build examples/socket/00_echo_server_blocking.exe: link_app examples/socket/00_echo_server_blocking.o libminimk.a
 
 build examples/time/00_monotonic.o: cc examples/time/00_monotonic.c
 build examples/time/00_monotonic.exe: link examples/time/00_monotonic.o libminimk.a
