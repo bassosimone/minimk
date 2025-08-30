@@ -113,7 +113,7 @@ static void coro_trampoline(void) noexcept {
 static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque),
                                      void *opaque) noexcept {
     // Zero initialize the whole coroutine
-    memset(coro, 0, sizeof(*coro));
+    *coro = {};
 
     // Initialize the entry
     coro->sock = minimk_syscall_invalid_socket;
@@ -143,7 +143,7 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
 static void destroy_coroutine(coroutine *coro) noexcept {
     (void)minimk_runtime_stack_free(&coro->stack);
     MINIMK_TRACE("trace: coroutine<0x%llx> NULL\n", (unsigned long long)coro);
-    memset(coro, 0, sizeof(*coro)); // The zero state implies empty slot
+    *coro = {}; // The zero state implies empty slot
 }
 
 minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) noexcept {
