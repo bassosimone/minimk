@@ -262,7 +262,7 @@ static size_t count_nonnull_coroutines(void) noexcept {
 static void block_on_poll(void) noexcept {
     // 1. pick a reasonable default deadline to avoid blocking for too much time.
     uint64_t now = minimk_time_monotonic_now();
-    uint64_t default_timeout = 100000000;
+    uint64_t default_timeout = 10000000000;
     uint64_t deadline = minimk_integer_u64_satadd(now, default_timeout);
 
     MINIMK_TRACE("trace: poll initial deadline=%llu [us]\n",
@@ -396,9 +396,12 @@ void minimk_runtime_run(void) noexcept {
         // Fairly select the first runnable coroutine.
         current = sched_pick_runnable(&fair);
 
-        // If there are no runnable coroutines, wait for something to happen.
+        // If there are no runnable coroutines, wait for something to
+        // happen but avoid sleeping if everyine is dead.
         if (current == nullptr) {
-            block_on_poll();
+            if (count_nonnull_coroutines() > 0) {
+                block_on_poll();
+            }
             continue;
         }
 
