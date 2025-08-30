@@ -6,7 +6,7 @@
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_clearerrno
-#include <minimk/trace.h>   // for MINIMK_TRACE
+#include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
 
 #include <stdint.h> // for uint64_t
 #include <time.h>   // for clock_gettime

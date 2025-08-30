@@ -6,6 +6,7 @@
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_clearerrno
+#include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
 
 #include <sys/socket.h> // for socket
 
@@ -16,20 +17,25 @@ template <
         decltype(socket) M_sys_socket = socket>
 minimk_error_t minimk_syscall_socket_impl(minimk_syscall_socket_t *sock, int domain, int type,
                                           int protocol) noexcept {
-    // Clear the errno ahead of the syscall
-    M_minimk_syscall_clearerrno();
+    // Log that we're about to invoke the syscall
+    MINIMK_TRACE_SYSCALL("socket: domain=%d\n", domain);
+    MINIMK_TRACE_SYSCALL("socket: type=%d\n", type);
+    MINIMK_TRACE_SYSCALL("socket: protocol=%d\n", protocol);
 
-    // Issue the syscall proper
+    // Clear the errno and issue the syscall
+    M_minimk_syscall_clearerrno();
     int fdesc = M_sys_socket(domain, type, protocol);
 
-    // Determine whether it succeeded
-    int ok = (fdesc >= 0);
+    // Assign the resulting socket and result branchlessly
+    *sock = (fdesc >= 0) ? fdesc : -1;
+    minimk_error_t res = (fdesc >= 0) ? 0 : M_minimk_syscall_geterrno();
 
-    // Assign the resulting socket depending on whether it succeeded
-    *sock = ok ? fdesc : -1;
+    // Log the results of invoking the syscall
+    MINIMK_TRACE_SYSCALL("socket: result=%s\n", minimk_errno_name(res));
+    MINIMK_TRACE_SYSCALL("socket: fd=%d\n", *sock);
 
-    // Assign retval depending on whether it succeeded
-    return ok ? 0 : M_minimk_syscall_geterrno();
+    // Return the result
+    return res;
 }
 
 #endif // LIBMINIMK_SYSCALL_SOCKET_POSIX_HPP

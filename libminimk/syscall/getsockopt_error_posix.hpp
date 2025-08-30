@@ -8,6 +8,7 @@
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_geterrno
+#include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
 
 #include <sys/socket.h> // for getsockopt
 
@@ -22,17 +23,27 @@ minimk_error_t minimk_syscall_getsockopt_error_impl(minimk_syscall_socket_t sock
     int soerr = 0;
     socklen_t soerrlen = sizeof(soerr);
 
-    // Clear errno before the syscall
-    M_minimk_syscall_clearerrno();
+    // Log that we're about to invoke the syscall
+    MINIMK_TRACE_SYSCALL("getsockopt: fd=%d\n", sock);
+    MINIMK_TRACE_SYSCALL("getsockopt: level=%s\n", "SOL_SOCKET");
+    MINIMK_TRACE_SYSCALL("getsockopt: optname=%s\n", "SO_ERROR");
 
-    // Get the socket error
-    if (M_sys_getsockopt(sock, SOL_SOCKET, SO_ERROR, static_cast<void *>(&soerr), &soerrlen) != 0) {
-        return M_minimk_syscall_geterrno();
-    }
+    // Clear the errno and issue the syscall
+    M_minimk_syscall_clearerrno();
+    int rv = M_sys_getsockopt(sock, SOL_SOCKET, SO_ERROR, static_cast<void *>(&soerr), &soerrlen);
+
+    // Assign the result of the syscall
+    minimk_error_t res = (rv == 0) ? 0 : M_minimk_syscall_geterrno();
 
     // Map the socket error to minimk_error_t
-    *error = M_minimk_errno_map(soerr);
-    return 0;
+    *error = (rv == 0) ? M_minimk_errno_map(soerr) : 0;
+
+    // Log the results of invoking the syscall
+    MINIMK_TRACE_SYSCALL("getsockopt: result=%s\n", minimk_errno_name(res));
+    MINIMK_TRACE_SYSCALL("getsockopt: soerr=%s\n", minimk_errno_name(*error));
+
+    // Return the result
+    return res;
 }
 
 #endif // LIBMINIMK_SYSCALL_GETSOCKOPT_ERROR_POSIX_HPP

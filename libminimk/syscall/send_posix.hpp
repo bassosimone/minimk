@@ -6,7 +6,8 @@
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_geterrno
-#include <minimk/trace.h>   // for MINIMK_TRACE
+#include <minimk/time.h>    // for minimk_time_monotonic_now
+#include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
 
 #include <sys/socket.h> // for send
 #include <sys/types.h>  // for ssize_t
@@ -26,8 +27,7 @@ minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void
 
     // As documented, reject zero-byte writes
     if (count <= 0) {
-        MINIMK_TRACE("trace: suspicious send 0x%llx with zero bytes size\n",
-                     static_cast<unsigned long long>(sock));
+        MINIMK_TRACE_SYSCALL("send: suspicious fd=%d with zero bytes count=%zu\n", sock, count);
         return MINIMK_EINVAL;
     }
 
@@ -37,19 +37,27 @@ minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void
     flags |= MSG_NOSIGNAL;
 #endif
 
-    // Issue the send system call proper
-    M_minimk_syscall_clearerrno();
+    // Log that we're about to invoke the syscall
     count = (count <= SSIZE_MAX) ? count : SSIZE_MAX;
+    MINIMK_TRACE_SYSCALL("send: fd=%d\n", sock);
+    MINIMK_TRACE_SYSCALL("send: count=%zu\n", count);
+    MINIMK_TRACE_SYSCALL("send: t0=%lu\n", minimk_time_monotonic_now());
+
+    // Clear the errno and issue the syscall
+    M_minimk_syscall_clearerrno();
     ssize_t rv = M_sys_send(sock, data, count, flags);
 
-    // Handle the case of error
-    if (rv == -1) {
-        return M_minimk_syscall_geterrno();
-    }
+    // Assign the result branchlessly
+    *nwritten = (rv > 0) ? static_cast<size_t>(rv) : 0;
+    minimk_error_t res = (rv == -1) ? M_minimk_syscall_geterrno() : 0;
 
-    // Handle the case of success
-    *nwritten = static_cast<size_t>(rv);
-    return 0;
+    // Log the results of invoking the syscall
+    MINIMK_TRACE_SYSCALL("send: result=%s\n", minimk_errno_name(res));
+    MINIMK_TRACE_SYSCALL("send: nwritten=%zu\n", *nwritten);
+    MINIMK_TRACE_SYSCALL("send: t1=%lu\n", minimk_time_monotonic_now());
+
+    // Return the result
+    return res;
 }
 
 #endif // LIBMINIMK_SYSCALL_SEND_POSIX_HPP

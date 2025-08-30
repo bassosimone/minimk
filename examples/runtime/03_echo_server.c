@@ -6,6 +6,7 @@
 #include <minimk/errno.h>   // for minimk_errno_name
 #include <minimk/runtime.h> // for minimk_runtime_go
 #include <minimk/syscall.h> // for minimk_syscall_socket_init
+#include <minimk/trace.h>   // for minimk_trace_enable
 
 #include <stdio.h>  // for fprintf
 #include <stdlib.h> // for exit
@@ -70,6 +71,9 @@ static void accept_loop(void *opaque) {
 }
 
 int main(void) {
+    // Configure tracing to observe events
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_SYSCALL;
+
     // Initialize socket library
     minimk_error_t rv = minimk_syscall_socket_init();
     if (rv != 0) {

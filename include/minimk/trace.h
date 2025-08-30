@@ -35,7 +35,7 @@ extern uint32_t minimk_trace_enable;
 #define MINIMK_TRACE_SYSCALL(fmt, ...)                                                             \
     do {                                                                                           \
         if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_SYSCALL) != 0) {                            \
-            minimk_log_printf("trace: " fmt, __VA_ARGS__);                                         \
+            minimk_log_printf("syscall: " fmt, __VA_ARGS__);                                       \
         }                                                                                          \
     } while (0)
 
