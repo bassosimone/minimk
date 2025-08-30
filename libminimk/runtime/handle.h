@@ -5,7 +5,7 @@
 #define LIBMINIMK_RUNTIME_HANDLE_H
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
-#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
 
 #include <stdint.h> // for uint8_t
 
@@ -62,7 +62,8 @@ static inline int __handle_generation_valid(uint64_t generation) MINIMK_NOEXCEPT
 }
 
 /// Function to create a handle given type, generation, and index.
-static inline uint64_t __make_handle(uint8_t type, uint64_t generation, uint8_t index) MINIMK_NOEXCEPT {
+static inline uint64_t __make_handle(uint8_t type, uint64_t generation,
+                                     uint8_t index) MINIMK_NOEXCEPT {
     uint64_t handle = 0;
 
     // Add the handle type

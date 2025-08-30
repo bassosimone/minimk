@@ -4,6 +4,8 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 #define LIBMINIMK_SOCKET_SOCKET_LINUX_HPP
 
+#include "../runtime/trace.h" // for MINIMK_TRACE
+
 #include "socket.h" // for minimk_socket_t
 
 #include <minimk/errno.h> // for minimk_errno_clear
@@ -17,13 +19,12 @@
 #include <stddef.h> // for size_t
 #include <unistd.h> // for close
 
-#include "../runtime/trace.h" // for MINIMK_TRACE
-
 // Testable minimk_socket_create implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(socket) __sys_socket = socket>
-minimk_error_t __minimk_socket_create(minimk_socket_t *sock, int domain, int type, int protocol) noexcept {
+minimk_error_t __minimk_socket_create(minimk_socket_t *sock, int domain, int type,
+                                      int protocol) noexcept {
     __minimk_errno_clear();
     int fdesc = __sys_socket(domain, type, protocol);
     int ok = (fdesc >= 0);
@@ -34,8 +35,7 @@ minimk_error_t __minimk_socket_create(minimk_socket_t *sock, int domain, int typ
 // Testable minimk_socket_setnonblock implementation.
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
-          decltype(fcntl) __sys_fcntl2 = fcntl,
-          decltype(fcntl) __sys_fcntl3 = fcntl>
+          decltype(fcntl) __sys_fcntl2 = fcntl, decltype(fcntl) __sys_fcntl3 = fcntl>
 minimk_error_t __minimk_socket_setnonblock(minimk_socket_t sock) noexcept {
     // Get the flags
     __minimk_errno_clear();
@@ -60,7 +60,8 @@ template <decltype(getaddrinfo) __libc_getaddrinfo = getaddrinfo,
           decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(connect) __sys_connect = connect>
-minimk_error_t __minimk_socket_connect(minimk_socket_t sock, const char *address, const char *port) noexcept {
+minimk_error_t __minimk_socket_connect(minimk_socket_t sock, const char *address,
+                                       const char *port) noexcept {
     // Use getaddrinfo to obtain a sockaddr_storage
     addrinfo hints{};
     hints.ai_socktype = SOCK_STREAM;
@@ -84,7 +85,8 @@ template <decltype(getaddrinfo) __libc_getaddrinfo = getaddrinfo,
           decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(bind) __sys_bind = bind>
-minimk_error_t __minimk_socket_bind(minimk_socket_t sock, const char *address, const char *port) noexcept {
+minimk_error_t __minimk_socket_bind(minimk_socket_t sock, const char *address,
+                                    const char *port) noexcept {
     // Use getaddrinfo to obtain a sockaddr_storage
     addrinfo hints{};
     hints.ai_socktype = SOCK_STREAM;
@@ -132,13 +134,15 @@ minimk_error_t __minimk_socket_accept(minimk_socket_t *client_sock, minimk_socke
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(recv) __sys_recv = recv>
-minimk_error_t __minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) noexcept {
+minimk_error_t __minimk_socket_recv(minimk_socket_t sock, void *data, size_t count,
+                                    size_t *nread) noexcept {
     // Initialize output parameter immediately
     *nread = 0;
 
     // As documented, reject zero-byte reads
     if (count <= 0) {
-        MINIMK_TRACE("trace: suspicious recv 0x%llx with zero bytes size\n", (unsigned long long)sock);
+        MINIMK_TRACE("trace: suspicious recv 0x%llx with zero bytes size\n",
+                     (unsigned long long)sock);
         return MINIMK_EINVAL;
     }
 
@@ -166,13 +170,15 @@ minimk_error_t __minimk_socket_recv(minimk_socket_t sock, void *data, size_t cou
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(send) __sys_send = send>
-minimk_error_t __minimk_socket_send(minimk_socket_t sock, const void *data, size_t count, size_t *nwritten) noexcept {
+minimk_error_t __minimk_socket_send(minimk_socket_t sock, const void *data, size_t count,
+                                    size_t *nwritten) noexcept {
     // Initialize output parameter immediately
     *nwritten = 0;
 
     // As documented, reject zero-byte reads
     if (count <= 0) {
-        MINIMK_TRACE("trace: suspicious send 0x%llx with zero bytes size\n", (unsigned long long)sock);
+        MINIMK_TRACE("trace: suspicious send 0x%llx with zero bytes size\n",
+                     (unsigned long long)sock);
         return MINIMK_EINVAL;
     }
 

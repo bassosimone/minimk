@@ -4,7 +4,7 @@
 #ifndef LIBMINIMK_SOCKET_SOCKET_H
 #define LIBMINIMK_SOCKET_SOCKET_H
 
-#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>  // for minimk_error_t
 #include <minimk/socket.h> // for init and constants
 
@@ -46,7 +46,8 @@ minimk_socket_t minimk_socket_invalid(void) MINIMK_NOEXCEPT;
 /// The protocol must be zero.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type, int protocol) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type,
+                                    int protocol) MINIMK_NOEXCEPT;
 
 /// Function to configure a socket as nonblocking.
 ///
@@ -69,7 +70,8 @@ minimk_error_t minimk_socket_setnonblock(minimk_socket_t sock) MINIMK_NOEXCEPT;
 /// The port argument must be a valid port number represented as a string (e.g., "80").
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address, const char *port) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address,
+                                     const char *port) MINIMK_NOEXCEPT;
 
 /// Function to bind a socket to a local address and port.
 ///
@@ -84,7 +86,8 @@ minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address, 
 /// The port argument must be a valid port number represented as a string (e.g., "8080").
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address, const char *port) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address,
+                                  const char *port) MINIMK_NOEXCEPT;
 
 /// Function to mark a socket as listening for incoming connections.
 ///
@@ -111,7 +114,8 @@ minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NO
 /// bound using minimk_socket_bind, and marked as listening using minimk_socket_listen.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_t sock) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock,
+                                    minimk_socket_t sock) MINIMK_NOEXCEPT;
 
 /// Function to read bytes from a given socket.
 ///
@@ -134,7 +138,8 @@ minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_
 /// 2. otherwise, if recv returns zero, it returns MINIMK_EOF.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count, size_t *nread) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count,
+                                  size_t *nread) MINIMK_NOEXCEPT;
 
 /// Function to write bytes to a given socket.
 ///
@@ -155,8 +160,8 @@ minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count
 /// likely a bug in the code and should not actually happen.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t
-minimk_socket_send(minimk_socket_t sock, const void *data, size_t count, size_t *nwritten) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_send(minimk_socket_t sock, const void *data, size_t count,
+                                  size_t *nwritten) MINIMK_NOEXCEPT;
 
 /// Like minimk_socket_recv but receives all requested bytes unless an error occurs.
 ///
@@ -170,7 +175,8 @@ minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t cou
 /// In case of short write, returns the error that occurred. This is an all-or-nothing operation.
 ///
 /// When interruped by a signal, this function continues to write relentlessly.
-minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf,
+                                     size_t count) MINIMK_NOEXCEPT;
 
 /// Function to destroy a socket instance.
 ///

@@ -1,5 +1,5 @@
 // File: include/minimk/runtime.h
-// Purpose: coroutine runtime.
+// Purpose: minimk coorutine cooperative netio runtime.
 // SPDX-License-Identifier: GPL-3.0-or-later
 #ifndef MINIMK_RUNTIME_H
 #define MINIMK_RUNTIME_H
@@ -69,20 +69,20 @@ void minimk_runtime_nanosleep(uint64_t nanosec) MINIMK_NOEXCEPT;
 /// The protocol must be zero.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, //
-                                            int domain,
-                                            int type,
+minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int domain, int type,
                                             int protocol) MINIMK_NOEXCEPT;
 
 /// Function to set the read timeout associated with a runtime socket.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_runtime_socket_set_read_timeout(minimk_runtime_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_socket_set_read_timeout(minimk_runtime_socket_t sock,
+                                                      uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Function to set the write timeout associated with a runtime socket.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t sock,
+                                                       uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Function to bind a socket to a local address and port.
 ///
@@ -95,8 +95,7 @@ minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t s
 /// The port argument must be a valid port number represented as a string (e.g., "8080").
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_runtime_socket_bind(minimk_runtime_socket_t sock, //
-                                          const char *address,
+minimk_error_t minimk_runtime_socket_bind(minimk_runtime_socket_t sock, const char *address,
                                           const char *port) MINIMK_NOEXCEPT;
 
 /// Function to mark a socket as listening for incoming connections.
@@ -108,7 +107,8 @@ minimk_error_t minimk_runtime_socket_bind(minimk_runtime_socket_t sock, //
 /// connections. A value of 128 is typically reasonable for most applications.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_runtime_socket_listen(minimk_runtime_socket_t sock, int backlog) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_socket_listen(minimk_runtime_socket_t sock,
+                                            int backlog) MINIMK_NOEXCEPT;
 
 /// Function to accept an incoming connection on a listening socket.
 ///
@@ -148,9 +148,7 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
 /// The return value is zero on success or a nonzero error code on failure.
 ///
 /// We return MINIMK_ETIMEDOUT when the sock read_timeout expires.
-minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, //
-                                          void *data,
-                                          size_t count,
+minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *data, size_t count,
                                           size_t *nread) MINIMK_NOEXCEPT;
 
 /// Function to write bytes to a given socket.
@@ -172,10 +170,8 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, //
 /// The return value is zero on success or a nonzero error code on failure.
 ///
 /// We return MINIMK_ETIMEDOUT when the sock write_timeout expires.
-minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, //
-                                          const void *data,
-                                          size_t count,
-                                          size_t *nwritten) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const void *data,
+                                          size_t count, size_t *nwritten) MINIMK_NOEXCEPT;
 
 /// Function to destroy a socket instance.
 ///
@@ -190,12 +186,12 @@ minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) MINI
 /// In case of short write, returns error. This is an all-or-nothing operation.
 ///
 /// When interruped by MINIMK_EINTR, this function continues to write relentlessly.
-minimk_error_t minimk_runtime_socket_sendall(minimk_runtime_socket_t sock, //
-                                             const void *buf,
+minimk_error_t minimk_runtime_socket_sendall(minimk_runtime_socket_t sock, const void *buf,
                                              size_t count) MINIMK_NOEXCEPT;
 
 /// Like minimk_runtime_socket_sendall but for receiving.
-minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf, size_t count) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf,
+                                             size_t count) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

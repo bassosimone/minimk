@@ -6,9 +6,10 @@
 #include "../poll/poll.h"     // for minimk_poll
 #include "../socket/socket.h" // for minimk_socket_t
 
-#include "stack.h"  // for struct stack
-#include "switch.h" // for minimk_switch
-#include "trace.h"  // for MINIMK_TRACE
+#include "runtime.h" // for minimk_suspend_read
+#include "stack.h"   // for struct stack
+#include "switch.h"  // for minimk_switch
+#include "trace.h"   // for MINIMK_TRACE
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
 #include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
@@ -109,7 +110,8 @@ static void coro_trampoline(void) noexcept {
 }
 
 /// Initialize the given coroutine or return a nonzero error.
-static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque), void *opaque) noexcept {
+static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque),
+                                     void *opaque) noexcept {
     // Zero initialize the whole coroutine
     memset(coro, 0, sizeof(*coro));
 
@@ -182,7 +184,8 @@ static void sched_maybe_resume(coroutine *coro, uint64_t now, short revents) noe
     }
 
     // Compute whether the coroutine was blocked on I/O and needs to be resumed
-    if (coro->state == CORO_BLOCKED_ON_IO && ((coro->events & revents) != 0 || now >= coro->deadline)) {
+    if (coro->state == CORO_BLOCKED_ON_IO &&
+        ((coro->events & revents) != 0 || now >= coro->deadline)) {
         coro->deadline = 0;
         coro->state = CORO_RUNNABLE;
         coro->sock = minimk_socket_invalid();
@@ -218,10 +221,8 @@ static inline void validate_coro_stack_pointer(const char *context, coroutine *c
     struct stack *stack = &coro->stack;
     uintptr_t sp = coro->sp;
 
-    MINIMK_TRACE("trace: %s: validating sp=0x%llx in stack[0x%llx, 0x%llx)\n",
-                 context,
-                 (unsigned long long)sp,
-                 (unsigned long long)stack->bottom,
+    MINIMK_TRACE("trace: %s: validating sp=0x%llx in stack[0x%llx, 0x%llx)\n", context,
+                 (unsigned long long)sp, (unsigned long long)stack->bottom,
                  (unsigned long long)stack->top);
 
     MINIMK_ASSERT(sp >= stack->bottom && sp < stack->top);
@@ -277,8 +278,8 @@ static void block_on_poll(void) noexcept {
             MINIMK_ASSERT(coro->revents == 0);
             fds[idx].events = coro->events;
             fds[idx].fd = coro->sock;
-            MINIMK_TRACE(
-                "trace: poll fd=%llu events=%llu\n", (unsigned long long)coro->sock, (unsigned long long)coro->events);
+            MINIMK_TRACE("trace: poll fd=%llu events=%llu\n", (unsigned long long)coro->sock,
+                         (unsigned long long)coro->events);
             continue;
         }
     }
@@ -303,15 +304,14 @@ static void block_on_poll(void) noexcept {
     // - EINVAL The nfds value exceeds the RLIMIT_NOFILE value.
     //
     // - ENOMEM Unable to allocate memory for kernel data structures.
-    MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n",
-                 (unsigned long long)fds,
-                 (unsigned long long)numfds,
-                 (unsigned long)poll_timeout);
+    MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n", (unsigned long long)fds,
+                 (unsigned long long)numfds, (unsigned long)poll_timeout);
 
     size_t active = 0;
     auto poll_rc = minimk_poll(fds, numfds, poll_timeout, &active);
 
-    MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", (unsigned long long)poll_rc, (unsigned long long)active);
+    MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", (unsigned long long)poll_rc,
+                 (unsigned long long)active);
 
     if (poll_rc == MINIMK_EINTR) {
         return;
@@ -329,8 +329,7 @@ static void block_on_poll(void) noexcept {
 static inline void __sched_switch(void) noexcept {
     // Log the state before switching
     MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
-                 (unsigned long long)current,
-                 (unsigned long long)current->sp);
+                 (unsigned long long)current, (unsigned long long)current->sp);
 
     validate_coro_stack_pointer("before_switch", current);
 
@@ -341,8 +340,7 @@ static inline void __sched_switch(void) noexcept {
 
     // Log the state after switching
     MINIMK_TRACE("trace: scheduler: returned from coroutine<0x%llx> sp=%llx\n",
-                 (unsigned long long)current,
-                 (unsigned long long)scheduler_sp);
+                 (unsigned long long)current, (unsigned long long)scheduler_sp);
 
     MINIMK_TRACE("trace: scheduler_sp after switch: 0x%llx\n", (unsigned long long)scheduler_sp);
 
@@ -401,7 +399,8 @@ void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
 }
 
 /// Internal function to uniformly handle suspending for I/O.
-static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short events, uint64_t nanosec) noexcept {
+static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short events,
+                                                 uint64_t nanosec) noexcept {
     // Ensure we're inside the coroutine world.
     MINIMK_ASSERT(current != nullptr);
 
@@ -418,9 +417,7 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     current->revents = 0;
 
     MINIMK_TRACE("trace: suspend coroutine<0x%llx> on fd=%llu events=%llu\n",
-                 (unsigned long long)current,
-                 (unsigned long long)sock,
-                 (unsigned long long)events);
+                 (unsigned long long)current, (unsigned long long)sock, (unsigned long long)events);
 
     // Suspend and wait for resume
     minimk_runtime_yield();
@@ -433,9 +430,7 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     MINIMK_ASSERT(current->events == 0);
 
     MINIMK_TRACE("trace: resume coroutine<0x%llx> on fd=%llu events=%llu revents=%llu\n",
-                 (unsigned long long)current,
-                 (unsigned long long)sock,
-                 (unsigned long long)events,
+                 (unsigned long long)current, (unsigned long long)sock, (unsigned long long)events,
                  (unsigned long long)revents);
 
     // We have a successful I/O suspend if the event we expected occurred.
@@ -453,14 +448,11 @@ static inline minimk_error_t __minimk_suspend_io(minimk_socket_t sock, short eve
     return MINIMK_ETIMEDOUT;
 }
 
-MINIMK_BEGIN_DECLS
-
 minimk_error_t minimk_runtime_suspend_read(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
     return __minimk_suspend_io(sock, minimk_poll_pollin(), nanosec);
 }
 
-minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
+minimk_error_t minimk_runtime_suspend_write(minimk_socket_t sock,
+                                            uint64_t nanosec) MINIMK_NOEXCEPT {
     return __minimk_suspend_io(sock, minimk_poll_pollout(), nanosec);
 }
-
-MINIMK_END_DECLS

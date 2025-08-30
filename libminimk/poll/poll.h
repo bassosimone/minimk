@@ -52,7 +52,8 @@ short minimk_poll_pollerr(void) MINIMK_NOEXCEPT;
 ///
 /// The return value is zero on success or a nonzero error code on failure. Note
 /// that success includes the case where no descriptors are ready.
-minimk_error_t minimk_poll(struct minimk_pollfd *fds, size_t size, int timeout, size_t *nready) MINIMK_NOEXCEPT;
+minimk_error_t minimk_poll(struct minimk_pollfd *fds, size_t size, int timeout,
+                           size_t *nready) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

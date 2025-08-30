@@ -13,7 +13,8 @@
 #include <stdint.h> // for UINT16_MAX
 
 // Ensure the structure definition is binary compatible
-static_assert(sizeof(struct minimk_pollfd) == sizeof(struct pollfd), "minimk_pollfd must have same size as pollfd");
+static_assert(sizeof(struct minimk_pollfd) == sizeof(struct pollfd),
+              "minimk_pollfd must have same size as pollfd");
 
 static_assert(offsetof(struct minimk_pollfd, fd) == offsetof(struct pollfd, fd),
               "minimk_pollfd.fd offset must match pollfd.fd");
@@ -28,7 +29,8 @@ static_assert(offsetof(struct minimk_pollfd, revents) == offsetof(struct pollfd,
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,
           decltype(minimk_errno_get) __minimk_errno_get = minimk_errno_get,
           decltype(poll) __sys_poll = poll>
-minimk_error_t __minimk_poll(struct minimk_pollfd *fds, size_t size, int timeout, size_t *nready) noexcept {
+minimk_error_t __minimk_poll(struct minimk_pollfd *fds, size_t size, int timeout,
+                             size_t *nready) noexcept {
     size = (size <= UINT16_MAX) ? size : UINT16_MAX;
     __minimk_errno_clear();
     int rv = __sys_poll((struct pollfd *)fds, (nfds_t)size, timeout);

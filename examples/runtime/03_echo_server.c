@@ -77,7 +77,8 @@ int main(void) {
 
     // Create listening socket
     minimk_runtime_socket_t server_sock = MINIMK_RUNTIME_INVALID_HANDLE;
-    rv = minimk_runtime_socket_create(&server_sock, minimk_socket_af_inet(), minimk_socket_sock_stream(), 0);
+    rv = minimk_runtime_socket_create(&server_sock, minimk_socket_af_inet(),
+                                      minimk_socket_sock_stream(), 0);
     if (rv != 0) {
         fprintf(stderr, "Socket create failed: %s\n", minimk_errno_name(rv));
         exit(1);
