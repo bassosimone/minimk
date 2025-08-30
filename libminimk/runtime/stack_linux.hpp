@@ -56,12 +56,13 @@ minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
 
     // Use mmap to create a memory mapping of the desired size.
     M_minimk_syscall_clearerrno();
-    void *base = M_sys_mmap(nullptr, sp->size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
-                            -1, 0);
+    int prot = PROT_READ | PROT_WRITE;
+    int flags = MAP_PRIVATE | MAP_ANONYMOUS;
+    void *base = M_sys_mmap(nullptr, sp->size, prot, flags, -1, 0);
     if (base == MAP_FAILED) {
         return MINIMK_ENOMEM;
     }
-    sp->base = (uintptr_t)base;
+    sp->base = reinterpret_cast<uintptr_t>(base);
     sp->bottom = sp->base + page_size;
     sp->top = sp->base + sp->size;
 
@@ -95,7 +96,7 @@ template <
 minimk_error_t minimk_runtime_stack_free_impl(struct stack *sp) noexcept {
     // Unmap the stack from memory
     M_minimk_syscall_clearerrno();
-    int rv = M_sys_munmap((void *)sp->base, sp->size);
+    int rv = M_sys_munmap(reinterpret_cast<void *>(sp->base), sp->size);
 
     // Let the user know what we have done
     MINIMK_TRACE("trace: freed previously allocated stack<base=0x%llx, size=0x%llx>\n",

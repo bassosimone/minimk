@@ -1,8 +1,8 @@
-// File: libminimk/runtime/handle.h
+// File: libminimk/runtime/handle.hpp
 // Purpose: handle management
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef LIBMINIMK_RUNTIME_HANDLE_H
-#define LIBMINIMK_RUNTIME_HANDLE_H
+#ifndef LIBMINIMK_RUNTIME_HANDLE_HPP
+#define LIBMINIMK_RUNTIME_HANDLE_HPP
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
 #include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
@@ -43,7 +43,7 @@ MINIMK_BEGIN_DECLS
 
 /// Function to extract the type from a handle.
 static inline uint8_t handle_type(uint64_t handle) MINIMK_NOEXCEPT {
-    return (uint8_t)((handle & 0xff00000000000000) >> 56);
+    return static_cast<uint8_t>((handle & 0xff00000000000000) >> 56);
 }
 
 /// Function to extract the generation from a handle.
@@ -53,7 +53,7 @@ static inline uint64_t handle_generation(uint64_t handle) MINIMK_NOEXCEPT {
 
 /// Function to extract the index from a handle.
 static inline uint64_t handle_index(uint64_t handle) MINIMK_NOEXCEPT {
-    return (uint8_t)(handle & 0x00000000000000ff);
+    return static_cast<uint8_t>(handle & 0x00000000000000ff);
 }
 
 /// Function returning whether a given generation value is valid.
@@ -67,18 +67,18 @@ static inline uint64_t make_handle(uint8_t type, uint64_t generation,
     uint64_t handle = 0;
 
     // Add the handle type
-    handle |= ((uint64_t)type) << 56;
+    handle |= (static_cast<uint64_t>(type)) << 56;
 
     // Add the handle generation
     MINIMK_ASSERT(handle_generation_valid(generation));
     handle |= generation << 8;
 
     // Add the handle index
-    handle |= (uint64_t)index;
+    handle |= static_cast<uint64_t>(index);
 
     return handle;
 }
 
 MINIMK_END_DECLS
 
-#endif // LIBMINIMK_RUNTIME_HANDLE_H
+#endif // LIBMINIMK_RUNTIME_HANDLE_HPP

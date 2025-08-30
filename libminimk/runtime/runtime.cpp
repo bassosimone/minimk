@@ -81,7 +81,8 @@ static minimk_error_t find_free_coroutine_slot(coroutine **found) noexcept {
         if (coro->state != CORO_NULL) {
             continue;
         }
-        MINIMK_TRACE("trace: found free coroutine<0x%llx>\n", (unsigned long long)coro);
+        MINIMK_TRACE("trace: found free coroutine<0x%llx>\n",
+                     reinterpret_cast<unsigned long long>(coro));
         *found = coro;
         return 0;
     }
@@ -100,7 +101,8 @@ static void coro_trampoline(void) noexcept {
     // Mark the coroutine as exited and the scheduler will
     // take care of freeing the allocated resources.
     current->state = CORO_EXITED;
-    MINIMK_TRACE("trace: coroutine<0x%llx> EXITED\n", (unsigned long long)current);
+    MINIMK_TRACE("trace: coroutine<0x%llx> EXITED\n",
+                 reinterpret_cast<unsigned long long>(current));
 
     // Transfer the control back to the scheduler.
     minimk_runtime_yield();
@@ -127,22 +129,24 @@ static minimk_error_t init_coroutine(coroutine *coro, void (*entry)(void *opaque
     }
 
     // Use assembly to synthesize the stack frame
-    minimk_runtime_init_coro_stack(&coro->sp, coro->stack.top, (uintptr_t)coro_trampoline);
+    minimk_runtime_init_coro_stack(&coro->sp, coro->stack.top,
+                                   reinterpret_cast<uintptr_t>(coro_trampoline));
 
-    MINIMK_TRACE("trace: coroutine<0x%llx> stack layout:\n", (unsigned long long)coro);
+    MINIMK_TRACE("trace: coroutine<0x%llx> stack layout:\n",
+                 reinterpret_cast<unsigned long long>(coro));
     MINIMK_TRACE("    stack_top: 0x%llx\n", static_cast<unsigned long long>(coro->stack.top));
     MINIMK_TRACE("    sp: 0x%llx\n", static_cast<unsigned long long>(coro->sp));
 
     // Mark as ready to run
     coro->state = CORO_RUNNABLE;
-    MINIMK_TRACE("trace: coroutine<0x%llx> RUNNABLE\n", (unsigned long long)coro);
+    MINIMK_TRACE("trace: coroutine<0x%llx> RUNNABLE\n", reinterpret_cast<unsigned long long>(coro));
     return 0;
 }
 
 /// Free all resources and mark the coroutine slot as empty.
 static void destroy_coroutine(coroutine *coro) noexcept {
     (void)minimk_runtime_stack_free(&coro->stack);
-    MINIMK_TRACE("trace: coroutine<0x%llx> NULL\n", (unsigned long long)coro);
+    MINIMK_TRACE("trace: coroutine<0x%llx> NULL\n", reinterpret_cast<unsigned long long>(coro));
     *coro = {}; // The zero state implies empty slot
 }
 
@@ -292,7 +296,7 @@ static void block_on_poll(void) noexcept {
 
     // 4. compute the poll timeout.
     uint64_t poll_timeout64 = (((deadline > now) ? (deadline - now) : 0) / 1000000) + 1;
-    int poll_timeout = (int)((poll_timeout64) < INT_MAX ? poll_timeout64 : INT_MAX);
+    int poll_timeout = static_cast<int>((poll_timeout64) < INT_MAX ? poll_timeout64 : INT_MAX);
 
     MINIMK_TRACE("trace: poll_timeout64=%llu [ms]\n",
                  static_cast<unsigned long long>(poll_timeout64));
@@ -309,8 +313,9 @@ static void block_on_poll(void) noexcept {
     // - EINVAL The nfds value exceeds the RLIMIT_NOFILE value.
     //
     // - ENOMEM Unable to allocate memory for kernel data structures.
-    MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n", (unsigned long long)fds,
-                 static_cast<unsigned long long>(numfds), static_cast<long long>(poll_timeout));
+    MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n",
+                 reinterpret_cast<unsigned long long>(fds), static_cast<unsigned long long>(numfds),
+                 static_cast<long long>(poll_timeout));
 
     size_t active = 0;
     auto poll_rc = minimk_syscall_poll(fds, numfds, poll_timeout, &active);
@@ -334,7 +339,8 @@ static void block_on_poll(void) noexcept {
 static inline void sched_switch(void) noexcept {
     // Log the state before switching
     MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
-                 (unsigned long long)current, static_cast<unsigned long long>(current->sp));
+                 reinterpret_cast<unsigned long long>(current),
+                 static_cast<unsigned long long>(current->sp));
 
     validate_coro_stack_pointer("before_switch", current);
 
@@ -346,7 +352,8 @@ static inline void sched_switch(void) noexcept {
 
     // Log the state after switching
     MINIMK_TRACE("trace: scheduler: returned from coroutine<0x%llx> sp=%llx\n",
-                 (unsigned long long)current, static_cast<unsigned long long>(scheduler_sp));
+                 reinterpret_cast<unsigned long long>(current),
+                 static_cast<unsigned long long>(scheduler_sp));
 
     MINIMK_TRACE("trace: scheduler_sp after switch: 0x%llx\n",
                  static_cast<unsigned long long>(scheduler_sp));
@@ -424,8 +431,8 @@ static inline minimk_error_t minimk_suspend_io(minimk_socket_t sock, short event
     current->revents = 0;
 
     MINIMK_TRACE("trace: suspend coroutine<0x%llx> on fd=%llu events=%llu\n",
-                 (unsigned long long)current, static_cast<unsigned long long>(sock),
-                 static_cast<unsigned long long>(events));
+                 reinterpret_cast<unsigned long long>(current),
+                 static_cast<unsigned long long>(sock), static_cast<unsigned long long>(events));
 
     // Suspend and wait for resume
     minimk_runtime_yield();
@@ -438,8 +445,9 @@ static inline minimk_error_t minimk_suspend_io(minimk_socket_t sock, short event
     MINIMK_ASSERT(current->events == 0);
 
     MINIMK_TRACE("trace: resume coroutine<0x%llx> on fd=%llu events=%llu revents=%llu\n",
-                 (unsigned long long)current, static_cast<unsigned long long>(sock),
-                 static_cast<unsigned long long>(events), static_cast<unsigned long long>(revents));
+                 reinterpret_cast<unsigned long long>(current),
+                 static_cast<unsigned long long>(sock), static_cast<unsigned long long>(events),
+                 static_cast<unsigned long long>(revents));
 
     // We have a successful I/O suspend if the event we expected occurred.
     if ((revents & events) != 0) {

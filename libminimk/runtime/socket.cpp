@@ -12,8 +12,8 @@
 #include "../syscall/send.h"               // for minimk_syscall_send
 #include "../syscall/socket_setnonblock.h" // for minimk_syscall_socket_setnonblock
 
-#include "handle.h"  // for make_handle
-#include "runtime.h" // for minimk_runtime_suspend_read/write
+#include "handle.hpp" // for make_handle
+#include "runtime.h"  // for minimk_runtime_suspend_read/write
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_socket_t
@@ -293,7 +293,8 @@ minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const vo
     }
 
     MINIMK_TRACE("trace: minimk_runtime_socket_send handle=0x%llx fd=%llu count=%zu\n",
-                 (unsigned long long)sock, (unsigned long long)info->fd, count);
+                 static_cast<unsigned long long>(sock), static_cast<unsigned long long>(info->fd),
+                 count);
 
     for (;;) {
         // Attempt to send data
