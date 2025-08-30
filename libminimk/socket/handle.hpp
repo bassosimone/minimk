@@ -1,8 +1,8 @@
-// File: libminimk/runtime/handle.hpp
-// Purpose: handle management
+// File: libminimk/socket/handle.hpp
+// Purpose: socket handle management
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef LIBMINIMK_RUNTIME_HANDLE_HPP
-#define LIBMINIMK_RUNTIME_HANDLE_HPP
+#ifndef LIBMINIMK_SOCKET_HANDLE_HPP
+#define LIBMINIMK_SOCKET_HANDLE_HPP
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
 #include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
@@ -81,4 +81,4 @@ static inline uint64_t make_handle(uint8_t type, uint64_t generation,
 
 MINIMK_END_DECLS
 
-#endif // LIBMINIMK_RUNTIME_HANDLE_HPP
+#endif // LIBMINIMK_SOCKET_HANDLE_HPP

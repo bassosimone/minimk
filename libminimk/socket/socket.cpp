@@ -1,4 +1,4 @@
-// File: libminimk/runtime/socket.cpp
+// File: libminimk/socket/socket.cpp
 // Purpose: runtime-managed socket table with ECS-style resource management
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,7 +6,8 @@
 
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/io.hpp>    // for minimk_io_readall
-#include <minimk/runtime.h> // for minimk_runtime_socket_t
+#include <minimk/runtime.h> // for minimk_runtime_suspend_*
+#include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/syscall.h> // for minimk_syscall_*
 #include <minimk/trace.h>   // for MINIMK_TRACE
 
@@ -20,7 +21,7 @@
 /// Socket slot in the runtime table.
 struct socketinfo {
     /// The actual handle associated to this entry.
-    minimk_runtime_socket_t handle;
+    minimk_socket_t handle;
 
     /// Read timeout in nanoseconds.
     uint64_t read_timeout;
@@ -53,7 +54,7 @@ static socketinfo *get_socketinfo(size_t idx) noexcept {
 }
 
 /// Find and validate socket info from ID, returning nullptr if invalid.
-static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_runtime_socket_t handle) noexcept {
+static minimk_error_t find_socketinfo(socketinfo **pinfo, minimk_socket_t handle) noexcept {
     // Zero the return argument
     *pinfo = nullptr;
 
@@ -144,13 +145,13 @@ static void destroy_socketinfo(socketinfo *info) noexcept {
     *info = {};
 }
 
-minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int domain, int type,
-                                            int protocol) noexcept {
+minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type,
+                                    int protocol) noexcept {
     // Invalidate the handle, as documented
-    *sock = MINIMK_RUNTIME_INVALID_HANDLE;
+    *sock = MINIMK_SOCKET_INVALID;
 
-    MINIMK_TRACE("trace: minimk_runtime_socket_create domain=%d type=%d protocol=%d\n", domain,
-                 type, protocol);
+    MINIMK_TRACE("trace: minimk_socket_create domain=%d type=%d protocol=%d\n", domain, type,
+                 protocol);
 
     // Create the underlying socket
     minimk_syscall_socket_t sockfd = minimk_syscall_invalid_socket;
@@ -183,28 +184,28 @@ minimk_error_t minimk_runtime_socket_create(minimk_runtime_socket_t *sock, int d
 
     // Return the socket handle to the caller
     *sock = info->handle;
-    MINIMK_TRACE("trace: minimk_runtime_socket_create success: handle=0x%llx\n",
+    MINIMK_TRACE("trace: minimk_socket_create success: handle=0x%llx\n",
                  static_cast<unsigned long long>(*sock));
     return 0;
 }
 
-minimk_error_t minimk_runtime_socket_bind(minimk_runtime_socket_t sock, const char *address,
-                                          const char *port) noexcept {
+minimk_error_t minimk_socket_bind(minimk_socket_t sock, const char *address,
+                                  const char *port) noexcept {
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     return (rv != 0) ? rv : minimk_syscall_bind(info->fd, address, port);
 }
 
-minimk_error_t minimk_runtime_socket_listen(minimk_runtime_socket_t sock, int backlog) noexcept {
+minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) noexcept {
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     return (rv != 0) ? rv : minimk_syscall_listen(info->fd, backlog);
 }
 
-minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock,
-                                            minimk_runtime_socket_t listener_sock) noexcept {
+minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock,
+                                    minimk_socket_t listener_sock) noexcept {
     // Invalidate the handle, as documented
-    *client_sock = MINIMK_RUNTIME_INVALID_HANDLE;
+    *client_sock = MINIMK_SOCKET_INVALID;
 
     // Find the corresponding info
     socketinfo *listener_info = nullptr;
@@ -253,18 +254,18 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
     }
 }
 
-minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *data, size_t count,
-                                          size_t *nread) noexcept {
+minimk_error_t minimk_socket_recv(minimk_socket_t sock, void *data, size_t count,
+                                  size_t *nread) noexcept {
     // Find the corresponding info
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_runtime_socket_recv find_socketinfo failed: %s\n",
+        MINIMK_TRACE("trace: minimk_socket_recv find_socketinfo failed: %s\n",
                      minimk_errno_name(rv));
         return rv;
     }
 
-    MINIMK_TRACE("trace: minimk_runtime_socket_recv handle=0x%llx fd=%llu count=%zu\n",
+    MINIMK_TRACE("trace: minimk_socket_recv handle=0x%llx fd=%llu count=%zu\n",
                  static_cast<unsigned long long>(sock), static_cast<unsigned long long>(info->fd),
                  count);
 
@@ -289,18 +290,18 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *da
     }
 }
 
-minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const void *data,
-                                          size_t count, size_t *nwritten) noexcept {
+minimk_error_t minimk_socket_send(minimk_socket_t sock, const void *data, size_t count,
+                                  size_t *nwritten) noexcept {
     // Find the corresponding info
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     if (rv != 0) {
-        MINIMK_TRACE("trace: minimk_runtime_socket_send find_socketinfo failed: %s\n",
+        MINIMK_TRACE("trace: minimk_socket_send find_socketinfo failed: %s\n",
                      minimk_errno_name(rv));
         return rv;
     }
 
-    MINIMK_TRACE("trace: minimk_runtime_socket_send handle=0x%llx fd=%llu count=%zu\n",
+    MINIMK_TRACE("trace: minimk_socket_send handle=0x%llx fd=%llu count=%zu\n",
                  static_cast<unsigned long long>(sock), static_cast<unsigned long long>(info->fd),
                  count);
 
@@ -325,9 +326,9 @@ minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const vo
     }
 }
 
-minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) noexcept {
+minimk_error_t minimk_socket_destroy(minimk_socket_t *sock) noexcept {
     // Idempotent destroy
-    if (*sock == MINIMK_RUNTIME_INVALID_HANDLE) {
+    if (*sock == MINIMK_SOCKET_INVALID) {
         return 0;
     }
 
@@ -335,7 +336,7 @@ minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) noex
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, *sock);
     if (rv != 0) {
-        *sock = MINIMK_RUNTIME_INVALID_HANDLE;
+        *sock = MINIMK_SOCKET_INVALID;
         return rv;
     }
 
@@ -346,20 +347,17 @@ minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) noex
     destroy_socketinfo(info);
 
     // Invalidate the caller's handle
-    *sock = MINIMK_RUNTIME_INVALID_HANDLE;
+    *sock = MINIMK_SOCKET_INVALID;
 
     // Return the closing error
     return rv;
 }
 
-minimk_error_t minimk_runtime_socket_sendall(minimk_runtime_socket_t sock, const void *buf,
-                                             size_t count) noexcept {
-    return minimk_io_writeall<minimk_runtime_socket_t, minimk_runtime_socket_send>(sock, buf,
-                                                                                   count);
+minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) noexcept {
+    return minimk_io_writeall<minimk_socket_t, minimk_socket_send>(sock, buf, count);
 }
 
-minimk_error_t minimk_runtime_socket_set_read_timeout(minimk_runtime_socket_t sock,
-                                                      uint64_t nanosec) noexcept {
+minimk_error_t minimk_socket_set_read_timeout(minimk_socket_t sock, uint64_t nanosec) noexcept {
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     if (rv != 0) {
@@ -370,8 +368,7 @@ minimk_error_t minimk_runtime_socket_set_read_timeout(minimk_runtime_socket_t so
     return 0;
 }
 
-minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t sock,
-                                                       uint64_t nanosec) noexcept {
+minimk_error_t minimk_socket_set_write_timeout(minimk_socket_t sock, uint64_t nanosec) noexcept {
     socketinfo *info = nullptr;
     minimk_error_t rv = find_socketinfo(&info, sock);
     if (rv != 0) {
@@ -382,7 +379,6 @@ minimk_error_t minimk_runtime_socket_set_write_timeout(minimk_runtime_socket_t s
     return 0;
 }
 
-minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf,
-                                             size_t count) noexcept {
-    return minimk_io_readall<minimk_runtime_socket_t, minimk_runtime_socket_recv>(sock, buf, count);
+minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t count) noexcept {
+    return minimk_io_readall<minimk_socket_t, minimk_socket_recv>(sock, buf, count);
 }

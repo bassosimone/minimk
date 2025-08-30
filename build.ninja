@@ -36,10 +36,10 @@ build libminimk/errno/errno_posix.o: cc libminimk/errno/errno_posix.c
 build libminimk/log/log.o: cc libminimk/log/log.c
 
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
-build libminimk/runtime/socket.o: cxx libminimk/runtime/socket.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
 
+build libminimk/socket/socket.o: cxx libminimk/socket/socket.cpp
 
 build libminimk/syscall/accept_posix.o: cxx libminimk/syscall/accept_posix.cpp
 build libminimk/syscall/bind_posix.o: cxx libminimk/syscall/bind_posix.cpp
@@ -66,9 +66,9 @@ build libminimk.a: ar $
   libminimk/errno/errno_posix.o $
   libminimk/log/log.o $
   libminimk/runtime/runtime.o $
-  libminimk/runtime/socket.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
+  libminimk/socket/socket.o $
   libminimk/syscall/accept_posix.o $
   libminimk/syscall/bind_posix.o $
   libminimk/syscall/closesocket_posix.o $
@@ -96,8 +96,8 @@ build examples/runtime/01_coroutine_pingpong.exe: link examples/runtime/01_corou
 build examples/runtime/02_coroutine_sleep.o: cc examples/runtime/02_coroutine_sleep.c
 build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutine_sleep.o libminimk.a
 
-build examples/runtime/03_echo_server.o: cc examples/runtime/03_echo_server.c
-build examples/runtime/03_echo_server.exe: link examples/runtime/03_echo_server.o libminimk.a
+build examples/socket/00_echo_server.o: cc examples/socket/00_echo_server.c
+build examples/socket/00_echo_server.exe: link examples/socket/00_echo_server.o libminimk.a
 
 build examples/syscall/00_echo_server_blocking.o: cxx_app examples/syscall/00_echo_server_blocking.cpp
 build examples/syscall/00_echo_server_blocking.exe: link_app examples/syscall/00_echo_server_blocking.o libminimk.a
