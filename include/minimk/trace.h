@@ -1,8 +1,8 @@
-// File: libminimk/runtime/trace.h
+// File: include/minimk/trace.h
 // Purpose: utility to trace execution
 // SPDX-License-Identifier: GPL-3.0-or-later
-#ifndef LIBMINIMK_RUNTIME_TRACE_H
-#define LIBMINIMK_RUNTIME_TRACE_H
+#ifndef MINIMK_TRACE_H
+#define MINIMK_TRACE_H
 
 #include <minimk/log.h> // for minimk_log_printf
 
@@ -20,4 +20,4 @@
         }                                                                                          \
     } while (0)
 
-#endif // LIBMINIMK_RUNTIME_TRACE_H
+#endif // MINIMK_TRACE_H

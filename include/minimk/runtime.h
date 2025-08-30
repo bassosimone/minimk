@@ -151,6 +151,10 @@ minimk_error_t minimk_runtime_socket_accept(minimk_runtime_socket_t *client_sock
 minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *data, size_t count,
                                           size_t *nread) MINIMK_NOEXCEPT;
 
+/// Like minimk_runtime_socket_sendall but for receiving.
+minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf,
+                                             size_t count) MINIMK_NOEXCEPT;
+
 /// Function to write bytes to a given socket.
 ///
 /// The sock argument must be a valid socket created using minimk_socket_create.
@@ -173,14 +177,6 @@ minimk_error_t minimk_runtime_socket_recv(minimk_runtime_socket_t sock, void *da
 minimk_error_t minimk_runtime_socket_send(minimk_runtime_socket_t sock, const void *data,
                                           size_t count, size_t *nwritten) MINIMK_NOEXCEPT;
 
-/// Function to destroy a socket instance.
-///
-/// The sock argument must be a valid socket created using minimk_runtime_socket_create.
-/// On return, the sock argument is unconditionally set to be MINIMK_RUNTIME_INVALID_HANDLE.
-///
-/// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) MINIMK_NOEXCEPT;
-
 /// Like minimk_runtime_socket_send but sends all the content of the buffer unless an error occurs.
 ///
 /// In case of short write, returns error. This is an all-or-nothing operation.
@@ -189,9 +185,13 @@ minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) MINI
 minimk_error_t minimk_runtime_socket_sendall(minimk_runtime_socket_t sock, const void *buf,
                                              size_t count) MINIMK_NOEXCEPT;
 
-/// Like minimk_runtime_socket_sendall but for receiving.
-minimk_error_t minimk_runtime_socket_recvall(minimk_runtime_socket_t sock, void *buf,
-                                             size_t count) MINIMK_NOEXCEPT;
+/// Function to destroy a socket instance.
+///
+/// The sock argument must be a valid socket created using minimk_runtime_socket_create.
+/// On return, the sock argument is unconditionally set to be MINIMK_RUNTIME_INVALID_HANDLE.
+///
+/// The return value is zero on success or a nonzero error code on failure.
+minimk_error_t minimk_runtime_socket_destroy(minimk_runtime_socket_t *sock) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 
