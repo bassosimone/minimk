@@ -4,9 +4,12 @@ TabWidth: 4
 UseTab: Never
 BreakBeforeBraces: Attach
 AllowShortIfStatementsOnASingleLine: false
-ColumnLimit: 120
-BinPackParameters: false
-BinPackArguments: false
-AlignAfterOpenBracket: Align
-AllowAllParametersOfDeclarationOnNextLine: false
+ColumnLimit: 100
+AlwaysBreakAfterReturnType: None
+BinPackParameters: true
+BinPackArguments: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowAllArgumentsOnNextLine: true
+PenaltyBreakBeforeFirstCallParameter: 1000000
+ContinuationIndentWidth: 8
 AllowShortFunctionsOnASingleLine: false

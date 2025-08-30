@@ -6,14 +6,29 @@
 
 #include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 
+#include <stdarg.h> // for va_list
+#include <stdio.h>  // for vfprintf
+#include <stdlib.h> // for abort
+
 MINIMK_BEGIN_DECLS
 
-/// Internal implementation of `MINIMK_ASSERT`.
-void __minimk_assert(int should_abort, const char *fmt, ...) MINIMK_NOEXCEPT;
+/// Internal inline function invoked by MINIMK_ASSERT.
+static inline void minimk_assert_abort__(const char *fmt, ...) MINIMK_NOEXCEPT {
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    abort();
+}
 
 MINIMK_END_DECLS
 
 /// Non-maskable assertion that causes abort on failure.
-#define MINIMK_ASSERT(expr) __minimk_assert(!(expr), "assertion failed: %s (%s:%d)\n", #expr, __FILE__, __LINE__)
+#define MINIMK_ASSERT(expr)                                                                        \
+    do {                                                                                           \
+        if (!(expr)) {                                                                             \
+            minimk_assert_abort__("assertion failed: %s (%s:%d)\n", #expr, __FILE__, __LINE__);    \
+        }                                                                                          \
+    } while (0)
 
 #endif // MINIMK_ASSERT_H

@@ -5,12 +5,13 @@
 #include "../integer/u64.h"   // for minimk_integer_u64_satadd
 #include "../poll/poll.h"     // for minimk_poll
 #include "../socket/socket.h" // for minimk_socket_t
-#include "stack.h"            // for struct stack
-#include "switch.h"           // for minimk_switch
-#include "trace.h"            // for MINIMK_TRACE
+
+#include "stack.h"  // for struct stack
+#include "switch.h" // for minimk_switch
+#include "trace.h"  // for MINIMK_TRACE
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
-#include <minimk/cdefs.h>    // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_run
 #include <minimk/time.h>    // for minimk_time_monotonic_now

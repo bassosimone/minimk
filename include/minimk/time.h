@@ -6,7 +6,7 @@
 
 #include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 
-#include <stdint.h> // for int64_t
+#include <stdint.h> // for uint64_t
 
 MINIMK_BEGIN_DECLS
 

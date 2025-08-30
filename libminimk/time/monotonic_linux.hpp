@@ -4,13 +4,13 @@
 #ifndef LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 #define LIBMINIMK_TIME_MONOTONIC_LINUX_HPP
 
+#include "../integer/u64.h" // for minimk_integer_u64_satmul
+
 #include <minimk/assert.h> // for MINIMK_ASSERT
 #include <minimk/errno.h>  // for minimk_error_t
 
 #include <stdint.h> // for uint64_t
 #include <time.h>   // for clock_gettime
-
-#include "../integer/u64.h" // for minimk_integer_u64_satmul
 
 /// Testable implementation of minimk_time_monotonic_now
 template <decltype(minimk_errno_clear) __minimk_errno_clear = minimk_errno_clear,

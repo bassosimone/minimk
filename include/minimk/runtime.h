@@ -4,7 +4,7 @@
 #ifndef MINIMK_RUNTIME_H
 #define MINIMK_RUNTIME_H
 
-#include <minimk/cdefs.h>  // for MINIMK_BEGIN_DECLS
+#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
 #include <minimk/errno.h> // for minimk_error_t
 
 #include <stddef.h> // for size_t
@@ -13,7 +13,7 @@
 /// Generic opaque handle managed by the runtime.
 typedef uint64_t minimk_runtime_handle_t;
 
-/// A socket managed by the runtime is a handle.
+/// A socket managed by the runtime is a specific kind of handle.
 typedef minimk_runtime_handle_t minimk_runtime_socket_t;
 
 /// Invalid handle value used by the runtime.

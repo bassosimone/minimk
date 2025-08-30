@@ -22,8 +22,6 @@ rule ar
   command = ar rv $out $in
   description = AR $out
 
-build libminimk/assert/assert.o: cc libminimk/assert/assert.c
-
 build libminimk/errno/errno_linux.o: cc libminimk/errno/errno_linux.c
 
 build libminimk/poll/poll_linux.o: cxx libminimk/poll/poll_linux.cpp
@@ -39,7 +37,6 @@ build libminimk/socket/socket_linux.o: cxx libminimk/socket/socket_linux.cpp
 build libminimk/time/monotonic_linux.o: cxx libminimk/time/monotonic_linux.cpp
 
 build libminimk.a: ar $
-  libminimk/assert/assert.o $
   libminimk/errno/errno_linux.o $
   libminimk/poll/poll_linux.o $
   libminimk/runtime/runtime.o $
