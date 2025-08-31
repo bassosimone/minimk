@@ -43,10 +43,12 @@ static void coro_trampoline(void) noexcept {
     MINIMK_ASSERT(false);
 }
 
-minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) noexcept {
+/// Function that creates a runnable coroutine within the scheduler.
+static inline minimk_error_t minimk_runtime_scheduler_coroutine_create( //
+        scheduler *sched, void (*entry)(void *opaque), void *opaque) noexcept {
     // 1. find an available coroutine slot
     coroutine *coro = nullptr;
-    auto rv = minimk_runtime_scheduler_find_free_coroutine_slot(&s0, &coro);
+    auto rv = minimk_runtime_scheduler_find_free_coroutine_slot(sched, &coro);
     if (rv != 0) {
         return rv;
     }
@@ -58,6 +60,10 @@ minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) noex
 
     // 3. declare success
     return 0;
+}
+
+minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) noexcept {
+    return minimk_runtime_scheduler_coroutine_create(&s0, entry, opaque);
 }
 
 /// Function that runs the given scheduler until we're out of coroutines to run.
