@@ -151,6 +151,17 @@ minimk_error_t minimk_socket_send(minimk_socket_t sock, const void *data, size_t
 minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf,
                                      size_t count) MINIMK_NOEXCEPT;
 
+/// Function to set SO_REUSEADDR socket option.
+///
+/// The sock argument must be a valid socket created using minimk_socket_create.
+///
+/// This function sets the SO_REUSEADDR socket option to allow reuse of
+/// local addresses. This is typically used for server sockets to avoid
+/// "Address already in use" errors when restarting the server quickly.
+///
+/// The return value is zero on success or a nonzero error code on failure.
+minimk_error_t minimk_socket_setsockopt_reuseaddr(minimk_socket_t sock) MINIMK_NOEXCEPT;
+
 /// Function to destroy a socket instance.
 ///
 /// The sock argument must be a valid socket created using minimk_socket_create.

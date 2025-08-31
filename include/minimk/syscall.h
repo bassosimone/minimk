@@ -221,6 +221,19 @@ minimk_error_t minimk_syscall_send(minimk_syscall_socket_t sock, const void *dat
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_syscall_setsockopt_nosigpipe(minimk_syscall_socket_t sock) MINIMK_NOEXCEPT;
 
+/// Function to set SO_REUSEADDR socket option.
+///
+/// This function is thread-safe.
+///
+/// The sock argument must be a valid socket.
+///
+/// This function sets the SO_REUSEADDR socket option to allow reuse of
+/// local addresses. This is typically used for server sockets to avoid
+/// "Address already in use" errors when restarting the server quickly.
+///
+/// The return value is zero on success or a nonzero error code on failure.
+minimk_error_t minimk_syscall_setsockopt_reuseaddr(minimk_syscall_socket_t sock) MINIMK_NOEXCEPT;
+
 /// Function to create a new socket instance.
 ///
 /// This function is thread-safe.

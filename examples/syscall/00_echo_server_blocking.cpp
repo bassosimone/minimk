@@ -64,6 +64,14 @@ int main(void) {
         exit(1);
     }
 
+    // Set SO_REUSEADDR to allow quick server restarts
+    rv = minimk_syscall_setsockopt_reuseaddr(server_sock);
+    if (rv != 0) {
+        std::cerr << "Socket setsockopt reuseaddr failed: " << minimk_errno_name(rv) << std::endl;
+        minimk_syscall_closesocket(&server_sock);
+        exit(1);
+    }
+
     // Bind to localhost:9774
     rv = minimk_syscall_bind(server_sock, "127.0.0.1", "9774");
     if (rv != 0) {

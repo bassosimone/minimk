@@ -391,6 +391,23 @@ minimk_error_t minimk_socket_send(minimk_socket_t sock, const void *data, size_t
     }
 }
 
+minimk_error_t minimk_socket_setsockopt_reuseaddr(minimk_socket_t sock) noexcept {
+    MINIMK_TRACE_SOCKET("setsockopt_reuseaddr handle=0x%llx\n", CAST_ULL(sock));
+
+    // Find the corresponding info
+    socketinfo *info = nullptr;
+    minimk_error_t rv = find_socketinfo(&info, sock);
+    if (rv != 0) {
+        MINIMK_TRACE_SOCKET("setsockopt_reuseaddr result=%s\n", minimk_errno_name(rv));
+        return rv;
+    }
+
+    // Set SO_REUSEADDR on the underlying socket
+    rv = minimk_syscall_setsockopt_reuseaddr(info->fd);
+    MINIMK_TRACE_SOCKET("setsockopt_reuseaddr result=%s\n", minimk_errno_name(rv));
+    return rv;
+}
+
 minimk_error_t minimk_socket_destroy(minimk_socket_t *sock) noexcept {
     MINIMK_TRACE_SOCKET("destroy handle=0x%llx\n", CAST_ULL(*sock));
 

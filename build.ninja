@@ -55,6 +55,7 @@ build libminimk/syscall/poll_posix.o: cxx libminimk/syscall/poll_posix.cpp
 build libminimk/syscall/recv_posix.o: cxx libminimk/syscall/recv_posix.cpp
 build libminimk/syscall/send_posix.o: cxx libminimk/syscall/send_posix.cpp
 build libminimk/syscall/setsockopt_nosigpipe_posix.o: cxx libminimk/syscall/setsockopt_nosigpipe_posix.cpp
+build libminimk/syscall/setsockopt_reuseaddr_posix.o: cxx libminimk/syscall/setsockopt_reuseaddr_posix.cpp
 build libminimk/syscall/socket_init_posix.o: cc libminimk/syscall/socket_init_posix.c
 build libminimk/syscall/socket_posix.o: cxx libminimk/syscall/socket_posix.cpp
 build libminimk/syscall/socket_setnonblock_posix.o: cxx libminimk/syscall/socket_setnonblock_posix.cpp
@@ -85,6 +86,7 @@ build libminimk.a: ar $
   libminimk/syscall/recv_posix.o $
   libminimk/syscall/send_posix.o $
   libminimk/syscall/setsockopt_nosigpipe_posix.o $
+  libminimk/syscall/setsockopt_reuseaddr_posix.o $
   libminimk/syscall/socket_init_posix.o $
   libminimk/syscall/socket_posix.o $
   libminimk/syscall/socket_setnonblock_posix.o $

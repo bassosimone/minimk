@@ -93,6 +93,14 @@ int main(void) {
         exit(1);
     }
 
+    // Set SO_REUSEADDR to allow quick server restarts
+    rv = minimk_socket_setsockopt_reuseaddr(server_sock);
+    if (rv != 0) {
+        fprintf(stderr, "Socket setsockopt reuseaddr failed: %s\n", minimk_errno_name(rv));
+        minimk_socket_destroy(&server_sock);
+        exit(1);
+    }
+
     // Bind to localhost:9774
     rv = minimk_socket_bind(server_sock, "127.0.0.1", "9774");
     if (rv != 0) {
