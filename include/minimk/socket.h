@@ -94,6 +94,25 @@ minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NO
 /// We return MINIMK_ETIMEDOUT when the sock read_timeout expires.
 minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_t sock) MINIMK_NOEXCEPT;
 
+/// Function to establish a connection with a remote endpoint.
+///
+/// The sock argument must be a valid socket created using minimk_socket_create.
+///
+/// The address MUST be an IPv4 or IPv6 address in string form (e.g., "127.0.0.1", "::1").
+///
+/// The port MUST be a port number in string form (e.g., "8080").
+///
+/// This function uses non-blocking connect with cooperative yielding. If the connection
+/// cannot be established immediately, the coroutine will suspend and wait for the socket
+/// to become writeable. Once writeable, it checks the SO_ERROR value to determine if
+/// the connection succeeded or failed.
+///
+/// The return value is zero on success or a nonzero error code on failure.
+///
+/// We return MINIMK_ETIMEDOUT when the sock write_timeout expires.
+minimk_error_t minimk_socket_connect(minimk_socket_t sock, const char *address,
+                                     const char *port) MINIMK_NOEXCEPT;
+
 /// Function to read bytes from a given socket.
 ///
 /// The sock argument must be a valid socket created using minimk_socket_create.
