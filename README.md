@@ -150,13 +150,13 @@ We recommend running these examples to confirm ~everything is still okay:
 After you modify files, please format them as follows:
 
 ```bash
-clang-format -i <file1> <file2> ...
+clang-format -i file1 file2 ...
 ```
 
 Also, use `iwyu` to ensure the includes are okay:
 
 ```bash
-for file in <file1> <file2> ...; do
+for file in file1 file2 ...; do
     iwyu -Iinclude $file
 done
 ```
