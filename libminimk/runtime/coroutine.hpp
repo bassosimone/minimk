@@ -23,6 +23,7 @@ template <
         decltype(minimk_runtime_stack_alloc) M_stack_alloc = minimk_runtime_stack_alloc,
         decltype(minimk_runtime_init_coro_stack) M_init_coro_stack = minimk_runtime_init_coro_stack>
 minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro, void (*trampoline)(void),
+                                                  struct scheduler *sched,
                                                   void (*entry)(void *opaque),
                                                   void *opaque) noexcept {
     // Zero initialize the whole coroutine
@@ -40,7 +41,8 @@ minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro, void (
     }
 
     // Use assembly to synthesize the stack frame
-    M_init_coro_stack(&coro->sp, coro->stack.top, reinterpret_cast<uintptr_t>(trampoline));
+    M_init_coro_stack(&coro->sp, coro->stack.top, reinterpret_cast<uintptr_t>(trampoline),
+                      reinterpret_cast<uintptr_t>(sched));
 
     MINIMK_TRACE("trace: coroutine<0x%llx> stack layout:\n",
                  reinterpret_cast<unsigned long long>(coro));

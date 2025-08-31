@@ -54,7 +54,7 @@ static inline minimk_error_t minimk_runtime_scheduler_coroutine_create( //
     }
 
     // 2. initialize the coroutine slot
-    if ((rv = minimk_runtime_coroutine_init(coro, coro_trampoline, entry, opaque)) != 0) {
+    if ((rv = minimk_runtime_coroutine_init(coro, coro_trampoline, sched, entry, opaque)) != 0) {
         return rv;
     }
 

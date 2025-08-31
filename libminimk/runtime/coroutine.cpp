@@ -9,8 +9,9 @@
 #include <minimk/syscall.h> // for minimk_syscall_invalid_socket
 
 minimk_error_t minimk_runtime_coroutine_init(struct coroutine *coro, void (*trampoline)(void),
-                                             void (*entry)(void *opaque), void *opaque) noexcept {
-    return minimk_runtime_coroutine_init_impl(coro, trampoline, entry, opaque);
+                                             struct scheduler *sched, void (*entry)(void *opaque),
+                                             void *opaque) noexcept {
+    return minimk_runtime_coroutine_init_impl(coro, trampoline, sched, entry, opaque);
 }
 
 void minimk_runtime_coroutine_finish(struct coroutine *coro) noexcept {

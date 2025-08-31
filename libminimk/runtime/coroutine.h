@@ -52,6 +52,9 @@ struct coroutine {
 
 } __attribute__((aligned(16)));
 
+// Forward declaration of the coroutine scheduler.
+struct scheduler;
+
 MINIMK_BEGIN_DECLS
 
 /// Initializes the given coroutine struct with the given entry and opaque pointer.
@@ -70,7 +73,7 @@ MINIMK_BEGIN_DECLS
 ///
 /// Returns zero on success and a nonzero error code on failure.
 minimk_error_t minimk_runtime_coroutine_init(struct coroutine *coro, void (*trampoline)(void),
-                                             void (*entry)(void *opaque),
+                                             struct scheduler *sched, void (*entry)(void *opaque),
                                              void *opaque) MINIMK_NOEXCEPT;
 
 /// Releases the associated resources and zeroes the coroutine.

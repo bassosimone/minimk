@@ -40,7 +40,8 @@ minimk_runtime_switch:
     // void minimk_runtime_init_coro_stack(
     //  uintptr_t *stack_ptr  /* = rdi */,
     //  uintptr_t  stack_top  /* = rsi */,
-    //  uintptr_t  trampoline /* = rdx */
+    //  uintptr_t  trampoline /* = rdx */,
+    //  uintptr_t  sched      /* = rcx */
     // );
     .globl minimk_runtime_init_coro_stack
     .type minimk_runtime_init_coro_stack, @function
@@ -51,13 +52,15 @@ minimk_runtime_init_coro_stack:
     // Temporarily switch to new coroutine stack
     movq %rsi, %rsp
 
-    // Add padding so that before calling any C function the stack
-    // ends up being aligned on a 16 bytes boundary, which is the
-    // requirement from the ABI we're using.
-    //
-    // The switching code will never pick up on this padding but this
-    // will ensure we have a properly aligned stack for SIMD code.
-    pushq $0    // padding
+    // Warning: the current setup where we push 8 things on the
+    // stack ensures it is aligned on a 16 bytes boundary. Adding
+    // more registers should ensure to preserve this alignment
+    // through padding, if necessary. Otherwise, we'll segfault
+    // immediately on the first SIMD instruction.
+
+    // Push the scheduler address to the stack so that the trampoline
+    // knows the scheduler that owns the coroutine.
+    pushq %rcx  // sched
     
     // Push trampoline address as the address to return to
     pushq %rdx
