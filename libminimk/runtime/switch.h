@@ -31,6 +31,12 @@ void minimk_runtime_switch(uintptr_t *old_stack_ptr, uintptr_t new_stack_ptr) MI
 void minimk_runtime_init_coro_stack(uintptr_t *stack_ptr, uintptr_t stack_top, uintptr_t trampoline,
                                     uintptr_t sched) MINIMK_NOEXCEPT;
 
+/// The assembly trampoline to which we jump the first time we execute
+/// a coroutine. The job of this trampoline would be to get the scheduler
+/// address by reading the stack, create a suitably aligned C stack, and
+/// then jump to the coroutine main passing it the scheduler as arg0.
+void minimk_runtime_asm_trampoline(void) MINIMK_NOEXCEPT;
+
 MINIMK_END_DECLS
 
 #endif // LIBMINIMK_RUNTIME_SWITCH_H

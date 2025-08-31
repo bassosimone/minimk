@@ -81,3 +81,19 @@ minimk_runtime_init_coro_stack:
     ret
 
     .size minimk_runtime_init_coro_stack, .-minimk_runtime_init_coro_stack
+
+    // void minimk_runtime_asm_trampoline(void);
+    .globl minimk_runtime_asm_trampoline
+    .type minimk_runtime_asm_trampoline, @function
+    .extern minimk_runtime_scheduler_coroutine_main
+minimk_runtime_asm_trampoline:
+    // We are called after switch through ret, so the top of our
+    // stack is the scheduler's address.
+    movq (%rsp), %rdi
+
+    // We need to create a fake rbp, which actually has the
+    // side effect of aligning the stack to 16 bytes.
+    pushq $0   // rbp
+
+    // Invoke the C trampoline
+    call minimk_runtime_scheduler_coroutine_main

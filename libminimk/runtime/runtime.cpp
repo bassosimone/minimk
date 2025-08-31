@@ -21,20 +21,31 @@
 /// Global scheduler to use
 static scheduler s0;
 
-/// Trampoline for starting to execute a coroutine.
-static void coro_trampoline(void) noexcept __attribute__((noreturn));
+// TODO(bassosimone): now that we have removed all dependencies from the
+// global scheduler, we should see to refactor this code.
+MINIMK_BEGIN_DECLS
 
-static void coro_trampoline(void) noexcept {
+/// Main coroutine function implemented in C and called by the assembly trampoline.
+///
+/// The sched argument points to the scheduler owning the coroutine.
+///
+/// This function never returns. When the coroutine has exited it won't be picked
+/// up again by the scheduler and the stack will be freed.
+void minimk_runtime_scheduler_coroutine_main(scheduler *sched) noexcept __attribute__((noreturn));
+
+MINIMK_END_DECLS
+
+void minimk_runtime_scheduler_coroutine_main(scheduler *sched) noexcept {
     // Ensure that we're in the coroutine world.
-    MINIMK_ASSERT(s0.current != nullptr);
+    MINIMK_ASSERT(sched->current != nullptr);
 
     // Transfer control to the coroutine entry, which in turn may
     // voluntarily yield the control to other coroutines.
-    s0.current->entry(s0.current->opaque);
+    sched->current->entry(sched->current->opaque);
 
     // Mark the coroutine as exited and the scheduler will
     // take care of freeing the allocated resources.
-    minimk_runtime_coroutine_mark_as_exited(s0.current);
+    minimk_runtime_coroutine_mark_as_exited(sched->current);
 
     // Transfer the control back to the scheduler.
     minimk_runtime_yield();
@@ -54,7 +65,8 @@ static inline minimk_error_t minimk_runtime_scheduler_coroutine_create( //
     }
 
     // 2. initialize the coroutine slot
-    if ((rv = minimk_runtime_coroutine_init(coro, coro_trampoline, sched, entry, opaque)) != 0) {
+    rv = minimk_runtime_coroutine_init(coro, minimk_runtime_asm_trampoline, sched, entry, opaque);
+    if (rv != 0) {
         return rv;
     }
 
