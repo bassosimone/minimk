@@ -7,12 +7,16 @@ rule cxx
   description = CXX $out
 
 rule cxx_app
-  command = clang++ -Iinclude -O2 -std=c++11 -Wall -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Werror -c $in -o $out
+  command = clang++ -Iinclude -O2 -std=c++11 -Wall -Wextra -Werror -c $in -o $out
   description = CXX_APP $out
 
 rule cc
   command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -Weverything -Wno-pre-c11-compat -Wno-declaration-after-statement -Werror -c $in -o $out
   description = CC $out
+
+rule cc_app
+  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -Werror -c $in -o $out
+  description = CC_APP $out
 
 rule link
   command = clang $in -o $out
@@ -119,20 +123,23 @@ build libminimk.a: ar $
   libminimk/time/monotonic.o $
   libminimk/trace/trace.o
 
-build examples/runtime/00_coroutine_hello.o: cc examples/runtime/00_coroutine_hello.c
+build examples/runtime/00_coroutine_hello.o: cc_app examples/runtime/00_coroutine_hello.c
 build examples/runtime/00_coroutine_hello.exe: link examples/runtime/00_coroutine_hello.o libminimk.a
 
-build examples/runtime/01_coroutine_pingpong.o: cc examples/runtime/01_coroutine_pingpong.c
+build examples/runtime/01_coroutine_pingpong.o: cc_app examples/runtime/01_coroutine_pingpong.c
 build examples/runtime/01_coroutine_pingpong.exe: link examples/runtime/01_coroutine_pingpong.o libminimk.a
 
-build examples/runtime/02_coroutine_sleep.o: cc examples/runtime/02_coroutine_sleep.c
+build examples/runtime/02_coroutine_sleep.o: cc_app examples/runtime/02_coroutine_sleep.c
 build examples/runtime/02_coroutine_sleep.exe: link examples/runtime/02_coroutine_sleep.o libminimk.a
 
-build examples/socket/00_echo_server.o: cc examples/socket/00_echo_server.c
+build examples/socket/00_echo_server.o: cc_app examples/socket/00_echo_server.c
 build examples/socket/00_echo_server.exe: link examples/socket/00_echo_server.o libminimk.a
+
+build examples/socket/01_echo_test.o: cc_app examples/socket/01_echo_test.c
+build examples/socket/01_echo_test.exe: link examples/socket/01_echo_test.o libminimk.a
 
 build examples/syscall/00_echo_server_blocking.o: cxx_app examples/syscall/00_echo_server_blocking.cpp
 build examples/syscall/00_echo_server_blocking.exe: link_app examples/syscall/00_echo_server_blocking.o libminimk.a
 
-build examples/time/00_monotonic.o: cc examples/time/00_monotonic.c
+build examples/time/00_monotonic.o: cc_app examples/time/00_monotonic.c
 build examples/time/00_monotonic.exe: link examples/time/00_monotonic.o libminimk.a
