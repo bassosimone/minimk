@@ -8,23 +8,6 @@
 
 #include <inttypes.h> // for uint32_t
 
-/// Deprecated: we should use specific channels instead.
-#ifdef MINIMK_ENABLE_TRACE
-#define MINIMK_TRACE_IS_ENABLED 1
-#else
-#define MINIMK_TRACE_IS_ENABLED 0
-#endif
-
-/// Traces execution and prints specific values.
-///
-/// Deprecated: we should use specific channels instead.
-#define MINIMK_TRACE(fmt, ...)                                                                               \
-    do {                                                                                                     \
-        if (MINIMK_TRACE_IS_ENABLED) {                                                                       \
-            minimk_log_printf(fmt, __VA_ARGS__);                                                             \
-        }                                                                                                    \
-    } while (0)
-
 /// Knob to control whether tracing is enabled.
 extern uint32_t minimk_trace_enable;
 
