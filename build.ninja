@@ -3,15 +3,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 rule cxx
-  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -c $in -o $out
+  command = clang++ -Iinclude -O2 -std=c++11 -fno-rtti -fno-exceptions -nostdinc++ -Wall -Wextra -Weverything -Werror -Wno-c++98-compat -Wno-c++98-compat-pedantic -c $in -o $out
   description = CXX $out
 
 rule cxx_app
-  command = clang++ -Iinclude -O2 -std=c++11 -Wall -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -c $in -o $out
+  command = clang++ -Iinclude -O2 -std=c++11 -Wall -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Werror -c $in -o $out
   description = CXX_APP $out
 
 rule cc
-  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -Weverything -Wno-pre-c11-compat -Wno-declaration-after-statement -c $in -o $out
+  command = clang -Iinclude -O2 -std=c11 -Wall -Wextra -Weverything -Wno-pre-c11-compat -Wno-declaration-after-statement -Werror -c $in -o $out
   description = CC $out
 
 rule link

@@ -204,6 +204,12 @@ minimk_error_t minimk_syscall_recv(minimk_syscall_socket_t sock, void *data, siz
 ///
 /// The nwritten return argument will be set to the number of bytes actually written.
 ///
+/// This function automatically sets MSG_NOSIGNAL, where available (Linux and BSD
+/// for sure), to prevent EPIPE to cause a SIGPIPE. When MSG_NOSIGNAL is available,
+/// we automatically use it when creating or accepting sockets (this works on
+/// macOS/FreeBSD). Windows doesn't generate SIGPIPE. For other systems, you will
+/// need to mask SIGPIPE using `signal` or `pthread_sigmask`.
+///
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_syscall_send(minimk_syscall_socket_t sock, const void *data, size_t count,
                                    size_t *nwritten) MINIMK_NOEXCEPT;

@@ -180,6 +180,17 @@ minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type,
         return rv;
     }
 
+    // Set SO_NOSIGPIPE when available (FreeBSD/macOS) for defense-in-depth SIGPIPE prevention
+    MINIMK_TRACE_SOCKET("setsockopt_nosigpipe fd=%llu\n", CAST_ULL(sockfd));
+
+    rv = minimk_syscall_setsockopt_nosigpipe(sockfd);
+    MINIMK_TRACE_SOCKET("setsockopt_nosigpipe result=%s\n", minimk_errno_name(rv));
+
+    // Note: we don't fail socket creation if SO_NOSIGPIPE fails since:
+    // 1. It's not available on all platforms (Linux doesn't have it)
+    // 2. We have MSG_NOSIGNAL as primary protection on Linux
+    // 3. This is defense-in-depth, not essential functionality
+
     // Create the corresponding socketinfo
     MINIMK_TRACE_SOCKET("create_socketinfo fd=%llu\n", CAST_ULL(sockfd));
 
@@ -288,6 +299,12 @@ minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_
             minimk_syscall_closesocket(&client_fd);
             return rv;
         }
+
+        // Set SO_NOSIGPIPE when available (FreeBSD/macOS) for defense-in-depth SIGPIPE prevention
+        MINIMK_TRACE_SOCKET("accept setsockopt_nosigpipe clientfd=%llu\n", CAST_ULL(client_fd));
+        rv = minimk_syscall_setsockopt_nosigpipe(client_fd);
+        MINIMK_TRACE_SOCKET("accept setsockopt_nosigpipe result=%s\n", minimk_errno_name(rv));
+        // Note: we don't fail on SO_NOSIGPIPE failure (same reasoning as in create)
 
         // Create the corresponding socketinfo
         socketinfo *client_info = nullptr;

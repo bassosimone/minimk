@@ -26,7 +26,9 @@ MINIMK_BEGIN_DECLS
 /// The socket structure will refer to a valid socket and its timeouts will
 /// be set to UINT64_MAX, which is basically equal to infinite.
 ///
-/// The underlying socket is configured as nonblocking.
+/// The underlying socket is configured as nonblocking and for SIGPIPE
+/// prevention: SO_NOSIGPIPE is set when available (FreeBSD/macOS). See
+/// minimk_socket_send docs for more details on SIGPIPE.
 ///
 /// On success, you take ownership of the heap allocated socket.
 ///
@@ -43,14 +45,12 @@ minimk_error_t minimk_socket_create(minimk_socket_t *sock, int domain, int type,
 /// Function to set the read timeout associated with a runtime socket.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_set_read_timeout(minimk_socket_t sock,
-                                              uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_set_read_timeout(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Function to set the write timeout associated with a runtime socket.
 ///
 /// The return value is zero on success or a nonzero error code on failure.
-minimk_error_t minimk_socket_set_write_timeout(minimk_socket_t sock,
-                                               uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_set_write_timeout(minimk_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Function to bind a socket to a local address and port.
 ///
@@ -82,7 +82,8 @@ minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NO
 /// The client_sock return argument will be set to MINIMK_INVALID_HANDLE when the
 /// function is invoked and later changed to a valid socket on success representing the
 /// accepted client connection. The underlying client_sock socket will be configured for
-/// using nonblocking I/O.
+/// using nonblocking I/O and for SIGPIPE prevention, using SO_NOSIGPIPE where
+/// available (macOS/FreeBSD). See minimk_socket_send docs for more details on SIGPIPE.
 ///
 /// The sock argument must be a valid socket created using minimk_socket_create,
 /// bound using minimk_socket_bind, and marked as listening using
@@ -91,8 +92,7 @@ minimk_error_t minimk_socket_listen(minimk_socket_t sock, int backlog) MINIMK_NO
 /// The return value is zero on success or a nonzero error code on failure.
 ///
 /// We return MINIMK_ETIMEDOUT when the sock read_timeout expires.
-minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock,
-                                    minimk_socket_t sock) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_accept(minimk_socket_t *client_sock, minimk_socket_t sock) MINIMK_NOEXCEPT;
 
 /// Function to read bytes from a given socket.
 ///
@@ -137,6 +137,12 @@ minimk_error_t minimk_socket_recvall(minimk_socket_t sock, void *buf, size_t cou
 /// 1. if count is zero, it returns MINIMK_EINVAL since writing zero bytes is most
 /// likely a bug in the code and should not actually happen.
 ///
+/// This function automatically sets MSG_NOSIGNAL, where available (Linux and BSD
+/// for sure), to prevent EPIPE to cause a SIGPIPE. When MSG_NOSIGNAL is available,
+/// we automatically use it when creating or accepting sockets (this works on
+/// macOS/FreeBSD). Windows doesn't generate SIGPIPE. For other systems, you will
+/// need to mask SIGPIPE using `signal` or `pthread_sigmask`.
+///
 /// The return value is zero on success or a nonzero error code on failure.
 ///
 /// We return MINIMK_ETIMEDOUT when the sock write_timeout expires.
@@ -148,8 +154,7 @@ minimk_error_t minimk_socket_send(minimk_socket_t sock, const void *data, size_t
 /// In case of short write, returns error. This is an all-or-nothing operation.
 ///
 /// When interruped by MINIMK_EINTR, this function continues to write relentlessly.
-minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf,
-                                     size_t count) MINIMK_NOEXCEPT;
+minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) MINIMK_NOEXCEPT;
 
 /// Function to set SO_REUSEADDR socket option.
 ///
