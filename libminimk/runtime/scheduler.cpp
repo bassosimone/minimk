@@ -5,7 +5,8 @@
 #include "scheduler.h"   // for struct scheduler
 #include "scheduler.hpp" // for minimk_runtime_scheduler_get_coroutine_slot_impl
 
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_socket_t
 
 #include <stddef.h> // for size_t
 
@@ -42,4 +43,32 @@ void minimk_runtime_scheduler_block_on_poll(struct scheduler *sched) noexcept {
 
 void minimk_runtime_scheduler_switch(struct scheduler *sched) noexcept {
     minimk_runtime_scheduler_switch_impl(sched);
+}
+
+void minimk_runtime_scheduler_coroutine_main(struct scheduler *sched) noexcept {
+    minimk_runtime_scheduler_coroutine_main_impl(sched);
+}
+
+minimk_error_t minimk_runtime_scheduler_coroutine_create( //
+        struct scheduler *sched, void (*entry)(void *opaque), void *opaque) noexcept {
+    return minimk_runtime_scheduler_coroutine_create_impl(sched, entry, opaque);
+}
+
+void minimk_runtime_scheduler_run(struct scheduler *sched) noexcept {
+    minimk_runtime_scheduler_run_impl(sched);
+}
+
+void minimk_runtime_scheduler_coroutine_yield(struct scheduler *sched) noexcept {
+    minimk_runtime_scheduler_coroutine_yield_impl(sched);
+}
+
+void minimk_runtime_scheduler_coroutine_suspend_timer(struct scheduler *sched,
+                                                      uint64_t nanosec) noexcept {
+    minimk_runtime_scheduler_coroutine_suspend_timer_impl(sched, nanosec);
+}
+
+minimk_error_t minimk_runtime_scheduler_coroutine_suspend_io( //
+        struct scheduler *sched, minimk_syscall_socket_t sock, short events,
+        uint64_t nanosec) noexcept {
+    return minimk_runtime_scheduler_coroutine_suspend_io_impl(sched, sock, events, nanosec);
 }

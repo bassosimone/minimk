@@ -6,8 +6,9 @@
 
 #include "coroutine.h" // for struct coroutine
 
-#include <minimk/cdefs.h> // for MINIMK_BEGIN_DECLS
-#include <minimk/errno.h> // for minimk_error_t
+#include <minimk/cdefs.h>   // for MINIMK_BEGIN_DECLS
+#include <minimk/errno.h>   // for minimk_error_t
+#include <minimk/syscall.h> // for minimk_syscall_socket_t
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uintptr_t
@@ -58,6 +59,28 @@ void minimk_runtime_scheduler_block_on_poll(struct scheduler *sched) MINIMK_NOEX
 
 /// Utility function to factor code for switching coroutine.
 void minimk_runtime_scheduler_switch(struct scheduler *sched) MINIMK_NOEXCEPT;
+
+/// Main coroutine function called by the assembly trampoline.
+void minimk_runtime_scheduler_coroutine_main(struct scheduler *sched) MINIMK_NOEXCEPT;
+
+/// Creates a runnable coroutine within the scheduler.
+minimk_error_t minimk_runtime_scheduler_coroutine_create( //
+        struct scheduler *sched, void (*entry)(void *opaque), void *opaque) MINIMK_NOEXCEPT;
+
+/// Runs the scheduler until no coroutines remain.
+void minimk_runtime_scheduler_run(struct scheduler *sched) MINIMK_NOEXCEPT;
+
+/// Yields the CPU from current to another coroutine.
+void minimk_runtime_scheduler_coroutine_yield(struct scheduler *sched) MINIMK_NOEXCEPT;
+
+/// Suspends current coroutine until the given timeout expires.
+void minimk_runtime_scheduler_coroutine_suspend_timer(struct scheduler *sched,
+                                                      uint64_t nanosec) MINIMK_NOEXCEPT;
+
+/// Suspends current coroutine waiting for I/O with timeout.
+minimk_error_t minimk_runtime_scheduler_coroutine_suspend_io( //
+        struct scheduler *sched, minimk_syscall_socket_t sock, short events,
+        uint64_t nanosec) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 
