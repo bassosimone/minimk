@@ -22,14 +22,14 @@ MINIMK_BEGIN_DECLS
 /// The return value is zero on success or a nonzero error code on failure.
 minimk_error_t minimk_runtime_go(void (*entry)(void *opaque), void *opaque) MINIMK_NOEXCEPT;
 
-/// Blocks executing goroutines until there are goroutines to execute.
+/// Blocks executing coroutines until there are coroutines to execute.
 ///
 /// This function must be called at most once usually from the program `main()`.
 void minimk_runtime_run(void) MINIMK_NOEXCEPT;
 
 /// Yield the CPU and transfer control to the runtime scheduler.
 ///
-/// This function must be called by a running goroutine.
+/// This function must be called by a running coroutine.
 void minimk_runtime_yield(void) MINIMK_NOEXCEPT;
 
 /// Put the coroutine to sleep for the given amount of nanoseconds.
@@ -38,7 +38,7 @@ void minimk_runtime_yield(void) MINIMK_NOEXCEPT;
 /// runtime to avoid overflows. You do not actually need to sleep for so much
 /// time anyway. We will surely extinguish ourselves before that.
 ///
-/// This function must be called by a running goroutine.
+/// This function must be called by a running coroutine.
 void minimk_runtime_nanosleep(uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Put the coroutine to sleep until read would not block or there's a timeout.

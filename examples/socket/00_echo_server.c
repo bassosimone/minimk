@@ -109,10 +109,10 @@ int main(void) {
     fprintf(stderr, "Echo server listening on 127.0.0.1:9774\n");
     fprintf(stderr, "Test with: nc 127.0.0.1 9774\n");
 
-    // Spawn the goroutine that accepts connections
+    // Spawn the coroutine that accepts connections
     minimk_runtime_go(accept_loop, (void *)server_sock);
 
-    // Block on running the goroutines.
+    // Block on running the coroutines.
     minimk_runtime_run();
 
     // Cleanup the server socket and exit.

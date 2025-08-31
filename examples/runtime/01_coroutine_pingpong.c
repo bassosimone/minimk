@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <minimk/runtime.h> // for minimk_runtime_go
+#include <minimk/trace.h>   // for minimk_trace_enable
 
 #include <stdio.h> // for fprintf
 
@@ -30,6 +31,10 @@ static void init(void *opaque) {
 }
 
 int main(void) {
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_COROUTINE;
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_SCHEDULER;
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_SYSCALL;
+
     minimk_runtime_go(init, NULL);
     minimk_runtime_run();
 }

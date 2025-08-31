@@ -4,7 +4,8 @@
 #ifndef LIBMINIMK_RUNTIME_COROUTINE_HPP
 #define LIBMINIMK_RUNTIME_COROUTINE_HPP
 
-#include "../integer/u64.h" // for minimk_integer_u64_satadd
+#include "../cast/static.hpp" // for CAST_VOID_P
+#include "../integer/u64.h"   // for minimk_integer_u64_satadd
 
 #include "coroutine.h" // for struct coroutine
 #include "stack.h"     // for minimk_runtime_stack_alloc
@@ -14,22 +15,21 @@
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_invalid_socket
 #include <minimk/time.h>    // for minimk_time_monotonic_now
-#include <minimk/trace.h>   // for MINIMK_TRACE
+#include <minimk/trace.h>   // for MINIMK_TRACE_COROUTINE
 
 #include <stdint.h> // for int64_t
 
 /// Testable implementation of minimk_runtime_coroutine_init.
-template <
-        decltype(minimk_runtime_stack_alloc) M_stack_alloc = minimk_runtime_stack_alloc,
-        decltype(minimk_runtime_init_coro_stack) M_init_coro_stack = minimk_runtime_init_coro_stack>
+template <decltype(minimk_runtime_stack_alloc) M_stack_alloc = minimk_runtime_stack_alloc,
+          decltype(minimk_runtime_init_coro_stack) M_init_coro_stack = minimk_runtime_init_coro_stack>
 minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro, void (*trampoline)(void),
-                                                  struct scheduler *sched,
-                                                  void (*entry)(void *opaque),
+                                                  struct scheduler *sched, void (*entry)(void *opaque),
                                                   void *opaque) noexcept {
     // Zero initialize the whole coroutine
     *coro = {};
 
     // Initialize the entry
+    MINIMK_TRACE_COROUTINE("%p init\n", CAST_VOID_P(coro));
     coro->sock = minimk_syscall_invalid_socket;
     coro->entry = entry;
     coro->opaque = opaque;
@@ -40,41 +40,53 @@ minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro, void (
         return rv;
     }
 
+    MINIMK_TRACE_COROUTINE("%p alloc_stack\n", CAST_VOID_P(coro));
+    MINIMK_TRACE_COROUTINE("%p    base=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(coro->stack.base));
+    MINIMK_TRACE_COROUTINE("%p    size=%zu\n", CAST_VOID_P(coro), coro->stack.size);
+    MINIMK_TRACE_COROUTINE("%p    top=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(coro->stack.top));
+
     // Use assembly to synthesize the stack frame
     M_init_coro_stack(&coro->sp, coro->stack.top, reinterpret_cast<uintptr_t>(trampoline),
                       reinterpret_cast<uintptr_t>(sched));
 
-    MINIMK_TRACE("trace: coroutine<0x%llx> stack layout:\n",
-                 reinterpret_cast<unsigned long long>(coro));
-    MINIMK_TRACE("    stack_top: 0x%llx\n", static_cast<unsigned long long>(coro->stack.top));
-    MINIMK_TRACE("    sp: 0x%llx\n", static_cast<unsigned long long>(coro->sp));
+    MINIMK_TRACE_COROUTINE("%p    sp=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(coro->sp));
 
     // Mark as ready to run
     coro->state = CORO_RUNNABLE;
-    MINIMK_TRACE("trace: coroutine<0x%llx> RUNNABLE\n", reinterpret_cast<unsigned long long>(coro));
+    MINIMK_TRACE_COROUTINE("%p state=RUNNABLE\n", CAST_VOID_P(coro));
     return 0;
 }
 
 /// Testable implementation of minimk_runtime_coroutine_finish.
 template <decltype(minimk_runtime_stack_free) M_stack_free = minimk_runtime_stack_free>
 void minimk_runtime_coroutine_finish_impl(struct coroutine *coro) noexcept {
-    (void)M_stack_free(&coro->stack);
-    MINIMK_TRACE("trace: coroutine<0x%llx> NULL\n", reinterpret_cast<unsigned long long>(coro));
-    *coro = {}; // The zero state implies empty slot
+    // Delete the coroutine stack
+    auto stack = &coro->stack;
+    MINIMK_TRACE_COROUTINE("%p free_stack\n", CAST_VOID_P(coro));
+    MINIMK_TRACE_COROUTINE("%p    base=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(stack->base));
+    MINIMK_TRACE_COROUTINE("%p    sp=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(coro->sp));
+    MINIMK_TRACE_COROUTINE("%p    size=%zu\n", CAST_VOID_P(coro), stack->size);
+    (void)M_stack_free(stack);
+
+    // Zero the structure and make it empty
+    static_assert(CORO_NULL == 0, "expected CORO_NULL to be equal to zero");
+    MINIMK_TRACE_COROUTINE("%p state=NULL\n", CAST_VOID_P(coro));
+    *coro = {};
 }
 
 static inline void minimk_runtime_coroutine_maybe_resume_impl(struct coroutine *coro, uint64_t now,
                                                               short revents) noexcept {
     // Compute whether the coroutine was blocked on a timer and needs to be resumed
     if (coro->state == CORO_BLOCKED_ON_TIMER && now >= coro->deadline) {
+        MINIMK_TRACE_COROUTINE("%p state=RUNNABLE\n", CAST_VOID_P(coro));
         coro->deadline = 0;
         coro->state = CORO_RUNNABLE;
         return;
     }
 
     // Compute whether the coroutine was blocked on I/O and needs to be resumed
-    if (coro->state == CORO_BLOCKED_ON_IO &&
-        ((coro->events & revents) != 0 || now >= coro->deadline)) {
+    if (coro->state == CORO_BLOCKED_ON_IO && ((coro->events & revents) != 0 || now >= coro->deadline)) {
+        MINIMK_TRACE_COROUTINE("%p state=RUNNABLE\n", CAST_VOID_P(coro));
         coro->deadline = 0;
         coro->state = CORO_RUNNABLE;
         coro->sock = minimk_syscall_invalid_socket;
@@ -89,25 +101,30 @@ static inline void minimk_runtime_coroutine_validate_stack_pointer_impl( //
     struct stack *stack = &coro->stack;
     uintptr_t sp = coro->sp;
 
-    MINIMK_TRACE("trace: %s: validating sp=0x%llx in stack[0x%llx, 0x%llx)\n", context,
-                 static_cast<unsigned long long>(sp),
-                 static_cast<unsigned long long>(stack->bottom),
-                 static_cast<unsigned long long>(stack->top));
+    MINIMK_TRACE_COROUTINE("%p validate_stack=%s\n", CAST_VOID_P(coro), context);
+    MINIMK_TRACE_COROUTINE("%p    bottom=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(stack->bottom));
+    MINIMK_TRACE_COROUTINE("%p    sp=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(sp));
+    MINIMK_TRACE_COROUTINE("%p    top=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(stack->top));
 
     MINIMK_ASSERT(sp >= stack->bottom && sp < stack->top);
 }
 
 static inline void minimk_runtime_coroutine_suspend_timer_impl(struct coroutine *coro,
                                                                uint64_t deadline) noexcept {
+    MINIMK_TRACE_COROUTINE("%p state=BLOCKED_ON_TIMER\n", CAST_VOID_P(coro));
     coro->state = CORO_BLOCKED_ON_TIMER;
     coro->deadline = deadline;
+
+    MINIMK_TRACE_COROUTINE("%p suspend_timer\n", CAST_VOID_P(coro));
+    MINIMK_TRACE_COROUTINE("%p    deadline=%llu\n", CAST_VOID_P(coro), CAST_ULL(deadline));
 }
 
 static inline void minimk_runtime_coroutine_resume_timer_impl(struct coroutine *coro) noexcept {
+    MINIMK_TRACE_COROUTINE("%p resume_timer\n", CAST_VOID_P(coro));
     coro->deadline = 0;
 }
 
-/// Parks the current goroutine until the given timeout expires.
+/// Parks the current coroutine until the given timeout expires.
 template <decltype(minimk_time_monotonic_now) M_time_now = minimk_time_monotonic_now>
 void minimk_runtime_coroutine_suspend_io_impl(struct coroutine *coro, minimk_syscall_socket_t sock,
                                               short events, uint64_t nanosec) noexcept {
@@ -116,6 +133,7 @@ void minimk_runtime_coroutine_suspend_io_impl(struct coroutine *coro, minimk_sys
     deadline = minimk_integer_u64_satadd(deadline, nanosec);
 
     // Prepare for suspending
+    MINIMK_TRACE_COROUTINE("%p state=BLOCKED_ON_IO\n", CAST_VOID_P(coro));
     coro->state = CORO_BLOCKED_ON_IO;
     coro->deadline = deadline;
     MINIMK_ASSERT(sock != minimk_syscall_invalid_socket);
@@ -123,9 +141,10 @@ void minimk_runtime_coroutine_suspend_io_impl(struct coroutine *coro, minimk_sys
     coro->events = events;
     coro->revents = 0;
 
-    MINIMK_TRACE("trace: suspend coroutine<0x%llx> on fd=%llu events=%llu\n",
-                 reinterpret_cast<unsigned long long>(coro), static_cast<unsigned long long>(sock),
-                 static_cast<unsigned long long>(events));
+    MINIMK_TRACE_COROUTINE("%p suspend_io\n", CAST_VOID_P(coro));
+    MINIMK_TRACE_COROUTINE("%p    fd=%llu\n", CAST_VOID_P(coro), CAST_ULL(sock));
+    MINIMK_TRACE_COROUTINE("%p    events=%llu\n", CAST_VOID_P(coro), CAST_ULL(events));
+    MINIMK_TRACE_COROUTINE("%p    deadline=%llu\n", CAST_VOID_P(coro), CAST_ULL(deadline));
 }
 
 static inline minimk_error_t minimk_runtime_coroutine_resume_io_impl(struct coroutine *coro,
@@ -138,9 +157,10 @@ static inline minimk_error_t minimk_runtime_coroutine_resume_io_impl(struct coro
     MINIMK_ASSERT(coro->sock == minimk_syscall_invalid_socket);
     MINIMK_ASSERT(coro->events == 0);
 
-    MINIMK_TRACE("trace: resume coroutine<0x%llx> on fd=%llu events=%llu revents=%llu\n",
-                 reinterpret_cast<unsigned long long>(coro), static_cast<unsigned long long>(sock),
-                 static_cast<unsigned long long>(events), static_cast<unsigned long long>(revents));
+    MINIMK_TRACE_COROUTINE("%p resume_io\n", CAST_VOID_P(coro));
+    MINIMK_TRACE_COROUTINE("%p    fd=%llu\n", CAST_VOID_P(coro), CAST_ULL(sock));
+    MINIMK_TRACE_COROUTINE("%p    events=%llu\n", CAST_VOID_P(coro), CAST_ULL(events));
+    MINIMK_TRACE_COROUTINE("%p    revents=%llu\n", CAST_VOID_P(coro), CAST_ULL(revents));
 
     // We have a successful I/O suspend if the event we expected occurred.
     if ((revents & events) != 0) {
@@ -158,7 +178,7 @@ static inline minimk_error_t minimk_runtime_coroutine_resume_io_impl(struct coro
 }
 
 static inline void minimk_runtime_coroutine_mark_as_exited_impl(struct coroutine *coro) noexcept {
-    MINIMK_TRACE("trace: coroutine<0x%llx> EXITED\n", reinterpret_cast<unsigned long long>(coro));
+    MINIMK_TRACE_COROUTINE("%p state=EXITED\n", CAST_VOID_P(coro));
     coro->state = CORO_EXITED;
 }
 

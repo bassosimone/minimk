@@ -13,7 +13,10 @@ static void hello(void *opaque) {
 }
 
 int main(void) {
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_COROUTINE;
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_SCHEDULER;
     minimk_trace_enable |= MINIMK_TRACE_ENABLE_SYSCALL;
+
     minimk_runtime_go(hello, NULL);
     minimk_runtime_run();
 }
