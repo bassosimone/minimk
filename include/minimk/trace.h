@@ -18,11 +18,11 @@
 /// Traces execution and prints specific values.
 ///
 /// Deprecated: we should use specific channels instead.
-#define MINIMK_TRACE(fmt, ...)                                                                     \
-    do {                                                                                           \
-        if (MINIMK_TRACE_IS_ENABLED) {                                                             \
-            minimk_log_printf(fmt, __VA_ARGS__);                                                   \
-        }                                                                                          \
+#define MINIMK_TRACE(fmt, ...)                                                                               \
+    do {                                                                                                     \
+        if (MINIMK_TRACE_IS_ENABLED) {                                                                       \
+            minimk_log_printf(fmt, __VA_ARGS__);                                                             \
+        }                                                                                                    \
     } while (0)
 
 /// Knob to control whether tracing is enabled.
@@ -38,27 +38,27 @@ extern uint32_t minimk_trace_enable;
 #define MINIMK_TRACE_ENABLE_SCHEDULER (1 << 2)
 
 /// Trace syscall events if this tracing has been enabled.
-#define MINIMK_TRACE_SYSCALL(fmt, ...)                                                             \
-    do {                                                                                           \
-        if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_SYSCALL) != 0) {                            \
-            minimk_log_printf("syscall: " fmt, __VA_ARGS__);                                       \
-        }                                                                                          \
+#define MINIMK_TRACE_SYSCALL(fmt, ...)                                                                       \
+    do {                                                                                                     \
+        if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_SYSCALL) != 0) {                                      \
+            minimk_log_printf("  syscall: " fmt, __VA_ARGS__);                                               \
+        }                                                                                                    \
     } while (0)
 
 /// Trace coroutine events if this tracing has been enabled.
-#define MINIMK_TRACE_COROUTINE(fmt, ...)                                                           \
-    do {                                                                                           \
-        if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_COROUTINE) != 0) {                          \
-            minimk_log_printf("coroutine: " fmt, __VA_ARGS__);                                     \
-        }                                                                                          \
+#define MINIMK_TRACE_COROUTINE(fmt, ...)                                                                     \
+    do {                                                                                                     \
+        if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_COROUTINE) != 0) {                                    \
+            minimk_log_printf("     coro: " fmt, __VA_ARGS__);                                               \
+        }                                                                                                    \
     } while (0)
 
 /// Trace scheduler events if this tracing has been enabled.
-#define MINIMK_TRACE_SCHEDULER(fmt, ...)                                                           \
-    do {                                                                                           \
-        if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_SCHEDULER) != 0) {                          \
-            minimk_log_printf("scheduler: " fmt, __VA_ARGS__);                                     \
-        }                                                                                          \
+#define MINIMK_TRACE_SCHEDULER(fmt, ...)                                                                     \
+    do {                                                                                                     \
+        if ((minimk_trace_enable & MINIMK_TRACE_ENABLE_SCHEDULER) != 0) {                                    \
+            minimk_log_printf("    sched: " fmt, __VA_ARGS__);                                               \
+        }                                                                                                    \
     } while (0)
 
 #endif // MINIMK_TRACE_H

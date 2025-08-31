@@ -73,6 +73,8 @@ static void accept_loop(void *opaque) {
 
 int main(void) {
     // Configure tracing to observe events
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_COROUTINE;
+    minimk_trace_enable |= MINIMK_TRACE_ENABLE_SCHEDULER;
     minimk_trace_enable |= MINIMK_TRACE_ENABLE_SYSCALL;
 
     // Initialize socket library

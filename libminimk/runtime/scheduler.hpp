@@ -4,7 +4,8 @@
 #ifndef LIBMINIMK_RUNTIME_SCHEDULER_HPP
 #define LIBMINIMK_RUNTIME_SCHEDULER_HPP
 
-#include "../integer/u64.h" // for minimk_integer_u64_satadd
+#include "../cast/static.hpp" // for CAST_ULL
+#include "../integer/u64.h"   // for minimk_integer_u64_satadd
 
 #include "coroutine.h" // for struct coroutine
 #include "scheduler.h" // for struct scheduler
@@ -14,7 +15,7 @@
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_*
 #include <minimk/time.h>    // for minimk_time_monotonic_now
-#include <minimk/trace.h>   // for MINIMK_TRACE
+#include <minimk/trace.h>   // for MINIMK_TRACE_SCHEDULER
 
 #include <limits.h> // for INT_MAX
 #include <stddef.h> // for size_t
@@ -37,8 +38,7 @@ minimk_error_t minimk_runtime_scheduler_find_free_coroutine_slot_impl( //
         if (coro->state != CORO_NULL) {
             continue;
         }
-        MINIMK_TRACE("trace: found free coroutine<0x%llx>\n",
-                     reinterpret_cast<unsigned long long>(coro));
+        MINIMK_TRACE_SCHEDULER("%p found slot=%p\n", CAST_VOID_P(sched), CAST_VOID_P(coro));
         *found = coro;
         return 0;
     }
@@ -60,8 +60,7 @@ void minimk_runtime_scheduler_clean_exited_coroutines_impl(struct scheduler *sch
 
 template <decltype(minimk_runtime_scheduler_get_coroutine_slot) M_get =
                   minimk_runtime_scheduler_get_coroutine_slot,
-          decltype(minimk_runtime_coroutine_maybe_resume) M_resume =
-                  minimk_runtime_coroutine_maybe_resume>
+          decltype(minimk_runtime_coroutine_maybe_resume) M_resume = minimk_runtime_coroutine_maybe_resume>
 void minimk_runtime_scheduler_maybe_expire_deadlines_impl(struct scheduler *sched) noexcept {
     uint64_t now = minimk_time_monotonic_now();
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
@@ -101,16 +100,15 @@ size_t minimk_runtime_scheduler_count_nonnull_coroutines_impl(struct scheduler *
 template <decltype(minimk_runtime_scheduler_get_coroutine_slot) M_get =
                   minimk_runtime_scheduler_get_coroutine_slot,
           decltype(minimk_syscall_poll) M_poll = minimk_syscall_poll,
-          decltype(minimk_runtime_coroutine_maybe_resume) M_resume =
-                  minimk_runtime_coroutine_maybe_resume>
+          decltype(minimk_runtime_coroutine_maybe_resume) M_resume = minimk_runtime_coroutine_maybe_resume>
 void minimk_runtime_scheduler_block_on_poll_impl(struct scheduler *sched) noexcept {
     // 1. pick a reasonable default deadline to avoid blocking for too much time.
     uint64_t now = minimk_time_monotonic_now();
     uint64_t default_timeout = 10000000000;
     uint64_t deadline = minimk_integer_u64_satadd(now, default_timeout);
 
-    MINIMK_TRACE("trace: poll initial deadline=%llu [us]\n",
-                 static_cast<unsigned long long>(deadline));
+    MINIMK_TRACE_SCHEDULER("%p poll\n", CAST_VOID_P(sched));
+    MINIMK_TRACE_SCHEDULER("%p    initial deadline=%llu [us]\n", CAST_VOID_P(sched), CAST_ULL(deadline));
 
     // 2. we need to poll at most a socket per coroutine.
     //
@@ -144,23 +142,20 @@ void minimk_runtime_scheduler_block_on_poll_impl(struct scheduler *sched) noexce
             fd->events = coro->events;
             fd->fd = coro->sock;
 
-            MINIMK_TRACE("trace: poll fd=%llu events=%llu\n",
-                         static_cast<unsigned long long>(coro->sock),
-                         static_cast<unsigned long long>(coro->events));
+            MINIMK_TRACE_SCHEDULER("%p      fd=%llu\n", CAST_VOID_P(sched), CAST_ULL(coro->sock));
+            MINIMK_TRACE_SCHEDULER("%p        events=%llu\n", CAST_VOID_P(sched), CAST_ULL(coro->events));
             continue;
         }
     }
 
-    MINIMK_TRACE("trace: poll adjusted deadline=%llu [us]\n",
-                 static_cast<unsigned long long>(deadline));
+    MINIMK_TRACE_SCHEDULER("%p    adjusted deadline=%llu [us]\n", CAST_VOID_P(sched), CAST_ULL(deadline));
 
     // 4. compute the poll timeout.
     uint64_t poll_timeout64 = (((deadline > now) ? (deadline - now) : 0) / 1000000) + 1;
     int poll_timeout = static_cast<int>((poll_timeout64) < INT_MAX ? poll_timeout64 : INT_MAX);
 
-    MINIMK_TRACE("trace: poll_timeout64=%llu [ms]\n",
-                 static_cast<unsigned long long>(poll_timeout64));
-    MINIMK_TRACE("trace: poll_timeout=%lld [ms]\n", static_cast<long long>(poll_timeout));
+    MINIMK_TRACE_SCHEDULER("%p    timeout64=%llu [ms]\n", CAST_VOID_P(sched), CAST_ULL(poll_timeout64));
+    MINIMK_TRACE_SCHEDULER("%p    timeout=%llu [ms]\n", CAST_VOID_P(sched), CAST_ULL(poll_timeout));
 
     // 5. invoke the poll system call and handle is result.
     //
@@ -173,15 +168,13 @@ void minimk_runtime_scheduler_block_on_poll_impl(struct scheduler *sched) noexce
     // - EINVAL The nfds value exceeds the RLIMIT_NOFILE value.
     //
     // - ENOMEM Unable to allocate memory for kernel data structures.
-    MINIMK_TRACE("trace: poll fds=0x%llx numfds=%llu timeout=%lld\n",
-                 reinterpret_cast<unsigned long long>(fds), static_cast<unsigned long long>(numfds),
-                 static_cast<long long>(poll_timeout));
+    MINIMK_TRACE_SCHEDULER("%p    numfds=%llu\n", CAST_VOID_P(sched), CAST_ULL(numfds));
 
     size_t active = 0;
     auto poll_rc = M_poll(fds, numfds, poll_timeout, &active);
 
-    MINIMK_TRACE("trace: poll rc=%llu active=%llu\n", static_cast<unsigned long long>(poll_rc),
-                 static_cast<unsigned long long>(active));
+    MINIMK_TRACE_SCHEDULER("%p    rc=%llu\n", CAST_VOID_P(sched), CAST_ULL(poll_rc));
+    MINIMK_TRACE_SCHEDULER("%p    active=%llu\n", CAST_VOID_P(sched), CAST_ULL(active));
 
     if (poll_rc == MINIMK_EINTR) {
         return;
@@ -206,33 +199,27 @@ template <decltype(minimk_runtime_switch) M_switch = minimk_runtime_switch,
                   minimk_runtime_coroutine_validate_stack_pointer>
 void minimk_runtime_scheduler_switch_impl(struct scheduler *sched) noexcept {
     // Log the state before switching
-    MINIMK_TRACE("trace: scheduler: switching to coroutine<0x%llx> sp=%llx\n",
-                 reinterpret_cast<unsigned long long>(sched->current),
-                 static_cast<unsigned long long>(sched->current->sp));
+    MINIMK_TRACE_SCHEDULER("%p switching to %p\n", CAST_VOID_P(sched), CAST_VOID_P(sched->current));
+    MINIMK_TRACE_SCHEDULER("%p    coro_sp=0x%llu\n", CAST_VOID_P(sched), CAST_ULL(sched->current->sp));
+    MINIMK_TRACE_SCHEDULER("%p    sched_sp=0x%llu\n", CAST_VOID_P(sched), CAST_ULL(sched->sp));
 
     M_validate("before_switch", sched->current);
-
-    MINIMK_TRACE("trace: scheduler_sp before switch: 0x%llx\n",
-                 static_cast<unsigned long long>(sched->sp));
 
     // Perform the actual switching
     M_switch(&sched->sp, sched->current->sp);
 
     // Log the state after switching
-    MINIMK_TRACE("trace: scheduler: returned from coroutine<0x%llx> sp=%llx\n",
-                 reinterpret_cast<unsigned long long>(sched->current),
-                 static_cast<unsigned long long>(sched->sp));
-
-    MINIMK_TRACE("trace: scheduler_sp after switch: 0x%llx\n",
-                 static_cast<unsigned long long>(sched->sp));
+    MINIMK_TRACE_SCHEDULER("%p returned from %p\n", CAST_VOID_P(sched), CAST_VOID_P(sched->current));
+    MINIMK_TRACE_SCHEDULER("%p    coro_sp=0x%llu\n", CAST_VOID_P(sched), CAST_ULL(sched->current->sp));
+    MINIMK_TRACE_SCHEDULER("%p    sched_sp=0x%llu\n", CAST_VOID_P(sched), CAST_ULL(sched->sp));
 
     M_validate("after_switch", sched->current);
 }
 
-template <decltype(minimk_runtime_coroutine_mark_as_exited) M_mark_exited =
-                  minimk_runtime_coroutine_mark_as_exited,
-          decltype(minimk_runtime_scheduler_coroutine_yield) M_yield =
-                  minimk_runtime_scheduler_coroutine_yield>
+template <
+        decltype(minimk_runtime_coroutine_mark_as_exited) M_mark_exited =
+                minimk_runtime_coroutine_mark_as_exited,
+        decltype(minimk_runtime_scheduler_coroutine_yield) M_yield = minimk_runtime_scheduler_coroutine_yield>
 void minimk_runtime_scheduler_coroutine_main_impl(struct scheduler *sched) noexcept {
     // Ensure that we're in the coroutine world.
     MINIMK_ASSERT(sched->current != nullptr);
@@ -281,10 +268,8 @@ template <decltype(minimk_runtime_scheduler_count_nonnull_coroutines) M_count =
                   minimk_runtime_scheduler_clean_exited_coroutines,
           decltype(minimk_runtime_scheduler_maybe_expire_deadlines) M_expire =
                   minimk_runtime_scheduler_maybe_expire_deadlines,
-          decltype(minimk_runtime_scheduler_pick_runnable) M_pick =
-                  minimk_runtime_scheduler_pick_runnable,
-          decltype(minimk_runtime_scheduler_block_on_poll) M_poll =
-                  minimk_runtime_scheduler_block_on_poll,
+          decltype(minimk_runtime_scheduler_pick_runnable) M_pick = minimk_runtime_scheduler_pick_runnable,
+          decltype(minimk_runtime_scheduler_block_on_poll) M_poll = minimk_runtime_scheduler_block_on_poll,
           decltype(minimk_runtime_scheduler_switch) M_switch = minimk_runtime_scheduler_switch>
 void minimk_runtime_scheduler_run_impl(struct scheduler *sched) noexcept {
     // Ensure we are not yet inside the coroutine world.
@@ -292,6 +277,8 @@ void minimk_runtime_scheduler_run_impl(struct scheduler *sched) noexcept {
 
     // Continue until we're out of coroutines.
     for (size_t fair = 0; M_count(sched) > 0;) {
+        MINIMK_TRACE_SCHEDULER("%p loop\n", CAST_VOID_P(sched));
+
         // Check whether there are coroutines that need cleanup.
         M_clean(sched);
 
@@ -327,14 +314,12 @@ void minimk_runtime_scheduler_coroutine_yield_impl(struct scheduler *sched) noex
     M_switch(&sched->current->sp, sched->sp);
 }
 
-template <decltype(minimk_time_monotonic_now) M_now = minimk_time_monotonic_now,
-          decltype(minimk_integer_u64_satadd) M_add = minimk_integer_u64_satadd,
-          decltype(minimk_runtime_coroutine_suspend_timer) M_suspend =
-                  minimk_runtime_coroutine_suspend_timer,
-          decltype(minimk_runtime_scheduler_coroutine_yield) M_yield =
-                  minimk_runtime_scheduler_coroutine_yield,
-          decltype(minimk_runtime_coroutine_resume_timer) M_resume =
-                  minimk_runtime_coroutine_resume_timer>
+template <
+        decltype(minimk_time_monotonic_now) M_now = minimk_time_monotonic_now,
+        decltype(minimk_integer_u64_satadd) M_add = minimk_integer_u64_satadd,
+        decltype(minimk_runtime_coroutine_suspend_timer) M_suspend = minimk_runtime_coroutine_suspend_timer,
+        decltype(minimk_runtime_scheduler_coroutine_yield) M_yield = minimk_runtime_scheduler_coroutine_yield,
+        decltype(minimk_runtime_coroutine_resume_timer) M_resume = minimk_runtime_coroutine_resume_timer>
 void minimk_runtime_scheduler_coroutine_suspend_timer_impl(struct scheduler *sched,
                                                            uint64_t nanosec) noexcept {
     // Ensure we're inside the coroutine world.
@@ -355,14 +340,11 @@ void minimk_runtime_scheduler_coroutine_suspend_timer_impl(struct scheduler *sch
 }
 
 template <
-        decltype(minimk_runtime_coroutine_suspend_io) M_suspend =
-                minimk_runtime_coroutine_suspend_io,
-        decltype(minimk_runtime_scheduler_coroutine_yield) M_yield =
-                minimk_runtime_scheduler_coroutine_yield,
+        decltype(minimk_runtime_coroutine_suspend_io) M_suspend = minimk_runtime_coroutine_suspend_io,
+        decltype(minimk_runtime_scheduler_coroutine_yield) M_yield = minimk_runtime_scheduler_coroutine_yield,
         decltype(minimk_runtime_coroutine_resume_io) M_resume = minimk_runtime_coroutine_resume_io>
 minimk_error_t minimk_runtime_scheduler_coroutine_suspend_io_impl( //
-        struct scheduler *sched, minimk_syscall_socket_t sock, short events,
-        uint64_t nanosec) noexcept {
+        struct scheduler *sched, minimk_syscall_socket_t sock, short events, uint64_t nanosec) noexcept {
     // Ensure we're inside the coroutine world.
     MINIMK_ASSERT(sched->current != nullptr);
 
