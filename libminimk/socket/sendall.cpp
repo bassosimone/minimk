@@ -1,0 +1,20 @@
+// File: libminimk/socket/sendall.cpp
+// Purpose: sendall implementation
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include "../cast/static.hpp" // for CAST_ULL
+
+#include <minimk/errno.h>  // for minimk_error_t
+#include <minimk/io.hpp>   // for minimk_io_writeall
+#include <minimk/socket.h> // for minimk_socket_t
+#include <minimk/trace.h>  // for MINIMK_TRACE_SOCKET
+
+#include <stddef.h> // for size_t
+
+minimk_error_t minimk_socket_sendall(minimk_socket_t sock, const void *buf, size_t count) noexcept {
+    MINIMK_TRACE_SOCKET("sendall handle=0x%llx\n", CAST_ULL(sock));
+    MINIMK_TRACE_SOCKET("sendall count=%zu\n", count);
+    minimk_error_t rv = minimk_io_writeall<minimk_socket_t, minimk_socket_send>(sock, buf, count);
+    MINIMK_TRACE_SOCKET("sendall result=%s\n", minimk_errno_name(rv));
+    return rv;
+}

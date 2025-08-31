@@ -41,7 +41,20 @@ build libminimk/runtime/scheduler.o: cxx libminimk/runtime/scheduler.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
 
-build libminimk/socket/socket.o: cxx libminimk/socket/socket.cpp
+build libminimk/socket/accept.o: cxx libminimk/socket/accept.cpp
+build libminimk/socket/bind.o: cxx libminimk/socket/bind.cpp
+build libminimk/socket/connect.o: cxx libminimk/socket/connect.cpp
+build libminimk/socket/create.o: cxx libminimk/socket/create.cpp
+build libminimk/socket/destroy.o: cxx libminimk/socket/destroy.cpp
+build libminimk/socket/info.o: cxx libminimk/socket/info.cpp
+build libminimk/socket/listen.o: cxx libminimk/socket/listen.cpp
+build libminimk/socket/recv.o: cxx libminimk/socket/recv.cpp
+build libminimk/socket/recvall.o: cxx libminimk/socket/recvall.cpp
+build libminimk/socket/send.o: cxx libminimk/socket/send.cpp
+build libminimk/socket/sendall.o: cxx libminimk/socket/sendall.cpp
+build libminimk/socket/set_read_timeout.o: cxx libminimk/socket/set_read_timeout.cpp
+build libminimk/socket/set_write_timeout.o: cxx libminimk/socket/set_write_timeout.cpp
+build libminimk/socket/setsockopt_reuseaddr.o: cxx libminimk/socket/setsockopt_reuseaddr.cpp
 
 build libminimk/syscall/accept_posix.o: cxx libminimk/syscall/accept_posix.cpp
 build libminimk/syscall/bind_posix.o: cxx libminimk/syscall/bind_posix.cpp
@@ -73,7 +86,20 @@ build libminimk.a: ar $
   libminimk/runtime/scheduler.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
-  libminimk/socket/socket.o $
+  libminimk/socket/accept.o $
+  libminimk/socket/bind.o $
+  libminimk/socket/connect.o $
+  libminimk/socket/create.o $
+  libminimk/socket/destroy.o $
+  libminimk/socket/info.o $
+  libminimk/socket/listen.o $
+  libminimk/socket/recv.o $
+  libminimk/socket/recvall.o $
+  libminimk/socket/send.o $
+  libminimk/socket/sendall.o $
+  libminimk/socket/set_read_timeout.o $
+  libminimk/socket/set_write_timeout.o $
+  libminimk/socket/setsockopt_reuseaddr.o $
   libminimk/syscall/accept_posix.o $
   libminimk/syscall/bind_posix.o $
   libminimk/syscall/closesocket_posix.o $
