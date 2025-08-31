@@ -37,6 +37,7 @@ build libminimk/log/log.o: cc libminimk/log/log.c
 
 build libminimk/runtime/coroutine.o: cxx libminimk/runtime/coroutine.cpp
 build libminimk/runtime/runtime.o: cxx libminimk/runtime/runtime.cpp
+build libminimk/runtime/scheduler.o: cxx libminimk/runtime/scheduler.cpp
 build libminimk/runtime/stack_linux.o: cxx libminimk/runtime/stack_linux.cpp
 build libminimk/runtime/switch_linux_amd64.o: asm libminimk/runtime/switch_linux_amd64.S
 
@@ -68,6 +69,7 @@ build libminimk.a: ar $
   libminimk/log/log.o $
   libminimk/runtime/coroutine.o $
   libminimk/runtime/runtime.o $
+  libminimk/runtime/scheduler.o $
   libminimk/runtime/stack_linux.o $
   libminimk/runtime/switch_linux_amd64.o $
   libminimk/socket/socket.o $
