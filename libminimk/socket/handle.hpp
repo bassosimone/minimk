@@ -62,8 +62,7 @@ static inline int handle_generation_valid(uint64_t generation) MINIMK_NOEXCEPT {
 }
 
 /// Function to create a handle given type, generation, and index.
-static inline uint64_t make_handle(uint8_t type, uint64_t generation,
-                                   uint8_t index) MINIMK_NOEXCEPT {
+static inline uint64_t make_handle(uint8_t type, uint64_t generation, uint8_t index) MINIMK_NOEXCEPT {
     uint64_t handle = 0;
 
     // Add the handle type
