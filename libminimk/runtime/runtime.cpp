@@ -67,9 +67,7 @@ static void coro_trampoline(void) noexcept {
 
     // Mark the coroutine as exited and the scheduler will
     // take care of freeing the allocated resources.
-    current->state = CORO_EXITED;
-    MINIMK_TRACE("trace: coroutine<0x%llx> EXITED\n",
-                 reinterpret_cast<unsigned long long>(current));
+    minimk_runtime_coroutine_mark_as_exited(current);
 
     // Transfer the control back to the scheduler.
     minimk_runtime_yield();
@@ -173,6 +171,7 @@ static void block_on_poll(void) noexcept {
         // 3.2. deal with I/O
         if (coro->state == CORO_BLOCKED_ON_IO) {
             deadline = (coro->deadline < deadline) ? coro->deadline : deadline;
+
             MINIMK_ASSERT(coro->sock != minimk_syscall_invalid_socket);
             MINIMK_ASSERT(coro->events != 0);
             MINIMK_ASSERT(coro->revents == 0);
@@ -315,14 +314,14 @@ void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
     deadline = minimk_integer_u64_satadd(deadline, nanosec);
 
     // Suspend the coroutine
-    current->state = CORO_BLOCKED_ON_TIMER;
-    current->deadline = deadline;
+    minimk_runtime_coroutine_suspend_timer(current, deadline);
     minimk_runtime_yield();
+    minimk_runtime_coroutine_resume_timer(current);
 }
 
 /// Internal function to uniformly handle suspending for I/O.
-static inline minimk_error_t minimk_suspend_io(minimk_syscall_socket_t sock, short events,
-                                               uint64_t nanosec) noexcept {
+static inline minimk_error_t suspend_io(minimk_syscall_socket_t sock, short events,
+                                        uint64_t nanosec) noexcept {
     // Ensure we're inside the coroutine world.
     MINIMK_ASSERT(current != nullptr);
 
@@ -338,10 +337,10 @@ static inline minimk_error_t minimk_suspend_io(minimk_syscall_socket_t sock, sho
 
 minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock,
                                            uint64_t nanosec) MINIMK_NOEXCEPT {
-    return minimk_suspend_io(sock, minimk_syscall_pollin, nanosec);
+    return suspend_io(sock, minimk_syscall_pollin, nanosec);
 }
 
 minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock,
                                             uint64_t nanosec) MINIMK_NOEXCEPT {
-    return minimk_suspend_io(sock, minimk_syscall_pollout, nanosec);
+    return suspend_io(sock, minimk_syscall_pollout, nanosec);
 }

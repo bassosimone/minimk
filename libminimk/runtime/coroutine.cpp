@@ -27,6 +27,14 @@ void minimk_runtime_coroutine_validate_stack_pointer( //
     minimk_runtime_coroutine_validate_stack_pointer_impl(context, coro);
 }
 
+void minimk_runtime_coroutine_suspend_timer(struct coroutine *coro, uint64_t deadline) noexcept {
+    minimk_runtime_coroutine_suspend_timer_impl(coro, deadline);
+}
+
+void minimk_runtime_coroutine_resume_timer(struct coroutine *coro) noexcept {
+    minimk_runtime_coroutine_resume_timer_impl(coro);
+}
+
 void minimk_runtime_coroutine_suspend_io(struct coroutine *coro, minimk_syscall_socket_t sock,
                                          short events, uint64_t nanosec) noexcept {
     minimk_runtime_coroutine_suspend_io_impl(coro, sock, events, nanosec);
@@ -36,4 +44,8 @@ minimk_error_t minimk_runtime_coroutine_resume_io(struct coroutine *coro,
                                                   minimk_syscall_socket_t sock,
                                                   short events) noexcept {
     return minimk_runtime_coroutine_resume_io_impl(coro, sock, events);
+}
+
+void minimk_runtime_coroutine_mark_as_exited(struct coroutine *coro) noexcept {
+    minimk_runtime_coroutine_mark_as_exited_impl(coro);
 }

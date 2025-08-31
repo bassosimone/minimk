@@ -95,6 +95,16 @@ static inline void minimk_runtime_coroutine_validate_stack_pointer_impl( //
     MINIMK_ASSERT(sp >= stack->bottom && sp < stack->top);
 }
 
+static inline void minimk_runtime_coroutine_suspend_timer_impl(struct coroutine *coro,
+                                                               uint64_t deadline) noexcept {
+    coro->state = CORO_BLOCKED_ON_TIMER;
+    coro->deadline = deadline;
+}
+
+static inline void minimk_runtime_coroutine_resume_timer_impl(struct coroutine *coro) noexcept {
+    coro->deadline = 0;
+}
+
 /// Parks the current goroutine until the given timeout expires.
 template <decltype(minimk_time_monotonic_now) M_time_now = minimk_time_monotonic_now>
 void minimk_runtime_coroutine_suspend_io_impl(struct coroutine *coro, minimk_syscall_socket_t sock,
@@ -143,6 +153,11 @@ static inline minimk_error_t minimk_runtime_coroutine_resume_io_impl(struct coro
 
     // Otherwise, it must have been an I/O timeout.
     return MINIMK_ETIMEDOUT;
+}
+
+static inline void minimk_runtime_coroutine_mark_as_exited_impl(struct coroutine *coro) noexcept {
+    MINIMK_TRACE("trace: coroutine<0x%llx> EXITED\n", reinterpret_cast<unsigned long long>(coro));
+    coro->state = CORO_EXITED;
 }
 
 #endif // LIBMINIMK_RUNTIME_COROUTINE_HPP
