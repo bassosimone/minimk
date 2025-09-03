@@ -97,3 +97,6 @@ minimk_runtime_asm_trampoline:
 
     // Invoke the C trampoline
     call minimk_runtime_scheduler_coroutine_main
+
+    // Mark that we don't need executable stack
+    .section .note.GNU-stack,"",%progbits
