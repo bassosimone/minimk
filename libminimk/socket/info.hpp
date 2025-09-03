@@ -17,6 +17,10 @@
 /// Maximum number of sockets managed by the runtime.
 #define MAX_SOCKETS MAX_HANDLES
 
+// Ensure that we respect the handles protocol even when the value
+// assigned is different from `MAX_HANDLES`.
+static_assert(MAX_SOCKETS <= MAX_HANDLES, "MAX_SOCKETS must be <= MAX_HANDLES");
+
 /// Socket slot in the runtime table.
 struct socket_info {
     /// The actual handle associated to this entry.
