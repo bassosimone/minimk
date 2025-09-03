@@ -8,6 +8,7 @@
 #include "info.hpp"   // for struct socket_info
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/cdefs.h>   // for MINIMK_UNSAFE_BUFFER_USAGE_*
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/syscall.h> // for minimk_syscall_*
@@ -27,9 +28,9 @@ static size_t next_slot = 0;
 
 socket_info *minimk_socket_info_get(size_t idx) noexcept {
     MINIMK_ASSERT(idx >= 0 && idx < MAX_SOCKETS);
-#pragma clang unsafe_buffer_usage begin
+    MINIMK_UNSAFE_BUFFER_USAGE_BEGIN
     return &sockets[idx];
-#pragma clang unsafe_buffer_usage end
+    MINIMK_UNSAFE_BUFFER_USAGE_END
 }
 
 minimk_error_t minimk_socket_info_find(socket_info **pinfo, minimk_socket_t handle) noexcept {

@@ -25,4 +25,13 @@
 #define MINIMK_NOEXCEPT /* Nothing */
 #endif
 
+/// Macros for handling unsafe buffer usage warnings.
+#ifdef __clang__
+#define MINIMK_UNSAFE_BUFFER_USAGE_BEGIN _Pragma("clang unsafe_buffer_usage begin")
+#define MINIMK_UNSAFE_BUFFER_USAGE_END _Pragma("clang unsafe_buffer_usage end")
+#else
+#define MINIMK_UNSAFE_BUFFER_USAGE_BEGIN /* Nothing */
+#define MINIMK_UNSAFE_BUFFER_USAGE_END /* Nothing */
+#endif
+
 #endif // MINIMK_CDEFS_H

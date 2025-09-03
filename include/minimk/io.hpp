@@ -5,6 +5,7 @@
 #define MINIMK_IO_HPP
 
 #include <minimk/assert.h> // for MINIMK_ASSERT
+#include <minimk/cdefs.h>  // for MINIMK_UNSAFE_BUFFER_USAGE_*
 #include <minimk/errno.h>  // for minimk_error_t
 
 #include <stddef.h> // for size_t
@@ -28,9 +29,9 @@ minimk_error_t minimk_io_writeall(T sock, const void *vbuf, size_t count) noexce
         size_t amount = count - total;
 
         // Send inside a section where clang buffer safety is disabled
-#pragma clang unsafe_buffer_usage begin
+        MINIMK_UNSAFE_BUFFER_USAGE_BEGIN
         minimk_error_t rv = M_T_send(sock, buf + total, amount, &nwritten);
-#pragma clang unsafe_buffer_usage end
+        MINIMK_UNSAFE_BUFFER_USAGE_END
 
         // Handle the failure cases
         if (rv == MINIMK_EINTR) {
@@ -69,9 +70,9 @@ minimk_error_t minimk_io_readall(T sock, void *vbuf, size_t count) noexcept {
         size_t amount = count - total;
 
         // Receive inside a section where clang buffer safety is disabled
-#pragma clang unsafe_buffer_usage begin
+        MINIMK_UNSAFE_BUFFER_USAGE_BEGIN
         minimk_error_t rv = M_T_recv(sock, buf + total, amount, &nread);
-#pragma clang unsafe_buffer_usage end
+        MINIMK_UNSAFE_BUFFER_USAGE_END
 
         // Handle the failure cases
         if (rv == MINIMK_EINTR) {

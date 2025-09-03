@@ -12,6 +12,7 @@
 #include "switch.h"    // for minimk_switch
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/cdefs.h>   // for MINIMK_UNSAFE_BUFFER_USAGE_*
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_*
 #include <minimk/time.h>    // for minimk_time_monotonic_now
@@ -24,9 +25,9 @@
 static inline struct coroutine *minimk_runtime_scheduler_get_coroutine_slot_impl( //
         struct scheduler *sched, size_t idx) noexcept {
     MINIMK_ASSERT(idx >= 0 && idx < MAX_COROS);
-#pragma clang unsafe_buffer_usage begin
+    MINIMK_UNSAFE_BUFFER_USAGE_BEGIN
     return &sched->coroutines[idx];
-#pragma clang unsafe_buffer_usage end
+    MINIMK_UNSAFE_BUFFER_USAGE_END
 }
 
 template <decltype(minimk_runtime_scheduler_get_coroutine_slot) M_get =
@@ -135,9 +136,9 @@ void minimk_runtime_scheduler_block_on_poll_impl(struct scheduler *sched) noexce
             MINIMK_ASSERT(coro->events != 0);
             MINIMK_ASSERT(coro->revents == 0);
 
-#pragma clang unsafe_buffer_usage begin
+            MINIMK_UNSAFE_BUFFER_USAGE_BEGIN
             auto fd = &fds[idx];
-#pragma clang unsafe_buffer_usage end
+            MINIMK_UNSAFE_BUFFER_USAGE_END
 
             fd->events = coro->events;
             fd->fd = coro->sock;
@@ -185,9 +186,9 @@ void minimk_runtime_scheduler_block_on_poll_impl(struct scheduler *sched) noexce
     now = minimk_time_monotonic_now();
     for (size_t idx = 0; idx < MAX_COROS; idx++) {
 
-#pragma clang unsafe_buffer_usage begin
+        MINIMK_UNSAFE_BUFFER_USAGE_BEGIN
         auto fd = &fds[idx];
-#pragma clang unsafe_buffer_usage end
+        MINIMK_UNSAFE_BUFFER_USAGE_END
 
         M_resume(M_get(sched, idx), now, fd->revents);
     }
