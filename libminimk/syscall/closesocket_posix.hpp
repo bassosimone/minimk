@@ -4,6 +4,7 @@
 #ifndef LIBMINIMK_SYSCALL_CLOSESOCKET_POSIX_HPP
 #define LIBMINIMK_SYSCALL_CLOSESOCKET_POSIX_HPP
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_geterrno
 #include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
@@ -14,7 +15,7 @@
 template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
           decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
           decltype(close) M_sys_close = close>
-minimk_error_t minimk_syscall_closesocket_impl(minimk_syscall_socket_t *sock) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_syscall_closesocket_impl(minimk_syscall_socket_t *sock) noexcept {
     // Log that we're about to invoke the syscall
     MINIMK_TRACE_SYSCALL("close: fd=%d\n", *sock);
 

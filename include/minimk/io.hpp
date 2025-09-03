@@ -18,7 +18,7 @@
 ///
 /// M_T_send must return nwritten > 0 when its return code is zero.
 template <typename T, minimk_error_t (*M_T_send)(T, const void *, size_t, size_t *)>
-minimk_error_t minimk_io_writeall(T sock, const void *vbuf, size_t count) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_io_writeall(T sock, const void *vbuf, size_t count) noexcept {
     // Allow pointer arithmetic and ensure overflow is impossible
     const char *buf = static_cast<const char *>(vbuf);
     MINIMK_ASSERT(reinterpret_cast<uintptr_t>(buf) <= UINTPTR_MAX - count);
@@ -59,7 +59,7 @@ minimk_error_t minimk_io_writeall(T sock, const void *vbuf, size_t count) noexce
 ///
 /// M_T_recv must return nread > 0 when its return code is zero.
 template <typename T, minimk_error_t (*M_T_recv)(T, void *, size_t, size_t *)>
-minimk_error_t minimk_io_readall(T sock, void *vbuf, size_t count) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_io_readall(T sock, void *vbuf, size_t count) noexcept {
     // Allow pointer arithmetic and ensure overflow is impossible
     char *buf = static_cast<char *>(vbuf);
     MINIMK_ASSERT(reinterpret_cast<uintptr_t>(buf) <= UINTPTR_MAX - count);

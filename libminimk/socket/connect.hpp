@@ -8,6 +8,7 @@
 
 #include "info.hpp" // for struct socket_info
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/runtime.h> // for minimk_runtime_suspend_*
 #include <minimk/socket.h>  // for minimk_socket_t
@@ -19,8 +20,8 @@ template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_fin
           decltype(minimk_syscall_connect) M_connect = minimk_syscall_connect,
           decltype(minimk_runtime_suspend_write) M_suspend_write = minimk_runtime_suspend_write,
           decltype(minimk_syscall_getsockopt_error) M_getsockopt_error = minimk_syscall_getsockopt_error>
-minimk_error_t minimk_socket_connect_impl(minimk_socket_t sock, const char *address,
-                                          const char *port) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_socket_connect_impl(minimk_socket_t sock, const char *address,
+                                                               const char *port) noexcept {
     MINIMK_TRACE_SOCKET("connect handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("connect address=%s\n", address);
     MINIMK_TRACE_SOCKET("connect port=%s\n", port);

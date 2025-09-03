@@ -8,6 +8,7 @@
 
 #include "info.hpp" // for struct socket_info
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/syscall.h> // for minimk_syscall_*
@@ -17,7 +18,7 @@
 template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
           decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
           decltype(minimk_socket_info_forget) M_info_forget = minimk_socket_info_forget>
-minimk_error_t minimk_socket_destroy_impl(minimk_socket_t *sock) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_socket_destroy_impl(minimk_socket_t *sock) noexcept {
     MINIMK_TRACE_SOCKET("destroy handle=0x%llx\n", CAST_ULL(*sock));
 
     // Idempotent destroy

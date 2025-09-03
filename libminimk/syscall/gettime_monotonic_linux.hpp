@@ -6,6 +6,7 @@
 
 #include "../cast/static.hpp" // for CAST_ULL
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_clearerrno
 #include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
@@ -17,7 +18,8 @@
 template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
           decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
           decltype(clock_gettime) M_vdso_clock_gettime = clock_gettime>
-minimk_error_t minimk_syscall_gettime_monotonic_impl(uint64_t *sec, uint64_t *nsec) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_syscall_gettime_monotonic_impl(uint64_t *sec,
+                                                                          uint64_t *nsec) noexcept {
     // Issue the system/vdso clock_gettime call
     M_minimk_syscall_clearerrno();
     struct timespec ts = {};

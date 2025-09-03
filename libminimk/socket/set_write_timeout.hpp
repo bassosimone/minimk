@@ -8,6 +8,7 @@
 
 #include "info.hpp" // for struct socket_info
 
+#include <minimk/cdefs.h>  // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>  // for minimk_error_t
 #include <minimk/socket.h> // for minimk_socket_t
 #include <minimk/trace.h>  // for MINIMK_TRACE_SOCKET
@@ -16,7 +17,8 @@
 
 /// Testable minimk_socket_set_write_timeout implementation.
 template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find>
-minimk_error_t minimk_socket_set_write_timeout_impl(minimk_socket_t sock, uint64_t nanosec) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_socket_set_write_timeout_impl(minimk_socket_t sock,
+                                                                         uint64_t nanosec) noexcept {
     MINIMK_TRACE_SOCKET("set_write_timeout handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("set_write_timeout nanosec=%llu\n", CAST_ULL(nanosec));
 

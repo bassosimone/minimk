@@ -8,6 +8,7 @@
 
 #include "info.hpp" // for struct socket_info
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/syscall.h> // for minimk_syscall_*
@@ -16,7 +17,7 @@
 /// Testable minimk_socket_listen implementation.
 template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
           decltype(minimk_syscall_listen) M_listen = minimk_syscall_listen>
-minimk_error_t minimk_socket_listen_impl(minimk_socket_t sock, int backlog) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_socket_listen_impl(minimk_socket_t sock, int backlog) noexcept {
     MINIMK_TRACE_SOCKET("listen handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("listen backlog=%d\n", backlog);
 

@@ -34,4 +34,12 @@
 #define MINIMK_UNSAFE_BUFFER_USAGE_END   /* Nothing */
 #endif
 
+/// Macro to always inline templates. In minimk, templates are
+/// just an implementation detail for testability.
+#ifdef __clang__
+#define MINIMK_ALWAYS_INLINE __attribute__((always_inline))
+#else
+#define MINIMK_ALWAYS_INLINE /* Nothing */
+#endif
+
 #endif // MINIMK_CDEFS_H

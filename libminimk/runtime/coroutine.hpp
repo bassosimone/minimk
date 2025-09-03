@@ -12,6 +12,7 @@
 #include "switch.h"    // for minimk_runtime_init_coro_stack
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_invalid_socket
 #include <minimk/time.h>    // for minimk_time_monotonic_now
@@ -22,9 +23,11 @@
 /// Testable implementation of minimk_runtime_coroutine_init.
 template <decltype(minimk_runtime_stack_alloc) M_stack_alloc = minimk_runtime_stack_alloc,
           decltype(minimk_runtime_init_coro_stack) M_init_coro_stack = minimk_runtime_init_coro_stack>
-minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro, void (*trampoline)(void),
-                                                  struct scheduler *sched, void (*entry)(void *opaque),
-                                                  void *opaque) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro,
+                                                                       void (*trampoline)(void),
+                                                                       struct scheduler *sched,
+                                                                       void (*entry)(void *opaque),
+                                                                       void *opaque) noexcept {
     // Zero initialize the whole coroutine
     *coro = {};
 
@@ -59,7 +62,7 @@ minimk_error_t minimk_runtime_coroutine_init_impl(struct coroutine *coro, void (
 
 /// Testable implementation of minimk_runtime_coroutine_finish.
 template <decltype(minimk_runtime_stack_free) M_stack_free = minimk_runtime_stack_free>
-void minimk_runtime_coroutine_finish_impl(struct coroutine *coro) noexcept {
+MINIMK_ALWAYS_INLINE void minimk_runtime_coroutine_finish_impl(struct coroutine *coro) noexcept {
     // Delete the coroutine stack
     auto stack = &coro->stack;
     MINIMK_TRACE_COROUTINE("%p free_stack\n", CAST_VOID_P(coro));
@@ -126,8 +129,9 @@ static inline void minimk_runtime_coroutine_resume_timer_impl(struct coroutine *
 
 /// Parks the current coroutine until the given timeout expires.
 template <decltype(minimk_time_monotonic_now) M_time_now = minimk_time_monotonic_now>
-void minimk_runtime_coroutine_suspend_io_impl(struct coroutine *coro, minimk_syscall_socket_t sock,
-                                              short events, uint64_t nanosec) noexcept {
+MINIMK_ALWAYS_INLINE void minimk_runtime_coroutine_suspend_io_impl(struct coroutine *coro,
+                                                                   minimk_syscall_socket_t sock, short events,
+                                                                   uint64_t nanosec) noexcept {
     // Get the current monotonic clock reading
     uint64_t deadline = M_time_now();
     deadline = minimk_integer_u64_satadd(deadline, nanosec);

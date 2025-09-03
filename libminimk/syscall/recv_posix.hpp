@@ -4,6 +4,7 @@
 #ifndef LIBMINIMK_SYSCALL_RECV_POSIX_HPP
 #define LIBMINIMK_SYSCALL_RECV_POSIX_HPP
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_geterrno
 #include <minimk/time.h>    // for minimk_time_monotonic_now
@@ -19,8 +20,8 @@
 template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
           decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
           decltype(recv) M_sys_recv = recv>
-minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data, size_t count,
-                                        size_t *nread) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data,
+                                                             size_t count, size_t *nread) noexcept {
     // Initialize output parameter immediately
     *nread = 0;
 

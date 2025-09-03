@@ -8,6 +8,7 @@
 
 #include "info.hpp" // for struct socket_info
 
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/socket.h>  // for minimk_socket_t
 #include <minimk/syscall.h> // for minimk_syscall_*
@@ -19,7 +20,8 @@ template <decltype(minimk_syscall_socket) M_socket = minimk_syscall_socket,
           decltype(minimk_syscall_setsockopt_nosigpipe) M_nosigpipe = minimk_syscall_setsockopt_nosigpipe,
           decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
           decltype(minimk_socket_info_create) M_info_create = minimk_socket_info_create>
-minimk_error_t minimk_socket_create_impl(minimk_socket_t *sock, int domain, int type, int protocol) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_socket_create_impl(minimk_socket_t *sock, int domain, int type,
+                                                              int protocol) noexcept {
     // Invalidate the handle, as documented
     *sock = MINIMK_SOCKET_INVALID;
 

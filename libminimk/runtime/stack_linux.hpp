@@ -9,6 +9,7 @@
 #include "stack.h" // for struct stack
 
 #include <minimk/assert.h>  // for MINIMK_ASSERT
+#include <minimk/cdefs.h>   // for MINIMK_ALWAYS_INLINE
 #include <minimk/errno.h>   // for minimk_error_t
 #include <minimk/syscall.h> // for minimk_syscall_clearerrno
 #include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
@@ -50,7 +51,7 @@ static inline size_t minimk_coro_stack_size_impl(size_t page_size) noexcept {
 template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
           decltype(getpagesize) M_sys_getpagesize = getpagesize, decltype(mmap) M_sys_mmap = mmap,
           decltype(mprotect) M_sys_mprotect = mprotect, decltype(munmap) M_sys_munmap = munmap>
-minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
     // Initialize the total amount of memory to allocate including the guard page.
     int page_size_signed = M_sys_getpagesize();
     MINIMK_ASSERT(page_size_signed >= 0);
@@ -103,7 +104,7 @@ minimk_error_t minimk_runtime_stack_alloc_impl(struct stack *sp) noexcept {
 template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
           decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
           decltype(munmap) M_sys_munmap = munmap>
-minimk_error_t minimk_runtime_stack_free_impl(struct stack *sp) noexcept {
+MINIMK_ALWAYS_INLINE minimk_error_t minimk_runtime_stack_free_impl(struct stack *sp) noexcept {
     // Unmap the stack from memory
     void *base = reinterpret_cast<void *>(sp->base);
     M_minimk_syscall_clearerrno();
