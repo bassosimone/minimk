@@ -108,6 +108,7 @@ static inline void minimk_runtime_coroutine_validate_stack_pointer_impl( //
     MINIMK_TRACE_COROUTINE("%p    bottom=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(stack->bottom));
     MINIMK_TRACE_COROUTINE("%p    sp=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(sp));
     MINIMK_TRACE_COROUTINE("%p    top=0x%llx\n", CAST_VOID_P(coro), CAST_ULL(stack->top));
+    (void)context;
 
     MINIMK_ASSERT(sp >= stack->bottom && sp < stack->top);
 }
@@ -165,6 +166,7 @@ static inline minimk_error_t minimk_runtime_coroutine_resume_io_impl(struct coro
     MINIMK_TRACE_COROUTINE("%p    fd=%llu\n", CAST_VOID_P(coro), CAST_ULL(sock));
     MINIMK_TRACE_COROUTINE("%p    events=%llu\n", CAST_VOID_P(coro), CAST_ULL(events));
     MINIMK_TRACE_COROUTINE("%p    revents=%llu\n", CAST_VOID_P(coro), CAST_ULL(revents));
+    (void)sock;
 
     // We have a successful I/O suspend if the event we expected occurred.
     if ((revents & events) != 0) {
