@@ -14,9 +14,8 @@
 #include <minimk/trace.h>   // for MINIMK_TRACE_SOCKET
 
 /// Testable minimk_socket_bind implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
-        decltype(minimk_syscall_bind) M_bind = minimk_syscall_bind>
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
+          decltype(minimk_syscall_bind) M_bind = minimk_syscall_bind>
 minimk_error_t minimk_socket_bind_impl(minimk_socket_t sock, const char *address, const char *port) noexcept {
     MINIMK_TRACE_SOCKET("bind handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("bind address=%s\n", address);

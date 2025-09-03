@@ -11,10 +11,9 @@
 #include <sys/socket.h> // for listen
 
 /// Testable minimk_syscall_listen implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(listen) M_sys_listen = listen>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(listen) M_sys_listen = listen>
 minimk_error_t minimk_syscall_listen_impl(minimk_syscall_socket_t sock, int backlog) noexcept {
     // Log that we're about to invoke the syscall
     MINIMK_TRACE_SYSCALL("listen: fd=%d\n", sock);

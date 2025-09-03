@@ -14,10 +14,9 @@
 #include <minimk/trace.h>   // for MINIMK_TRACE_SOCKET
 
 /// Testable minimk_socket_destroy implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
-        decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
-        decltype(minimk_socket_info_forget) M_info_forget = minimk_socket_info_forget>
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
+          decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
+          decltype(minimk_socket_info_forget) M_info_forget = minimk_socket_info_forget>
 minimk_error_t minimk_socket_destroy_impl(minimk_socket_t *sock) noexcept {
     MINIMK_TRACE_SOCKET("destroy handle=0x%llx\n", CAST_ULL(*sock));
 

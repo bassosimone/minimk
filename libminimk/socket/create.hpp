@@ -14,12 +14,11 @@
 #include <minimk/trace.h>   // for MINIMK_TRACE_SOCKET
 
 /// Testable minimk_socket_create implementation.
-template <
-        decltype(minimk_syscall_socket) M_socket = minimk_syscall_socket,
-        decltype(minimk_syscall_socket_setnonblock) M_setnonblock = minimk_syscall_socket_setnonblock,
-        decltype(minimk_syscall_setsockopt_nosigpipe) M_nosigpipe = minimk_syscall_setsockopt_nosigpipe,
-        decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
-        decltype(minimk_socket_info_create) M_info_create = minimk_socket_info_create>
+template <decltype(minimk_syscall_socket) M_socket = minimk_syscall_socket,
+          decltype(minimk_syscall_socket_setnonblock) M_setnonblock = minimk_syscall_socket_setnonblock,
+          decltype(minimk_syscall_setsockopt_nosigpipe) M_nosigpipe = minimk_syscall_setsockopt_nosigpipe,
+          decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
+          decltype(minimk_socket_info_create) M_info_create = minimk_socket_info_create>
 minimk_error_t minimk_socket_create_impl(minimk_socket_t *sock, int domain, int type, int protocol) noexcept {
     // Invalidate the handle, as documented
     *sock = MINIMK_SOCKET_INVALID;

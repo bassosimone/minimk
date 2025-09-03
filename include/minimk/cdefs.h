@@ -31,7 +31,7 @@
 #define MINIMK_UNSAFE_BUFFER_USAGE_END _Pragma("clang unsafe_buffer_usage end")
 #else
 #define MINIMK_UNSAFE_BUFFER_USAGE_BEGIN /* Nothing */
-#define MINIMK_UNSAFE_BUFFER_USAGE_END /* Nothing */
+#define MINIMK_UNSAFE_BUFFER_USAGE_END   /* Nothing */
 #endif
 
 #endif // MINIMK_CDEFS_H

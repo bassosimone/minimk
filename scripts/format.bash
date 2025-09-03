@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# File: ./scripts/fix_newline_eol.bash
+# File: ./scripts/format.bash
 # Purpose: Add newline at EOF for all C/C++ files missing it
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
@@ -11,4 +11,6 @@ find . -type f \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \
     echo "Adding newline to: $file"
     echo >>"$file"
   fi
+  echo "+ clang-format -i $file"
+  clang-format -i $file
 done

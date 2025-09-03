@@ -89,19 +89,17 @@ void minimk_runtime_coroutine_validate_stack_pointer( //
         const char *context, struct coroutine *coro) MINIMK_NOEXCEPT;
 
 /// Parks the coroutine until the given deadline expires.
-void minimk_runtime_coroutine_suspend_timer(struct coroutine *coro,
-                                            uint64_t deadline) MINIMK_NOEXCEPT;
+void minimk_runtime_coroutine_suspend_timer(struct coroutine *coro, uint64_t deadline) MINIMK_NOEXCEPT;
 
 /// Resume the coroutine after it suspended on timer.
 void minimk_runtime_coroutine_resume_timer(struct coroutine *coro) MINIMK_NOEXCEPT;
 
 /// Parks the coroutine until I/O occurs or the given timeout expires.
-void minimk_runtime_coroutine_suspend_io(struct coroutine *coro, minimk_syscall_socket_t sock,
-                                         short events, uint64_t nanosec) MINIMK_NOEXCEPT;
+void minimk_runtime_coroutine_suspend_io(struct coroutine *coro, minimk_syscall_socket_t sock, short events,
+                                         uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Resume the coroutine after it suspended on I/O.
-minimk_error_t minimk_runtime_coroutine_resume_io(struct coroutine *coro,
-                                                  minimk_syscall_socket_t sock,
+minimk_error_t minimk_runtime_coroutine_resume_io(struct coroutine *coro, minimk_syscall_socket_t sock,
                                                   short events) MINIMK_NOEXCEPT;
 
 /// Mark the coroutine as EXITED so the scheduler will not attempt to

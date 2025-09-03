@@ -62,13 +62,11 @@ void minimk_runtime_scheduler_coroutine_yield(struct scheduler *sched) noexcept 
     minimk_runtime_scheduler_coroutine_yield_impl(sched);
 }
 
-void minimk_runtime_scheduler_coroutine_suspend_timer(struct scheduler *sched,
-                                                      uint64_t nanosec) noexcept {
+void minimk_runtime_scheduler_coroutine_suspend_timer(struct scheduler *sched, uint64_t nanosec) noexcept {
     minimk_runtime_scheduler_coroutine_suspend_timer_impl(sched, nanosec);
 }
 
 minimk_error_t minimk_runtime_scheduler_coroutine_suspend_io( //
-        struct scheduler *sched, minimk_syscall_socket_t sock, short events,
-        uint64_t nanosec) noexcept {
+        struct scheduler *sched, minimk_syscall_socket_t sock, short events, uint64_t nanosec) noexcept {
     return minimk_runtime_scheduler_coroutine_suspend_io_impl(sched, sock, events, nanosec);
 }

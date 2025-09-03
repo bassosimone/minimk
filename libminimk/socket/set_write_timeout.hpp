@@ -15,8 +15,7 @@
 #include <stdint.h> // for UINT64_MAX
 
 /// Testable minimk_socket_set_write_timeout implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find>
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find>
 minimk_error_t minimk_socket_set_write_timeout_impl(minimk_socket_t sock, uint64_t nanosec) noexcept {
     MINIMK_TRACE_SOCKET("set_write_timeout handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("set_write_timeout nanosec=%llu\n", CAST_ULL(nanosec));

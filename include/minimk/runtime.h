@@ -49,12 +49,10 @@ void minimk_runtime_nanosleep(uint64_t nanosec) MINIMK_NOEXCEPT;
 ///
 /// Returns zero if read would not block and an error otherwise. Typically, the
 /// error is MINIMK_ETIMEDOUT in case of I/O timeout.
-minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock,
-                                           uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
 
 /// Like minimk_runtime_suspend_read but for writability.
-minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock,
-                                            uint64_t nanosec) MINIMK_NOEXCEPT;
+minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT;
 
 MINIMK_END_DECLS
 

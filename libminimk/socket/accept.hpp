@@ -15,15 +15,15 @@
 #include <minimk/trace.h>   // for MINIMK_TRACE_SOCKET
 
 /// Testable minimk_socket_accept implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
-        decltype(minimk_syscall_accept) M_accept = minimk_syscall_accept,
-        decltype(minimk_runtime_suspend_read) M_suspend_read = minimk_runtime_suspend_read,
-        decltype(minimk_syscall_socket_setnonblock) M_setnonblock = minimk_syscall_socket_setnonblock,
-        decltype(minimk_syscall_setsockopt_nosigpipe) M_nosigpipe = minimk_syscall_setsockopt_nosigpipe,
-        decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
-        decltype(minimk_socket_info_create) M_info_create = minimk_socket_info_create>
-minimk_error_t minimk_socket_accept_impl(minimk_socket_t *client_sock, minimk_socket_t listener_sock) noexcept {
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
+          decltype(minimk_syscall_accept) M_accept = minimk_syscall_accept,
+          decltype(minimk_runtime_suspend_read) M_suspend_read = minimk_runtime_suspend_read,
+          decltype(minimk_syscall_socket_setnonblock) M_setnonblock = minimk_syscall_socket_setnonblock,
+          decltype(minimk_syscall_setsockopt_nosigpipe) M_nosigpipe = minimk_syscall_setsockopt_nosigpipe,
+          decltype(minimk_syscall_closesocket) M_closesocket = minimk_syscall_closesocket,
+          decltype(minimk_socket_info_create) M_info_create = minimk_socket_info_create>
+minimk_error_t minimk_socket_accept_impl(minimk_socket_t *client_sock,
+                                         minimk_socket_t listener_sock) noexcept {
     MINIMK_TRACE_SOCKET("accept listenerfd=0x%llx\n", CAST_ULL(listener_sock));
 
     // Invalidate the handle, as documented

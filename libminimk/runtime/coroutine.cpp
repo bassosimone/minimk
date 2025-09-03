@@ -18,8 +18,7 @@ void minimk_runtime_coroutine_finish(struct coroutine *coro) noexcept {
     minimk_runtime_coroutine_finish_impl(coro);
 }
 
-void minimk_runtime_coroutine_maybe_resume(struct coroutine *coro, uint64_t now,
-                                           short revents) noexcept {
+void minimk_runtime_coroutine_maybe_resume(struct coroutine *coro, uint64_t now, short revents) noexcept {
     return minimk_runtime_coroutine_maybe_resume_impl(coro, now, revents);
 }
 
@@ -36,13 +35,12 @@ void minimk_runtime_coroutine_resume_timer(struct coroutine *coro) noexcept {
     minimk_runtime_coroutine_resume_timer_impl(coro);
 }
 
-void minimk_runtime_coroutine_suspend_io(struct coroutine *coro, minimk_syscall_socket_t sock,
-                                         short events, uint64_t nanosec) noexcept {
+void minimk_runtime_coroutine_suspend_io(struct coroutine *coro, minimk_syscall_socket_t sock, short events,
+                                         uint64_t nanosec) noexcept {
     minimk_runtime_coroutine_suspend_io_impl(coro, sock, events, nanosec);
 }
 
-minimk_error_t minimk_runtime_coroutine_resume_io(struct coroutine *coro,
-                                                  minimk_syscall_socket_t sock,
+minimk_error_t minimk_runtime_coroutine_resume_io(struct coroutine *coro, minimk_syscall_socket_t sock,
                                                   short events) noexcept {
     return minimk_runtime_coroutine_resume_io_impl(coro, sock, events);
 }

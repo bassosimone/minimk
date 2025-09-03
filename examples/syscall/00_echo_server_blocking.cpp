@@ -32,8 +32,7 @@ static void handle_client(minimk_syscall_socket_t client_sock) {
         MINIMK_ASSERT(nread > 0);
 
         // Echo back the data
-        rv = minimk_io_writeall<minimk_syscall_socket_t, minimk_syscall_send>(client_sock, buffer,
-                                                                              nread);
+        rv = minimk_io_writeall<minimk_syscall_socket_t, minimk_syscall_send>(client_sock, buffer, nread);
 
         // Handle potential errors
         if (rv != 0) {

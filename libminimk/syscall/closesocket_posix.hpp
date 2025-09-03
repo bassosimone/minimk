@@ -11,10 +11,9 @@
 #include <unistd.h> // for close
 
 /// Testable minimk_syscall_closesocket implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(close) M_sys_close = close>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(close) M_sys_close = close>
 minimk_error_t minimk_syscall_closesocket_impl(minimk_syscall_socket_t *sock) noexcept {
     // Log that we're about to invoke the syscall
     MINIMK_TRACE_SYSCALL("close: fd=%d\n", *sock);

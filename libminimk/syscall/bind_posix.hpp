@@ -13,11 +13,10 @@
 #include <netdb.h> // for getaddrinfo
 
 /// Testable minimk_syscall_bind implementation.
-template <
-        decltype(getaddrinfo) M_libc_getaddrinfo = getaddrinfo,
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(bind) M_sys_bind = bind>
+template <decltype(getaddrinfo) M_libc_getaddrinfo = getaddrinfo,
+          decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(bind) M_sys_bind = bind>
 minimk_error_t minimk_syscall_bind_impl(minimk_syscall_socket_t sock, const char *address,
                                         const char *port) noexcept {
     // Use getaddrinfo to obtain a sockaddr_storage

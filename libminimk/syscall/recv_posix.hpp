@@ -16,10 +16,9 @@
 #include <stddef.h> // for size_t
 
 /// Testable minimk_syscall_recv implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(recv) M_sys_recv = recv>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(recv) M_sys_recv = recv>
 minimk_error_t minimk_syscall_recv_impl(minimk_syscall_socket_t sock, void *data, size_t count,
                                         size_t *nread) noexcept {
     // Initialize output parameter immediately

@@ -14,10 +14,9 @@
 #include <stdint.h> // for UINT16_MAX
 
 /// Testable minimk_syscall_poll implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(poll) M_sys_poll = poll>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(poll) M_sys_poll = poll>
 minimk_error_t minimk_syscall_poll_impl(minimk_syscall_pollfd_t *fds, size_t size, int timeout,
                                         size_t *nready) noexcept {
     // As documented, camp the maximum number of descriptors.

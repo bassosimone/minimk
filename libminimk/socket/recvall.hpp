@@ -14,8 +14,7 @@
 #include <stddef.h> // for size_t
 
 /// Testable minimk_socket_recvall implementation.
-template <
-        decltype(minimk_socket_recv) M_recv = minimk_socket_recv>
+template <decltype(minimk_socket_recv) M_recv = minimk_socket_recv>
 minimk_error_t minimk_socket_recvall_impl(minimk_socket_t sock, void *buf, size_t count) noexcept {
     MINIMK_TRACE_SOCKET("recvall handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("recvall count=%zu\n", count);

@@ -11,10 +11,9 @@
 #include <sys/socket.h> // for socket
 
 /// Testable minimk_syscall_socket implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(socket) M_sys_socket = socket>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(socket) M_sys_socket = socket>
 minimk_error_t minimk_syscall_socket_impl(minimk_syscall_socket_t *sock, int domain, int type,
                                           int protocol) noexcept {
     // Log that we're about to invoke the syscall

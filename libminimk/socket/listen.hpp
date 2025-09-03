@@ -14,9 +14,8 @@
 #include <minimk/trace.h>   // for MINIMK_TRACE_SOCKET
 
 /// Testable minimk_socket_listen implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
-        decltype(minimk_syscall_listen) M_listen = minimk_syscall_listen>
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
+          decltype(minimk_syscall_listen) M_listen = minimk_syscall_listen>
 minimk_error_t minimk_socket_listen_impl(minimk_socket_t sock, int backlog) noexcept {
     MINIMK_TRACE_SOCKET("listen handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("listen backlog=%d\n", backlog);

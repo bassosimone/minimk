@@ -10,14 +10,13 @@
 #include <sys/socket.h> // for setsockopt
 
 #ifdef SO_NOSIGPIPE
-#include <minimk/trace.h>   // for MINIMK_TRACE_SYSCALL
+#include <minimk/trace.h> // for MINIMK_TRACE_SYSCALL
 #endif
 
 /// Testable minimk_syscall_setsockopt_nosigpipe implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(setsockopt) M_sys_setsockopt = setsockopt>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(setsockopt) M_sys_setsockopt = setsockopt>
 minimk_error_t minimk_syscall_setsockopt_nosigpipe_impl(minimk_syscall_socket_t sock) noexcept {
 #ifdef SO_NOSIGPIPE
     // Log that we're about to invoke the syscall

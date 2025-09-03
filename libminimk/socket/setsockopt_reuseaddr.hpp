@@ -14,9 +14,9 @@
 #include <minimk/trace.h>   // for MINIMK_TRACE_SOCKET
 
 /// Testable minimk_socket_setsockopt_reuseaddr implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
-        decltype(minimk_syscall_setsockopt_reuseaddr) M_setsockopt_reuseaddr = minimk_syscall_setsockopt_reuseaddr>
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
+          decltype(minimk_syscall_setsockopt_reuseaddr) M_setsockopt_reuseaddr =
+                  minimk_syscall_setsockopt_reuseaddr>
 minimk_error_t minimk_socket_setsockopt_reuseaddr_impl(minimk_socket_t sock) noexcept {
     MINIMK_TRACE_SOCKET("setsockopt_reuseaddr handle=0x%llx\n", CAST_ULL(sock));
 

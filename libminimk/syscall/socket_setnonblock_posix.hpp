@@ -11,10 +11,9 @@
 #include <fcntl.h> // for fcntl
 
 /// Testable minimk_syscall_socket_setnonblock implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(fcntl) M_sys_fcntl2 = fcntl, decltype(fcntl) M_sys_fcntl3 = fcntl>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(fcntl) M_sys_fcntl2 = fcntl, decltype(fcntl) M_sys_fcntl3 = fcntl>
 minimk_error_t minimk_syscall_socket_setnonblock_impl(minimk_syscall_socket_t sock) noexcept {
     // Log that we're about to get the flags
     MINIMK_TRACE_SYSCALL("fcntl: fd=%d\n", sock);

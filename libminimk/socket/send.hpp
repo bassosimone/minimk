@@ -17,11 +17,11 @@
 #include <stddef.h> // for size_t
 
 /// Testable minimk_socket_send implementation.
-template <
-        decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
-        decltype(minimk_syscall_send) M_send = minimk_syscall_send,
-        decltype(minimk_runtime_suspend_write) M_suspend_write = minimk_runtime_suspend_write>
-minimk_error_t minimk_socket_send_impl(minimk_socket_t sock, const void *data, size_t count, size_t *nwritten) noexcept {
+template <decltype(minimk_socket_info_find) M_info_find = minimk_socket_info_find,
+          decltype(minimk_syscall_send) M_send = minimk_syscall_send,
+          decltype(minimk_runtime_suspend_write) M_suspend_write = minimk_runtime_suspend_write>
+minimk_error_t minimk_socket_send_impl(minimk_socket_t sock, const void *data, size_t count,
+                                       size_t *nwritten) noexcept {
     MINIMK_TRACE_SOCKET("send handle=0x%llx\n", CAST_ULL(sock));
     MINIMK_TRACE_SOCKET("send count=%zu\n", count);
 

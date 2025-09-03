@@ -37,13 +37,10 @@ void minimk_runtime_nanosleep(uint64_t nanosec) noexcept {
     minimk_runtime_scheduler_coroutine_suspend_timer(&s0, nanosec);
 }
 
-minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock,
-                                           uint64_t nanosec) MINIMK_NOEXCEPT {
+minimk_error_t minimk_runtime_suspend_read(minimk_syscall_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
     return minimk_runtime_scheduler_coroutine_suspend_io(&s0, sock, minimk_syscall_pollin, nanosec);
 }
 
-minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock,
-                                            uint64_t nanosec) MINIMK_NOEXCEPT {
-    return minimk_runtime_scheduler_coroutine_suspend_io(&s0, sock, minimk_syscall_pollout,
-                                                         nanosec);
+minimk_error_t minimk_runtime_suspend_write(minimk_syscall_socket_t sock, uint64_t nanosec) MINIMK_NOEXCEPT {
+    return minimk_runtime_scheduler_coroutine_suspend_io(&s0, sock, minimk_syscall_pollout, nanosec);
 }

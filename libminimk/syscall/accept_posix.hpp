@@ -12,10 +12,9 @@
 #include <sys/socket.h> // for accept
 
 /// Testable minimk_syscall_accept implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(accept) M_sys_accept = accept>
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(accept) M_sys_accept = accept>
 minimk_error_t minimk_syscall_accept_impl(minimk_syscall_socket_t *client_sock,
                                           minimk_syscall_socket_t sock) noexcept {
     // Log that we're about to invoke the syscall

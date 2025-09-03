@@ -16,12 +16,11 @@
 #include <stddef.h> // for size_t
 
 /// Testable minimk_syscall_send implementation.
-template <
-        decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
-        decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
-        decltype(send) M_sys_send = send>
-minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void *data,
-                                        size_t count, size_t *nwritten) noexcept {
+template <decltype(minimk_syscall_clearerrno) M_minimk_syscall_clearerrno = minimk_syscall_clearerrno,
+          decltype(minimk_syscall_geterrno) M_minimk_syscall_geterrno = minimk_syscall_geterrno,
+          decltype(send) M_sys_send = send>
+minimk_error_t minimk_syscall_send_impl(minimk_syscall_socket_t sock, const void *data, size_t count,
+                                        size_t *nwritten) noexcept {
     // Initialize output parameter immediately
     *nwritten = 0;
 
